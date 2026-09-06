@@ -1,0 +1,68 @@
+{
+  "slug": "eclipse-explainer",
+  "type": "DHARMIC_CONCEPT",
+  "status": "PUBLISHED",
+  "category": "dharmic-concepts",
+  "subCategory": "meanings-practices",
+  "hueClass": "h-data",
+  "readMinutes": 6,
+  "isFestival": false,
+  "isFeatured": false,
+  "relatedSlugs": ["aja-ekadashi", "shravana-putrada-ekadashi"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 3,
+    "sourceName": "Dharmasindhu",
+    "sourceRef": "Grahana-prakarana — sutak and observance rules",
+    "sourceClass": "NIBANDHA",
+    "confidenceNote": "The sutak windows and eclipse-day observances are codified in the nibandha literature; most fears attached to eclipses today have no source there or anywhere else."
+  },
+  "lang": {
+    "en": {
+      "title": "Grahan and Sutak — what an eclipse actually asks of you",
+      "heroSubtitle": "The shadow, the sutak window, and the fears that have no source.",
+      "deck": "What a grahan is, where the sutak rules actually come from, what tradition sets aside during one — and the eclipse fears that deserve to end.",
+      "introHtml": "<p>An eclipse is a shadow: the Moon passing through the Earth's, or the Moon's falling across the Sun. Hindu astronomy has computed both with precision for over fifteen centuries — the tradition that names the grahan also predicts it to the minute. The observances around an eclipse come from the dharmashastra digests, and they are calm, limited and practical. The dread that surrounds eclipses today is not in those texts. This explainer separates the two.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "The rule most people never hear",
+          "text": "The sutak is observed only where the grahan is visible; where the eclipse is not seen, no restriction applies.",
+          "meta": { "attribution": "Dharmasindhu, Grahana-prakarana" }
+        },
+        {
+          "type": "PROSE",
+          "title": "What a grahan is",
+          "text": "A chandra grahan (lunar eclipse) happens when the Earth stands between Sun and Moon and its shadow crosses the full Moon. A surya grahan (solar eclipse) happens when the new Moon crosses in front of the Sun. Both are orbital geometry, and the Hindu astronomical tradition — the Surya Siddhanta and the siddhantic texts after it — treats them exactly that way, computing their timings centuries in advance. In the dharmic frame, the grahan is a marked time: a window traditionally given to stillness, japa and snan rather than to new undertakings. Marked time is not dangerous time."
+        },
+        {
+          "type": "ORIGIN",
+          "title": "Where sutak comes from",
+          "text": "Sutak is the quiet period the nibandha texts, the Dharmasindhu chief among them, attach to an eclipse: from roughly four praharas (about twelve hours) before a surya grahan, and three praharas (about nine hours) before a chandra grahan, until the eclipse releases. During it, tradition pauses eating, temple worship and new beginnings, and takes a snan at moksha — the eclipse's end. Two limits in the texts themselves keep sutak humane: it applies only where the eclipse is actually visible, and children, the elderly, the ill and pregnant women are expressly permitted food and medicine. Sutak is a devotional pause, not a quarantine.",
+          "meta": { "attribution": "Dharmasindhu, Grahana-prakarana" }
+        },
+        {
+          "type": "PROSE",
+          "title": "What tradition sets aside — and what it never asked",
+          "text": "Within a visible eclipse's sutak, tradition sets aside meals, murti-sparsh in temples and muhurat-dependent beginnings, and favours japa, path and daan — the eclipse hours are considered especially fruitful for mantra. That is the whole of it. The texts do not ask you to fear the sky, to stay frozen indoors, to throw away food, or to book a remedial puja. If an eclipse is not visible in your city, the panchang position is simple: for you, that day carries no sutak at all."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Eclipse fears — answered",
+          "myths": [
+            { "question": "Will an eclipse harm my unborn child if I move around or step outside?", "answer": "No text grounds this fear. The shastra's actual provision runs the other way — pregnant women are expressly exempted from sutak's fasting and permitted food, rest and medicine. Resting during the eclipse is a caring custom; harm from a shadow is not Dharma, and not science." },
+            { "question": "Does food cooked before an eclipse become poisonous?", "answer": "No. The texts ask that eating pause during sutak — a devotional fast, not a contamination warning. The custom of placing tulsi or kusha on stored food is a pratha of sanctity. Refrigerated food after an eclipse is exactly as safe as before it." },
+            { "question": "Is a grahan a bad omen that requires a dosh-nivaran puja?", "answer": "The same tradition that observes grahan predicts it to the minute — the Surya Siddhanta treats eclipses as celestial mechanics, not wrath. Japa and daan during the eclipse are the traditional observances, and they are free. A fear-priced 'remedy' puja has no textual basis." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "ग्रहण और सूतक — ग्रहण वास्तव में आपसे क्या माँगता है",
+      "heroSubtitle": "छाया, सूतक की अवधि, और वे भय जिनका कोई स्रोत नहीं।",
+      "deck": "ग्रहण क्या है, सूतक के नियम वास्तव में कहाँ से आते हैं, परंपरा ग्रहण में क्या स्थगित करती है — और वे भय जिन्हें समाप्त होना चाहिए।",
+      "introHtml": "<p>ग्रहण एक छाया है: पृथ्वी की छाया में से गुजरता चंद्रमा, या सूर्य के आगे से गुजरता चंद्रमा। हिंदू ज्योतिष पंद्रह शताब्दियों से दोनों की गणना मिनट तक करता आया है — जो परंपरा ग्रहण को नाम देती है, वही उसकी भविष्यवाणी भी करती है। ग्रहण के आचार धर्मशास्त्र निबंधों से आते हैं, और वे शांत, सीमित और व्यावहारिक हैं। आज ग्रहण से जुड़ा भय उन ग्रंथों में नहीं है। यह लेख दोनों को अलग करता है।</p>",
+      "blocks": []
+    }
+  }
+}

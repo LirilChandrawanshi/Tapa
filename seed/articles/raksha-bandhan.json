@@ -1,0 +1,99 @@
+{
+  "slug": "raksha-bandhan",
+  "type": "RITUAL_GUIDE",
+  "status": "DRAFT",
+  "category": "ritual-guides",
+  "subCategory": "festive-pujans",
+  "hueClass": "h-thread",
+  "readMinutes": 6,
+  "observanceDate": "2026-08-28",
+  "linkedObservanceSlug": "raksha-bandhan-2026",
+  "circleTeaser": "Raksha Bandhan tomorrow. A thread, a tilak and a blessing — the bond is the ritual.",
+  "reminderDaysBefore": 1,
+  "isFestival": true,
+  "isFeatured": false,
+  "relatedSlugs": ["nag-panchami", "hariyali-teej", "sawan-somwar-vrat"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Bhavishya Purana",
+    "sourceRef": "Uttara Parva — Indra–Shachi raksha katha",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "The Shravana Purnima raksha thread and its mantra are Puranic; the brother–sister form the day now carries is later, beloved custom."
+  },
+  "lang": {
+    "en": {
+      "title": "Raksha Bandhan",
+      "heroSubtitle": "The thread of protection on Shravana Purnima — a bond, not a bargain.",
+      "deck": "Where the rakhi actually comes from, the mantra spoken over it, and a simple home vidhi for the day of the thread.",
+      "introHtml": "<p>Before the rakhi was a brother–sister festival, it was a raksha — a consecrated thread tied on Shravana Purnima. The Bhavishya Purana tells of Shachi tying such a thread on Indra before his battle, and of the mantra still spoken over every rakhi today. The brother–sister form the day now carries is a later flowering, and a beautiful one. The core has never changed: a thread, a wish for protection, and a bond named out loud.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this day",
+          "text": "With this thread was bound the mighty king of the danavas; by its strength Indra stood unshaken in battle.",
+          "meta": { "attribution": "Bhavishya Purana, Uttara Parva" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम भ्रातुः (भगिन्याः) रक्षार्थं दीर्घायुरारोग्यसिद्ध्यर्थं रक्षाबन्धनं करिष्ये।",
+            "transliteration": "mama bhrātuḥ (bhaginyāḥ) rakṣārthaṃ dīrghāyur-ārogya-siddhyarthaṃ rakṣā-bandhanaṃ kariṣye",
+            "gloss": "For the protection, long life and wellbeing of my brother (or sister), I tie this raksha. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "Rakhi", "note": "any thread tied with love is a raksha", "optional": false },
+            { "name": "Roli or kumkum", "note": "for the tilak", "optional": false },
+            { "name": "Akshat", "note": "unbroken rice for the tilak", "optional": false },
+            { "name": "Diya and ghee", "note": "for the aarti", "optional": false },
+            { "name": "Mishri or sweets", "note": "", "optional": false },
+            { "name": "Coconut", "note": "placed in the thali in many homes", "optional": true }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Step-by-step",
+          "steps": [
+            { "number": 1, "title": "Prepare the thali", "description": "Arrange the rakhi, roli, akshat, diya and sweets on a clean thali. Light the diya.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 2, "title": "Tilak and akshat", "description": "Apply the roli tilak on the brother's forehead and press a few grains of akshat over it.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 3, "title": "Tie the rakhi with the raksha mantra", "description": "Tie the thread on the right wrist while speaking the raksha mantra — or your own words of blessing.", "mantraChip": "येन बद्धो बली राजा…", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 4, "title": "Aarti and sweets", "description": "Circle the diya before him, then share the sweets — each feeding the other.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 5, "title": "The brother's vachan and gift", "description": "The brother speaks his promise of protection and gives a gift as love allows. The gift measures affection, never obligation.", "note": "The return gift is warm custom, not a rule — a promise spoken plainly is the real vachan.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Pan-India household custom" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The raksha mantra",
+          "mantra": {
+            "devanagari": "येन बद्धो बली राजा दानवेन्द्रो महाबलः। तेन त्वामनुबध्नामि रक्षे मा चल मा चल॥",
+            "transliteration": "yena baddho balī rājā dānavendro mahābalaḥ, tena tvām anubadhnāmi rakṣe mā cala mā cala",
+            "meaning": "With the thread that bound the mighty Bali, king of the danavas, I bind you — O raksha, do not waver, do not waver.",
+            "defaultCount": 1,
+            "presets": [1, 3, 11]
+          }
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "Is it inauspicious — even dangerous — to tie a rakhi during Bhadra?", "answer": "Avoiding Bhadra for the tying is a jyotisha custom, and following it is fine. But no text threatens harm to a brother over the clock. A rakhi tied late, with love, protects exactly as well." },
+            { "question": "My brother lives abroad — does a rakhi sent by post 'count'?", "answer": "Yes. The raksha is the sankalp and the bond, not the ceremony's geometry. Tie it over a video call, or let him tie the posted rakhi himself with your words read aloud." },
+            { "question": "Is Raksha Bandhan only for blood brothers and sisters?", "answer": "No. The Purana's own raksha was tied by a wife on her husband before battle. Cousins, friends, anyone whose protection you wish — the thread has always been wider than one relationship." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "रक्षाबंधन",
+      "heroSubtitle": "श्रावण पूर्णिमा का रक्षासूत्र — एक बंधन, कोई सौदा नहीं।",
+      "deck": "राखी वास्तव में कहाँ से आई, उस पर बोला जाने वाला मंत्र, और धागे के दिन की सरल घरेलू विधि।",
+      "introHtml": "<p>भाई-बहन का पर्व बनने से पहले राखी एक रक्षा थी — श्रावण पूर्णिमा को बाँधा जाने वाला अभिमंत्रित सूत्र। भविष्य पुराण में शची द्वारा युद्ध से पहले इंद्र को यह सूत्र बाँधने की कथा है, और वही मंत्र आज भी हर राखी पर बोला जाता है। मूल कभी नहीं बदला: एक धागा, रक्षा की कामना, और खुलकर कहा गया एक बंधन।</p>",
+      "blocks": []
+    }
+  }
+}

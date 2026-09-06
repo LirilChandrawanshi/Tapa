@@ -1,0 +1,93 @@
+{
+  "slug": "nag-panchami",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "festive-pujans",
+  "hueClass": "h-thread",
+  "readMinutes": 7,
+  "observanceDate": "2026-08-17",
+  "linkedObservanceSlug": "nag-panchami-2026",
+  "circleTeaser": "Nag Panchami tomorrow. Offer milk to the image, never to live snakes. A short home puja is enough.",
+  "reminderDaysBefore": 1,
+  "isFestival": true,
+  "isFeatured": false,
+  "relatedSlugs": ["sawan-somwar-vrat", "hariyali-teej", "raksha-bandhan"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Bhavishya Purana",
+    "sourceRef": "Nag Panchami katha — Shravana Shukla Panchami",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "Worship of the nagas on this Panchami is named in the Purana; wall drawings, anthill visits and the milk-for-live-snakes practice are custom or misconception."
+  },
+  "lang": {
+    "en": {
+      "title": "Nag Panchami",
+      "heroSubtitle": "The day the serpent devtas are honoured — with reverence, not fear.",
+      "deck": "Who the nagas are, what the scripture actually asks on this Panchami, and a simple home puja that harms no living creature.",
+      "introHtml": "<p>On the fifth day of Shravana's bright fortnight, the nagas — the serpent devtas of the Puranas — are honoured. The worship is of the deity, offered before an image. It was never meant to involve a living snake. This guide keeps what the texts ask, names what is custom, and corrects the one practice that should end.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this day",
+          "text": "He who honours the nagas on the Panchami of Shravana — Ananta, Vasuki, Takshaka and the rest — his household knows no fear of serpents.",
+          "meta": { "attribution": "Bhavishya Purana, Nag Panchami katha" }
+        },
+        {
+          "type": "ORIGIN",
+          "title": "Who the nagas are",
+          "text": "The Puranas name eight great nagas — Ananta, Vasuki, Padma, Mahapadma, Takshaka, Kulika, Karkotaka and Shankha. Ananta bears the earth; Vasuki circles Shiva's neck and served as the rope at the churning of the ocean. Honouring them on this day is an old acknowledgement that the monsoon earth belongs to more creatures than us.",
+          "meta": { "attribution": "Bhavishya Purana" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम सकुटुम्बस्य निर्भयत्वसिद्ध्यर्थं नागपञ्चमीपूजनं करिष्ये।",
+            "transliteration": "mama sakuṭumbasya nirbhayatva-siddhyarthaṃ nāga-pañcamī-pūjanaṃ kariṣye",
+            "gloss": "For the fearlessness and wellbeing of my family, I perform this Nag Panchami puja. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "VIDHI",
+          "title": "Step-by-step puja",
+          "steps": [
+            { "number": 1, "title": "Bathe and clean the puja space", "description": "Morning bath, clean clothes. Wipe the altar or a clean patch of wall near the entrance.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 2, "title": "Place or draw the nag image", "description": "A printed image or small idol of the Nag Devta works fully. Many homes draw serpent figures with haldi, geru or cow-dung paste on the wall or a wooden board.", "note": "The wall drawing is regional custom; any respectful image is complete.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Pan-India — wall and board drawings strongest in Maharashtra, Karnataka, Bengal and the South" } },
+            { "number": 3, "title": "Take the sankalp", "description": "Sit facing east. Take water in your right palm, speak the sankalp, and let the water fall.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 4, "title": "Offer milk, haldi, akshat and flowers — before the image", "description": "Place a small bowl of milk, haldi-kumkum, unbroken rice and flowers before the image. The offering is to the deity, through the image — never to a living snake.", "note": "Milk offered at the image is tradition. Milk fed to live snakes harms them — snakes cannot digest it.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 5, "title": "Recite the names of the ashta nagas", "description": "Ananta, Vasuki, Padma, Mahapadma, Takshaka, Kulika, Karkotaka, Shankha — spoken once each with folded hands, or read the Nag Panchami katha.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 6, "title": "Aarti and prasad", "description": "Light the diya, close with a short aarti, and share the prasad. If you keep a fast today, it opens after this puja or in the evening, as your family observes.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } }
+          ]
+        },
+        {
+          "type": "FASTING",
+          "title": "Your fast today",
+          "fasting": [
+            { "name": "Full-day fast", "description": "Kept until the evening puja in many households. Only if your body allows.", "recommended": false },
+            { "name": "Sajal", "description": "Water, milk and fruit through the day; one sattvik meal after the puja.", "recommended": true },
+            { "name": "No fast", "description": "The puja alone is a complete observance of Nag Panchami. Fasting is optional on this day.", "recommended": false }
+          ],
+          "text": "The Panchami asks for worship; the fast is a devotional addition, not a mandate. Choose what suits your body."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "Should I pour milk on a live snake, or pay someone who carries one?", "answer": "No. Snakes cannot digest milk — it sickens and often kills them, and captive display snakes suffer badly. The scriptural offering is made before an image. Honouring the naga means not harming one." },
+            { "question": "If I skip Nag Panchami, will 'sarp dosh' or misfortune strike my family?", "answer": "No text threatens a household for a missed observance. Dosh-nivaran pujas sold on fear are commerce, not Dharma. Observe the day when you can, with devotion." },
+            { "question": "Is it true you must not dig the earth or cut vegetables today?", "answer": "Setting aside digging and ploughing is an old custom of care for creatures that live in the soil — a gentle pratha, not a rule whose breach brings harm." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "नाग पंचमी",
+      "heroSubtitle": "नाग देवताओं के सम्मान का दिन — श्रद्धा से, भय से नहीं।",
+      "deck": "नाग कौन हैं, शास्त्र इस पंचमी को वास्तव में क्या कहता है, और एक सरल घरेलू पूजा जो किसी जीव को हानि नहीं पहुँचाती।",
+      "introHtml": "<p>श्रावण शुक्ल पंचमी को पुराणों के नाग देवताओं का पूजन होता है। यह पूजा प्रतिमा के समक्ष, देवता की है — किसी जीवित सर्प की कभी नहीं। यह मार्गदर्शिका शास्त्र की बात रखती है, प्रथा को प्रथा कहती है, और उस एक प्रथा को सुधारती है जिसे समाप्त होना चाहिए।</p>",
+      "blocks": []
+    }
+  }
+}

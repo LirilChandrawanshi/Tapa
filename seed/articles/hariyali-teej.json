@@ -1,0 +1,120 @@
+{
+  "slug": "hariyali-teej",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "festive-pujans",
+  "hueClass": "h-teej",
+  "readMinutes": 8,
+  "observanceDate": "2026-08-15",
+  "linkedObservanceSlug": "hariyali-teej-2026",
+  "circleTeaser": "Hariyali Teej tomorrow. Green is custom; devotion is the vrat. A simple home puja is enough.",
+  "reminderDaysBefore": 1,
+  "isFestival": true,
+  "isFeatured": false,
+  "relatedSlugs": ["sawan-somwar-vrat", "kajari-teej", "hartalika-teej"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Shiva Purana",
+    "sourceRef": "Rudra Samhita / Parvati Khanda",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "Parvati's tapasya and Shiva's acceptance of her on this Tritiya are told in the Purana; green attire, swings and mehndi are regional custom."
+  },
+  "lang": {
+    "en": {
+      "title": "Hariyali Teej",
+      "heroSubtitle": "The Shravana Tritiya of Parvati's devotion — kept with love, not fear.",
+      "deck": "The story behind the green Teej, what the vrat actually asks of you, and a complete home vidhi for Shiva and Parvati.",
+      "introHtml": "<p>At the heart of this day is a story from the Shiva Purana: Parvati's long tapasya to be united with Shiva, and his acceptance of her on this Tritiya. The vrat observed today is a way of stepping into that same devotion — not a transaction, but a remembering.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "By her unwavering tapasya on this Tritiya of Shravana, Parvati won what no offering of wealth could win — the heart of Shiva himself.",
+          "meta": { "attribution": "Shiva Purana, Rudra Samhita — Parvati Khanda" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "text": "Before the puja, before the fast — sit quietly and state your intention. This is the first act, not a preparation for the ritual. The sankalpa is the ritual's beginning.",
+          "sankalpa": {
+            "devanagari": "मम शिवपार्वतीप्रसादप्राप्त्यर्थं हरियालीतृतीयाव्रतं करिष्ये।",
+            "transliteration": "mama śiva-pārvatī-prasāda-prāptyarthaṃ hariyālī-tṛtīyā-vrataṃ kariṣye",
+            "gloss": "I observe this vrat today with devotion, for the wellbeing of my loved ones and the grace of Shiva–Parvati. No Sanskrit required — sincerity is the sankalp."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "Water or Panchamrit", "note": "for abhishek", "optional": false },
+            { "name": "Sindoor", "note": "for Maa Parvati", "optional": false },
+            { "name": "Bangles", "note": "green, optional (Pratha)", "optional": true },
+            { "name": "Flowers", "note": "", "optional": false },
+            { "name": "Deepak and ghee", "note": "", "optional": false },
+            { "name": "Incense", "note": "", "optional": true },
+            { "name": "Shiva–Parvati image or idol", "note": "size and material do not matter", "optional": false },
+            { "name": "Ganesh image or idol", "note": "optional", "optional": true }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Step-by-step puja",
+          "steps": [
+            { "number": 1, "title": "Bathe and dress", "description": "Full bath before the puja. Wear fresh clothes. Green is traditional for Hariyali Teej, but any clean clothes are fine.", "note": "Green attire and bangles are regional custom — not a scriptural rule.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 2, "title": "Set up the altar", "description": "Place an image or idol of Lord Shiva, Maa Parvati and Ganesha on a clean cloth. Size and material do not matter.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 3, "title": "Abhishek — offer to Lord Shiva", "description": "Pour water or milk over the Shivling or image. Panchamrit if you have it — clean water is completely fine.", "mantraChip": "ॐ नमः शिवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 4, "title": "Offer to Maa Parvati", "description": "Sindoor, bangles and flowers placed before Maa Parvati. You're offering what you wear yourself — an act of solidarity with her tapasya.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 5, "title": "Vrat Katha", "description": "The sacred story — why this day exists. Listen or read. Both are equal.", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 6, "title": "Evening aarti and bhajans", "description": "Light a diya, do aarti, sing or play a bhajan. Jhula (swing) gatherings and Teej songs close the day in many homes.", "note": "Swings, mehndi and Teej songs are beloved pratha, not a requirement.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "North India — strongest in Rajasthan, UP, Bihar, Haryana" } },
+            { "number": 7, "title": "Break the fast — Udyapan", "description": "Next morning after a bath. Or after moonrise this evening if you observed a Sajal or Phalahar fast. The vrat is complete.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The mantra",
+          "mantra": {
+            "devanagari": "ॐ नमः शिवाय",
+            "transliteration": "oṃ namaḥ śivāya",
+            "meaning": "I bow to Lord Shiva, the auspicious one.",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "KATHA",
+          "title": "Vrat Katha — the sacred story",
+          "text": "Parvati, born to Himavan, resolved that she would accept no one but Shiva. Through years of tapasya — in heat, in rain, on a single leaf's worth of food and then on nothing at all — she held to that resolve. On the Tritiya of Shravana's bright fortnight, Shiva accepted her. The green of this day is the green of that monsoon; the vrat is a remembering of a devotion that asked for nothing except union with the divine.",
+          "meta": { "attribution": "Shiva Purana, Rudra Samhita / Parvati Khanda" }
+        },
+        {
+          "type": "FASTING",
+          "title": "Your fast today",
+          "fasting": [
+            { "name": "Nirjala", "description": "No food or water at all. Only for the able-bodied and experienced.", "recommended": false },
+            { "name": "Sajal", "description": "Water is allowed through the day. One sattvik meal after the evening puja.", "recommended": true },
+            { "name": "Phalahar", "description": "Fruit-based diet. Right for pregnancy, illness and age.", "recommended": false }
+          ],
+          "text": "No source text mandates nirjala. A sincere, gentler fast is a complete vrat. The devotion matters — not the difficulty."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "Must I wear green and new bangles for the vrat to count?", "answer": "No. Green attire, mehndi and bangles are beautiful regional custom — pratha, not Dharma. The vrat is the sankalp, the puja and the fast." },
+            { "question": "I am unmarried, or widowed. Can I keep this vrat?", "answer": "Yes. Parvati herself was unmarried when she kept her tapasya. No Puranic source bars anyone from this vrat; restrictions you may have heard are custom, not scripture." },
+            { "question": "I broke my fast by mistake. Is the vrat ruined?", "answer": "No. Complete the day with devotion and continue. No text attaches punishment to an honest lapse." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "हरियाली तीज",
+      "heroSubtitle": "श्रावण की तृतीया — पार्वती की भक्ति का दिन, बिना भय के।",
+      "deck": "हरी तीज की कथा, व्रत वास्तव में क्या माँगता है, और शिव-पार्वती की सम्पूर्ण घरेलू पूजा विधि।",
+      "introHtml": "<p>इस दिन के केंद्र में शिव पुराण की एक कथा है: शिव को पाने के लिए पार्वती की लम्बी तपस्या, और इसी तृतीया को शिव द्वारा उन्हें स्वीकारना। आज का व्रत उसी भक्ति में उतरने का मार्ग है — कोई सौदा नहीं, एक स्मरण।</p>",
+      "blocks": []
+    }
+  }
+}

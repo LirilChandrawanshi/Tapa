@@ -1,0 +1,125 @@
+{
+  "slug": "aja-ekadashi",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "all-year-pujans",
+  "hueClass": "h-vishnu",
+  "readMinutes": 8,
+  "observanceDate": "2026-09-07",
+  "linkedObservanceSlug": "aja-ekadashi-2026",
+  "circleTeaser": "Aja Ekadashi tomorrow. A grain-free day and a simple Vishnu puja at home complete the vrat.",
+  "reminderDaysBefore": 1,
+  "isFestival": false,
+  "isFeatured": true,
+  "heroOrder": 2,
+  "relatedSlugs": ["shravana-putrada-ekadashi", "kamika-ekadashi", "hartalika-teej"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Brahmanda Purana",
+    "sourceRef": "Aja Ekadashi mahatmya — Krishna–Yudhishthira samvada",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "The Bhadrapada Krishna Ekadashi and the Harishchandra katha are narrated in the Purana; the fasting form is the keeper's choice, as with every Ekadashi."
+  },
+  "lang": {
+    "en": {
+      "title": "Aja Ekadashi — the complete guide",
+      "heroSubtitle": "The dark-fortnight Ekadashi of Bhadrapada, kept over three gentle days.",
+      "deck": "The Harishchandra katha behind Aja Ekadashi, the three-day rhythm of the vrat, and the parana window that completes it.",
+      "introHtml": "<p>Aja Ekadashi falls on the eleventh day of Bhadrapada's dark fortnight. Its katha is the story of Harishchandra — the king who lost throne, family and name for the sake of truth, and was restored through this very vrat. The observance itself is simple: a light evening before, a grain-free day of worship, and a parana the morning after. No part of it requires a priest, a temple or fear.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "Even a king stripped of everything — throne, family, name — was made whole by this Ekadashi. What sin can stand where Hari's day is kept with devotion?",
+          "meta": { "attribution": "Brahmanda Purana, Aja Ekadashi mahatmya" }
+        },
+        {
+          "type": "KATHA",
+          "title": "The katha — Harishchandra's restoration",
+          "text": "King Harishchandra, bound by a promise, gave up his kingdom, sold his wife and son, and served at a cremation ground — all rather than speak one untruth. Years into this exile the sage Gautama met him and told him of the Ekadashi of Bhadrapada's dark half. Harishchandra kept the vrat with what devotion his broken circumstances allowed. The Purana says his son was restored to life, his wife to his side, and his kingdom to his hands. The katha's point is not magic — it is that no fall is final for the one who holds to truth and turns toward the divine.",
+          "meta": { "attribution": "Brahmanda Purana" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम श्रीविष्णुप्रीत्यर्थं अजैकादशीव्रतं करिष्ये।",
+            "transliteration": "mama śrī-viṣṇu-prītyarthaṃ ajā-ekādaśī-vrataṃ kariṣye",
+            "gloss": "For the love of Vishnu, I undertake this Aja Ekadashi vrat. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "Vishnu image or idol", "note": "any form you keep at home", "optional": false },
+            { "name": "Tulsi leaves", "note": "plucked the day before, never on Ekadashi itself", "optional": false },
+            { "name": "Yellow flowers", "note": "", "optional": true },
+            { "name": "Diya and ghee", "note": "", "optional": false },
+            { "name": "Dhoop or agarbatti", "note": "", "optional": true },
+            { "name": "Chandan", "note": "for tilak", "optional": true },
+            { "name": "Fruit or panchamrit", "note": "for bhog", "optional": true },
+            { "name": "Clean water", "note": "for sankalp and achaman", "optional": false }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Vidhi — the three-day rhythm",
+          "steps": [
+            { "number": 1, "title": "Eat light the evening before", "description": "One sattvik meal before sunset, no grains after it. The fast begins gently, not abruptly.", "note": "day: Dashami evening — 6 Sep", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Brahmanda Purana" } },
+            { "number": 2, "title": "Morning bath and sankalp", "description": "Bathe, wear clean clothes, sit facing east and take the sankalp with water in your right palm.", "note": "day: Ekadashi — 7 Sep", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Brahmanda Purana" } },
+            { "number": 3, "title": "Puja of Vishnu", "description": "Offer tulsi, flowers, chandan and the diya to Vishnu's image. Fruit or panchamrit as bhog if you have it.", "note": "day: Ekadashi — 7 Sep. Offer tulsi gathered the day before.", "mantraChip": "ॐ नमो भगवते वासुदेवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Brahmanda Purana" } },
+            { "number": 4, "title": "Keep the fast through the day", "description": "No grains, rice or lentils for the vrati. Water, fruit and milk as your chosen form allows. Return to japa whenever the day gives you a quiet minute.", "note": "day: Ekadashi — 7 Sep", "mantraChip": "ॐ नमो भगवते वासुदेवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Brahmanda Purana" } },
+            { "number": 5, "title": "Read or listen to the Harishchandra katha", "description": "The story of the king who would not lie. Listening is as complete as reading.", "note": "day: Ekadashi — 7 Sep", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Brahmanda Purana" } },
+            { "number": 6, "title": "Evening diya and bhajan — jagran if you can", "description": "Light the evening diya and sing or play a bhajan. Some households keep a night vigil with kirtan.", "note": "day: Ekadashi evening — 7 Sep. The full jagran is a loving addition, never a requirement.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Vaishnava households pan-India — strongest in UP, Bihar and Braj" } },
+            { "number": 7, "title": "Parana — break the fast", "description": "The morning after, within the parana window, break the fast with a simple grain meal offered first to Vishnu. The vrat is complete.", "note": "day: Dwadashi morning — 8 Sep", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Brahmanda Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The mantra",
+          "mantra": {
+            "devanagari": "ॐ नमो भगवते वासुदेवाय",
+            "transliteration": "oṃ namo bhagavate vāsudevāya",
+            "meaning": "I bow to Bhagavan Vasudeva — the twelve-syllable mantra of Vishnu, open to all.",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "FASTING",
+          "title": "Choose your fast",
+          "fasting": [
+            { "name": "Nirjala", "description": "No food, no water, through the Ekadashi. Only for the able-bodied and experienced.", "recommended": false },
+            { "name": "Phalahar", "description": "Fruit, milk and water through the day. The most widely kept form.", "recommended": true },
+            { "name": "Anna-tyaag", "description": "One grain-free sattvik meal in the day. Right for pregnancy, illness, age and first-timers.", "recommended": false }
+          ],
+          "text": "The one rule the texts share is the setting aside of grains and rice. Everything beyond that is your choice — devotion, not endurance."
+        },
+        {
+          "type": "PROSE",
+          "title": "Parana — the window that completes the vrat",
+          "text": "The fast is formally broken on Dwadashi morning — 8 September 2026 — after sunrise and before the Dwadashi tithi ends. Tradition sets aside the first quarter of Dwadashi (Hari Vasara) before eating; in practice, break the fast mid-morning within the panchang's parana window for your city. Offer the first food to Vishnu, then eat a simple grain meal. A parana delayed by circumstance, done with devotion, does not undo the vrat."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "I have never fasted before. Will a partial fast 'offend' Vishnu?", "answer": "No. The texts praise the turning of the mind toward Hari, not the emptiness of the stomach. Begin with anna-tyaag — one grain-free meal — and let the practice grow." },
+            { "question": "I ate grains by mistake on Ekadashi. Is the vrat destroyed?", "answer": "No. Complete the day with devotion and do the parana as planned. No text attaches punishment to an honest lapse." },
+            { "question": "Do I need a priest, or a temple visit, for the vrat to count?", "answer": "No. Every Ekadashi is a home observance. Your own sankalp, your own puja and your own katha-reading are the complete vrat." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "अजा एकादशी — सम्पूर्ण विधि",
+      "heroSubtitle": "भाद्रपद कृष्ण एकादशी — तीन सहज दिनों में पूर्ण होने वाला व्रत।",
+      "deck": "अजा एकादशी के पीछे हरिश्चंद्र की कथा, व्रत की तीन-दिवसीय लय, और पारण का समय जो व्रत को पूर्ण करता है।",
+      "introHtml": "<p>अजा एकादशी भाद्रपद कृष्ण पक्ष की ग्यारहवीं तिथि है। इसकी कथा सत्य के लिए राज्य, परिवार और नाम खो देने वाले राजा हरिश्चंद्र की है — जो इसी व्रत से पुनः पूर्ण हुए। व्रत सरल है: दशमी की हल्की संध्या, अन्न-रहित एकादशी, और द्वादशी का पारण। इसमें न पुरोहित अनिवार्य है, न मंदिर, न भय।</p>",
+      "blocks": []
+    }
+  }
+}

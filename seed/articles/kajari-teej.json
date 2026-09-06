@@ -1,0 +1,102 @@
+{
+  "slug": "kajari-teej",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "festive-pujans",
+  "hueClass": "h-teej",
+  "readMinutes": 7,
+  "observanceDate": "2026-08-23",
+  "linkedObservanceSlug": "kajari-teej-2026",
+  "circleTeaser": "Kajari Teej tomorrow. Sattu, songs and a simple Parvati puja — the fast ends with the moon.",
+  "reminderDaysBefore": 1,
+  "isFestival": true,
+  "isFeatured": false,
+  "relatedSlugs": ["hariyali-teej", "hartalika-teej", "sawan-somwar-vrat"],
+  "dpb": {
+    "classification": "MIXED",
+    "confidenceScore": 3,
+    "sourceName": "Bhavishya Purana",
+    "sourceRef": "Tritiya vrata for Parvati — Bhadrapada Krishna Tritiya",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "The Tritiya vrat to Parvati has Puranic ground; the kajari songs, Neemdi Mata worship and sattu offering that define this Teej are regional pratha, labeled as such below."
+  },
+  "lang": {
+    "en": {
+      "title": "Kajari Teej",
+      "heroSubtitle": "The monsoon Teej of songs and sattu — Dharma and pratha, honestly told apart.",
+      "deck": "What is scripture and what is beloved custom on Badi Teej, and a home vidhi that honours both without fear.",
+      "introHtml": "<p>Kajari Teej — Badi Teej — falls on the third day of Bhadrapada's dark fortnight. At its core is the same Tritiya vrat to Parvati that all three Teej days share. Around that core, regions have woven their own beauty: the kajari songs of Mirzapur and Banaras, the Neemdi Mata worship of Rajasthan, sattu shared at moonrise. This guide keeps the vrat and the customs side by side, and tells you plainly which is which.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "She who remembers Parvati's devotion on the Tritiya, her home is filled with the same steadfast love that won Shiva himself.",
+          "meta": { "attribution": "Bhavishya Purana, Tritiya vrata" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम सौभाग्यकुटुम्बकल्याणार्थं कज्जलीतृतीयाव्रतं करिष्ये।",
+            "transliteration": "mama saubhāgya-kuṭumba-kalyāṇārthaṃ kajjalī-tṛtīyā-vrataṃ kariṣye",
+            "gloss": "For the wellbeing of my marriage and my family, I keep this Kajari Teej vrat. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "Shiva–Parvati image or idol", "note": "", "optional": false },
+            { "name": "Neem branch or Neemdi Mata image", "note": "Rajasthan custom", "optional": true },
+            { "name": "Sattu", "note": "roasted gram flour, sweetened — the traditional offering", "optional": false },
+            { "name": "Kumkum and akshat", "note": "", "optional": false },
+            { "name": "Mehndi and bangles", "note": "shringar for Parvati (Pratha)", "optional": true },
+            { "name": "Flowers", "note": "", "optional": false },
+            { "name": "Diya and ghee", "note": "", "optional": false },
+            { "name": "Fruits or sweets", "note": "for bhog", "optional": true }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Step-by-step puja",
+          "steps": [
+            { "number": 1, "title": "Bathe and prepare", "description": "Morning bath, clean clothes. Set the altar with Shiva–Parvati on a clean cloth.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 2, "title": "Take the sankalp", "description": "Sit facing east, water in the right palm, speak the sankalp and let the water fall.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 3, "title": "Worship Neemdi Mata", "description": "In Rajasthani homes a neem branch — Neemdi Mata — is set up and offered water, kumkum and akshat, with a diya at its base.", "note": "A regional form of the goddess's worship; skip without loss if it is not your family's custom.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Rajasthan — strongest in Bundi, Jaipur and Shekhawati; parts of MP" } },
+            { "number": 4, "title": "Offer shringar to Parvati", "description": "Kumkum, mehndi, bangles and flowers before Maa Parvati — offering what you wear yourself, in solidarity with her tapasya.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Bhavishya Purana" } },
+            { "number": 5, "title": "Offer sattu and listen to the katha", "description": "Place the sweetened sattu as bhog and read or listen to the Kajari Teej katha. Listening is as complete as reading.", "note": "Sattu as the day's offering is pratha — beloved, and regional.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Rajasthan, UP, Bihar and MP households" } },
+            { "number": 6, "title": "Kajari songs and swings", "description": "The evening belongs to the kajari — the monsoon songs this Teej is named for — and to swings hung for the season.", "note": "Pure celebration, pure pratha. The vrat is complete without it; the day is sweeter with it.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Eastern UP — Mirzapur, Varanasi; Bihar; Rajasthan" } },
+            { "number": 7, "title": "Arghya to the moon, then break the fast", "description": "After moonrise, offer water mixed with a little milk and akshat toward the moon, then break the fast — traditionally with sattu first.", "note": "If clouds hide the moon, offer the arghya at moonrise time facing its direction. The vrat is complete.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Widespread household practice across Rajasthan, MP and UP" } }
+          ]
+        },
+        {
+          "type": "FASTING",
+          "title": "Your fast today",
+          "fasting": [
+            { "name": "Nirjala till moonrise", "description": "The traditional form — no food or water until the arghya. Only for the able-bodied.", "recommended": false },
+            { "name": "Sajal", "description": "Water through the day, fast broken after the moon arghya.", "recommended": true },
+            { "name": "Phalahar", "description": "Fruit and milk through the day. Right for pregnancy, illness and age.", "recommended": false }
+          ],
+          "text": "No source text mandates nirjala for Kajari Teej. A gentler fast kept with sincerity is a complete vrat."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "Is Kajari Teej actually in scripture, or is it 'just' custom?", "answer": "Both, honestly: the Tritiya vrat to Parvati has Puranic ground, while the kajari songs, Neemdi Mata and sattu are regional pratha. Custom is not lesser — it only should not be sold as scriptural law." },
+            { "question": "Clouds hid the moon. Is my vrat broken?", "answer": "No. Offer the arghya at the panchang's moonrise time, facing the moon's direction, and break your fast. The intention completes the act." },
+            { "question": "Can unmarried women keep this vrat?", "answer": "Yes. Girls traditionally keep Teej for a good future household, and no text bars anyone. The vrat belongs to whoever brings devotion to it." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "कजरी तीज",
+      "heroSubtitle": "गीतों और सत्तू की तीज — धर्म और प्रथा, ईमानदारी से अलग-अलग।",
+      "deck": "बड़ी तीज पर क्या शास्त्र है और क्या प्रिय प्रथा, और एक घरेलू विधि जो दोनों का सम्मान करती है — बिना भय के।",
+      "introHtml": "<p>कजरी तीज — बड़ी तीज — भाद्रपद कृष्ण तृतीया को आती है। इसके केंद्र में वही पार्वती-तृतीया व्रत है जो तीनों तीजों का मूल है। उसके चारों ओर क्षेत्रों ने अपना सौंदर्य बुना है: मिर्ज़ापुर-बनारस की कजरी, राजस्थान की नीमड़ी माता, चाँद पर सत्तू। यह मार्गदर्शिका स्पष्ट बताती है कि कौन-सी बात क्या है।</p>",
+      "blocks": []
+    }
+  }
+}

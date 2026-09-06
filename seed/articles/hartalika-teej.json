@@ -1,0 +1,114 @@
+{
+  "slug": "hartalika-teej",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "festive-pujans",
+  "hueClass": "h-teej",
+  "readMinutes": 9,
+  "observanceDate": "2026-09-14",
+  "linkedObservanceSlug": "hartalika-teej-2026",
+  "circleTeaser": "Hartalika Teej tomorrow. Sand idols, evening puja, the katha. Nirjala only if your body allows.",
+  "reminderDaysBefore": 1,
+  "isFestival": true,
+  "isFeatured": false,
+  "relatedSlugs": ["hariyali-teej", "kajari-teej", "sawan-somwar-vrat"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Shiva Purana",
+    "sourceRef": "Rudra Samhita / Parvati Khanda",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "Parvati's tapasya and her sand Shivling are Puranic; the name Hartalika — 'carried away by a friend' — comes from the katha tradition around it. The 24-hour nirjala form is dominant custom, not a textual mandate."
+  },
+  "lang": {
+    "en": {
+      "title": "Hartalika Teej",
+      "heroSubtitle": "The deepest Teej — Parvati's own vrat, kept across three phases without fear.",
+      "deck": "The sand idols, the night of jagaran and the morning visarjan — the full Hartalika vidhi, phase by phase, on Bhadrapada Shukla Tritiya.",
+      "introHtml": "<p>Hartalika is the Teej Parvati herself is said to have kept: hidden in the forest by her friend — <em>harita</em>, carried away; <em>alika</em>, by the friend — she shaped a Shivling from river sand and worshipped it through the night. The vrat that remembers this runs across three phases: the setup and puja, the night of jagaran, and the morning of visarjan. It is the most intense of the Teej fasts — and like every vrat, its heart is devotion, not endurance.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "With sand of the riverbank Parvati shaped the linga, and with leaves and vigil she worshipped through the night — and Shiva, won by devotion alone, granted her himself.",
+          "meta": { "attribution": "Shiva Purana, Rudra Samhita — Parvati Khanda" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम शिवपार्वतीप्रसादप्राप्त्यर्थं हरितालिकाव्रतं करिष्ये।",
+            "transliteration": "mama śiva-pārvatī-prasāda-prāptyarthaṃ haritālikā-vrataṃ kariṣye",
+            "gloss": "For the grace of Shiva and Parvati, I undertake this Hartalika vrat. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "River sand or clay", "note": "for idol-making — Shiva, Parvati, Ganesha", "optional": false },
+            { "name": "Banana or peepal leaf", "note": "for idol-making — the base the idols sit on", "optional": true },
+            { "name": "Belpatra and dhatura flowers", "note": "for puja — offered to Shiva; white flowers too if you have them", "optional": false },
+            { "name": "Ganga jal or clean water", "note": "for puja — abhishek", "optional": false },
+            { "name": "Diya and ghee", "note": "for puja", "optional": false },
+            { "name": "Incense (agarbatti)", "note": "for puja", "optional": true },
+            { "name": "Sindoor, kumkum and green bangles", "note": "for shringar — offered to Parvati", "optional": false },
+            { "name": "Mehndi, chunri, fruits and sweets", "note": "for shringar and bhog", "optional": true }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Vidhi — step by step, in three phases",
+          "steps": [
+            { "number": 1, "title": "Bathe and dress in green or red", "description": "Full bath, fresh clothes. Green or red is traditional for Hartalika; any clean clothes complete the step.", "note": "day: evening of 13 Sep (Dwitiya) — setup. The colours are loving custom, not a rule.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "North India and Maharashtra — UP, Bihar, Rajasthan, MP" } },
+            { "number": 2, "title": "Make sand or clay idols of Shiva, Parvati and Ganesha", "description": "Shape small idols from river sand or clay and seat them on a banana or peepal leaf. Rough hands make holy idols — Parvati's own linga was riverbank sand.", "note": "day: evening of 13 Sep (Dwitiya) — setup", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 3, "title": "Take the Vrat Sankalp facing east", "description": "Water in the right palm, speak the sankalp, let the water fall. The vrat has begun.", "note": "day: evening of 13 Sep (Dwitiya) — setup", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 4, "title": "Abhishek with water and milk — offer belpatra and flowers", "description": "Pour water, then milk if you have it, over the Shiva idol. Offer belpatra smooth side down, dhatura and white flowers.", "note": "Milk abhishek is beloved custom; water and belpatra are what the text asks.", "mantraChip": "ॐ नमः शिवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 5, "title": "Offer sindoor, bangles and shringar to Parvati", "description": "Sindoor, kumkum, green bangles, mehndi and chunri before Maa Parvati — offering what you wear yourself, in solidarity with her tapasya.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 6, "title": "Listen to or recite the Vrat Katha", "description": "The story of the friend who carried Parvati to the forest, and the sand linga worshipped through the night. Listening is as complete as reading.", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 7, "title": "Stay awake through the night — bhajans, songs, reading", "description": "The jagaran remembers Parvati's own vigil. Keep it with bhajans, Teej songs or quiet reading, in company or alone.", "note": "day: night of 14 Sep (Tritiya) — jagaran. If health does not allow a full vigil, keep what you can; sleep does not void the vrat.", "dpb": { "classification": "DHARMA", "confidenceScore": 3, "sourceName": "Shiva Purana" } },
+            { "number": 8, "title": "Morning aarti — immerse the idols — break the fast", "description": "After the morning aarti, do visarjan of the sand idols in clean water and break the fast. The vrat is complete.", "note": "day: morning of 15 Sep (Chaturthi) — completion. A bucket at home, poured later to a plant, is a full visarjan.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The mantra",
+          "mantra": {
+            "devanagari": "ॐ नमः शिवाय",
+            "transliteration": "oṃ namaḥ śivāya",
+            "meaning": "I bow to Shiva — the five-syllable mantra that needs no initiation.",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "FASTING",
+          "title": "Your fast — the honest picture",
+          "fasting": [
+            { "name": "Nirjala", "description": "No food or water for 24 hours, broken at sunrise on 15 Sep. The dominant traditional form — only for the able-bodied and experienced.", "recommended": true },
+            { "name": "Sajal", "description": "Water allowed through the fast. Fully accepted for health reasons.", "recommended": false },
+            { "name": "Phalahar", "description": "Fruit and milk permitted. Right for pregnancy, for elders and for health conditions.", "recommended": false }
+          ],
+          "text": "Nirjala is the tradition here, not a test. If your body needs water or fruit, your vrat is no less complete — Parvati's vrat was devotion, and devotion is what you are keeping."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "I fell asleep during jagaran, or had to drink water. Will something bad happen?", "answer": "No. No text attaches punishment to a body's honest needs. Complete the remaining steps with devotion — the vrat stands." },
+            { "question": "Is Hartalika only for married women, and does a broken vrat harm my husband?", "answer": "Parvati was unmarried when she kept this vrat, and unmarried women keep it across India. No scripture links a lapse in your fast to harm befalling anyone — that fear has no source." },
+            { "question": "Must the idols be immersed in a river?", "answer": "No. Any clean water is a full visarjan — a bucket at home, the water later given to a plant, returns the clay to the earth exactly as the ritual intends." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "हरतालिका तीज",
+      "heroSubtitle": "सबसे गहरी तीज — स्वयं पार्वती का व्रत, तीन चरणों में, बिना भय के।",
+      "deck": "रेत की प्रतिमाएँ, जागरण की रात और प्रातः विसर्जन — भाद्रपद शुक्ल तृतीया की सम्पूर्ण हरतालिका विधि, चरण दर चरण।",
+      "introHtml": "<p>हरतालिका वह तीज है जो कहा जाता है कि पार्वती ने स्वयं रखी: सखी द्वारा वन में ले जाई गईं — <em>हरित</em> अर्थात हरण, <em>आलिका</em> अर्थात सखी — वहाँ उन्होंने नदी की रेत से शिवलिंग बनाया और रात भर पूजा की। यह व्रत तीन चरणों में चलता है: स्थापना और पूजा, जागरण की रात, और प्रातः विसर्जन। यह तीज व्रतों में सबसे कठोर है — और हर व्रत की तरह इसका हृदय भक्ति है, सहनशक्ति नहीं।</p>",
+      "blocks": []
+    }
+  }
+}

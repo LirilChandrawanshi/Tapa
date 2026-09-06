@@ -1,0 +1,118 @@
+{
+  "slug": "shravana-putrada-ekadashi",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "all-year-pujans",
+  "hueClass": "h-vishnu",
+  "readMinutes": 8,
+  "observanceDate": "2026-08-21",
+  "linkedObservanceSlug": "shravana-putrada-ekadashi-2026",
+  "circleTeaser": "Putrada Ekadashi tomorrow. No grains for the vrati; a simple Vishnu puja at home is enough.",
+  "reminderDaysBefore": 1,
+  "isFestival": false,
+  "isFeatured": false,
+  "relatedSlugs": ["aja-ekadashi", "kamika-ekadashi", "sawan-somwar-vrat"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Bhavishya Purana",
+    "sourceRef": "Uttara Parva (Bhavishyottara) — Krishna–Yudhishthira samvada",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "The Shravana Shukla Ekadashi and its katha are narrated directly in the Purana; the exact fasting form varies by household and sampradaya."
+  },
+  "lang": {
+    "en": {
+      "title": "Shravana Putrada Ekadashi — the complete guide",
+      "heroSubtitle": "The bright-fortnight Ekadashi of Shravana, kept over three gentle days.",
+      "deck": "Why this Ekadashi is called Putrada, the three-day rhythm the vrat actually follows, and the parana window that completes it.",
+      "introHtml": "<p>Twice a month the eleventh tithi belongs to Vishnu, and the Ekadashi of Shravana's bright fortnight is called Putrada — 'the giver of children'. The name comes from its katha, but the texts describe its fruit for every household that keeps it with devotion. The vrat is not one hard day; it is three gentle ones — a light evening before, a grain-free Ekadashi, and a parana the morning after.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "Of vows there is none higher than the Ekadashi of Hari. He who keeps it, his line and his household flourish — so Krishna told Yudhishthira.",
+          "meta": { "attribution": "Bhavishya Purana, Uttara Parva" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम श्रीविष्णुप्रीत्यर्थं पुत्रदैकादशीव्रतं करिष्ये।",
+            "transliteration": "mama śrī-viṣṇu-prītyarthaṃ putradā-ekādaśī-vrataṃ kariṣye",
+            "gloss": "For the love of Vishnu, I undertake this Putrada Ekadashi vrat. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "Vishnu image or idol", "note": "Laddu Gopal or any form you keep at home", "optional": false },
+            { "name": "Tulsi leaves", "note": "plucked the day before, never on Ekadashi itself", "optional": false },
+            { "name": "Yellow flowers", "note": "", "optional": true },
+            { "name": "Diya and ghee", "note": "", "optional": false },
+            { "name": "Dhoop or agarbatti", "note": "", "optional": true },
+            { "name": "Chandan", "note": "for tilak", "optional": true },
+            { "name": "Panchamrit or fruit", "note": "for bhog", "optional": true },
+            { "name": "Clean water", "note": "for sankalp and achaman", "optional": false }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Vidhi — the three-day rhythm",
+          "steps": [
+            { "number": 1, "title": "Eat light the evening before", "description": "One sattvik meal before sunset, no grains after it. The body eases into the fast instead of crashing into it.", "note": "day: Dashami evening — 20 Aug", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 2, "title": "Morning bath and sankalp", "description": "Bathe, wear clean clothes, sit facing east and take the sankalp with water in your right palm.", "note": "day: Ekadashi — 21 Aug", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 3, "title": "Puja of Vishnu", "description": "Offer tulsi, flowers, chandan and diya to Vishnu's image. Panchamrit or fruit as bhog if you have it.", "note": "day: Ekadashi — 21 Aug. Offer tulsi gathered the day before.", "mantraChip": "ॐ नमो भगवते वासुदेवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Bhavishya Purana" } },
+            { "number": 4, "title": "Keep the fast through the day", "description": "No grains, rice or lentils for the vrati. Water, fruit and milk as your chosen form allows. Keep the mind on Vishnu — japa whenever the day permits.", "note": "day: Ekadashi — 21 Aug", "mantraChip": "ॐ नमो भगवते वासुदेवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Bhavishya Purana" } },
+            { "number": 5, "title": "Read or listen to the katha", "description": "The Putrada katha — King Suketuman's grief, his sages' counsel, and the vrat that answered it. Listening is as complete as reading.", "note": "day: Ekadashi — 21 Aug", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Bhavishya Purana" } },
+            { "number": 6, "title": "Evening diya and bhajan — jagran if you can", "description": "Light the evening diya and sing or play a bhajan. Some households keep a night vigil with kirtan.", "note": "day: Ekadashi evening — 21 Aug. A full jagran is a loving addition, never a requirement.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Vaishnava households pan-India — strongest in UP, Bihar and Braj" } },
+            { "number": 7, "title": "Parana — break the fast", "description": "The morning after, within the parana window, break the fast with a simple grain meal after offering it first to Vishnu. The vrat is complete.", "note": "day: Dwadashi morning — 22 Aug", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Bhavishya Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The mantra",
+          "mantra": {
+            "devanagari": "ॐ नमो भगवते वासुदेवाय",
+            "transliteration": "oṃ namo bhagavate vāsudevāya",
+            "meaning": "I bow to Bhagavan Vasudeva — the twelve-syllable mantra of Vishnu, open to all.",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "FASTING",
+          "title": "Choose your fast",
+          "fasting": [
+            { "name": "Nirjala", "description": "No food, no water, through the Ekadashi. Only for the able-bodied and experienced.", "recommended": false },
+            { "name": "Phalahar", "description": "Fruit, milk and water through the day. The most widely kept form.", "recommended": true },
+            { "name": "Anna-tyaag", "description": "One grain-free sattvik meal in the day. Right for pregnancy, illness, age and first-timers.", "recommended": false }
+          ],
+          "text": "The one rule the texts share is the setting aside of grains and rice. The intensity of the fast is yours to choose — devotion, not endurance."
+        },
+        {
+          "type": "PROSE",
+          "title": "Parana — the window that completes the vrat",
+          "text": "The fast is formally broken on Dwadashi morning — 22 August 2026 — after sunrise and before the Dwadashi tithi ends. Tradition sets aside the first quarter of Dwadashi (Hari Vasara) before eating; in practice, break the fast mid-morning within the panchang's parana window for your city. Offer the first food to Vishnu, then eat a simple grain meal. If circumstances delay you past the window, eat when you can — a late parana done with devotion does not undo the vrat."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "Is this vrat only for couples who want a son?", "answer": "No. The name comes from its katha, but the Purana describes its fruit for every keeper of the vrat — wellbeing of the whole family. Anyone may observe it, for any sincere intention." },
+            { "question": "I ate grains by mistake on Ekadashi. Is the vrat destroyed?", "answer": "No. Complete the day with devotion and do the parana as planned. No text attaches punishment to an honest lapse." },
+            { "question": "Does the whole family have to give up rice, or bad luck follows?", "answer": "The grain rule applies to the person keeping the vrat. The family eating normally brings no harm to anyone — that fear has no scriptural basis." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "श्रावण पुत्रदा एकादशी — सम्पूर्ण विधि",
+      "heroSubtitle": "श्रावण शुक्ल एकादशी — तीन सहज दिनों में पूर्ण होने वाला व्रत।",
+      "deck": "इस एकादशी को पुत्रदा क्यों कहते हैं, व्रत की तीन-दिवसीय लय, और पारण का समय जो व्रत को पूर्ण करता है।",
+      "introHtml": "<p>हर मास की एकादशी विष्णु की है, और श्रावण शुक्ल पक्ष की एकादशी पुत्रदा कहलाती है। नाम कथा से आया है, पर शास्त्र इसका फल हर श्रद्धालु परिवार के लिए कहते हैं। व्रत एक कठिन दिन नहीं — तीन सहज दिन हैं: दशमी की हल्की संध्या, अन्न-रहित एकादशी, और द्वादशी का पारण।</p>",
+      "blocks": []
+    }
+  }
+}

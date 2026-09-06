@@ -1,0 +1,116 @@
+{
+  "slug": "kamika-ekadashi",
+  "type": "RITUAL_GUIDE",
+  "status": "DRAFT",
+  "category": "ritual-guides",
+  "subCategory": "all-year-pujans",
+  "hueClass": "h-vishnu",
+  "readMinutes": 7,
+  "observanceDate": "2026-07-21",
+  "linkedObservanceSlug": "kamika-ekadashi-2026",
+  "circleTeaser": "Kamika Ekadashi tomorrow. A tulsi leaf offered with devotion outweighs every costlier gift.",
+  "reminderDaysBefore": 1,
+  "isFestival": false,
+  "isFeatured": false,
+  "relatedSlugs": ["shravana-putrada-ekadashi", "aja-ekadashi", "sawan-somwar-vrat"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Brahmavaivarta Purana",
+    "sourceRef": "Kamika Ekadashi mahatmya — Krishna–Yudhishthira samvada",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "The Shravana Krishna Ekadashi and its tulsi-centred mahatmya are narrated in the Purana; the fasting form is the keeper's choice, as with every Ekadashi."
+  },
+  "lang": {
+    "en": {
+      "title": "Kamika Ekadashi — the complete guide",
+      "heroSubtitle": "The dark-fortnight Ekadashi of Shravana, where a single tulsi leaf is the greatest offering.",
+      "deck": "Why Kamika is called the Ekadashi of the tulsi leaf, the three-day rhythm of the vrat, and the parana that completes it.",
+      "introHtml": "<p>Kamika Ekadashi falls in the dark fortnight of Shravana, in the heart of the monsoon months when Vishnu is said to rest. Its mahatmya makes one point above all others: a single tulsi leaf offered to Hari with devotion outweighs gold, gems and grand yajnas. The vrat follows the gentle three-day rhythm of every Ekadashi — a light evening before, a grain-free day of worship, and a parana the morning after.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "He who offers Hari but one leaf of tulsi on the Kamika day gains what mountains of gold cannot buy — so Krishna told Yudhishthira.",
+          "meta": { "attribution": "Brahmavaivarta Purana, Kamika mahatmya" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "Begin with Sankalp",
+          "sankalpa": {
+            "devanagari": "मम श्रीविष्णुप्रीत्यर्थं कामिकैकादशीव्रतं करिष्ये।",
+            "transliteration": "mama śrī-viṣṇu-prītyarthaṃ kāmikā-ekādaśī-vrataṃ kariṣye",
+            "gloss": "For the love of Vishnu, I undertake this Kamika Ekadashi vrat. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you'll need",
+          "samagri": [
+            { "name": "Vishnu image or idol", "note": "any form you keep at home", "optional": false },
+            { "name": "Tulsi leaves", "note": "the day's central offering — plucked the day before", "optional": false },
+            { "name": "Flowers", "note": "", "optional": true },
+            { "name": "Diya and ghee", "note": "", "optional": false },
+            { "name": "Dhoop or agarbatti", "note": "", "optional": true },
+            { "name": "Fruit or panchamrit", "note": "for bhog", "optional": true },
+            { "name": "Clean water", "note": "for sankalp and achaman", "optional": false }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Vidhi — the three-day rhythm",
+          "steps": [
+            { "number": 1, "title": "Eat light the evening before", "description": "One sattvik meal before sunset, no grains after it.", "note": "day: Dashami evening — 20 Jul", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Brahmavaivarta Purana" } },
+            { "number": 2, "title": "Morning bath and sankalp", "description": "Bathe, wear clean clothes, sit facing east and take the sankalp with water in your right palm.", "note": "day: Ekadashi — 21 Jul", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Brahmavaivarta Purana" } },
+            { "number": 3, "title": "Puja of Vishnu — tulsi first", "description": "Offer the tulsi leaf first, then flowers, the diya and bhog. The leaf is the day's whole point; everything else is garnish.", "note": "day: Ekadashi — 21 Jul. Offer tulsi gathered the day before, never plucked on Ekadashi itself.", "mantraChip": "ॐ नमो भगवते वासुदेवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Brahmavaivarta Purana" } },
+            { "number": 4, "title": "Keep the fast through the day", "description": "No grains, rice or lentils for the vrati. Water, fruit and milk as your chosen form allows, with japa whenever the day permits.", "note": "day: Ekadashi — 21 Jul", "mantraChip": "ॐ नमो भगवते वासुदेवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Brahmavaivarta Purana" } },
+            { "number": 5, "title": "Read or listen to the Kamika katha", "description": "The mahatmya Krishna narrates to Yudhishthira. Listening is as complete as reading.", "note": "day: Ekadashi — 21 Jul", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Brahmavaivarta Purana" } },
+            { "number": 6, "title": "Evening diya — deepdaan if you wish", "description": "Light the evening diya before Vishnu. Many households light an extra lamp — deepdaan — near tulsi or at a temple this night.", "note": "day: Ekadashi evening — 21 Jul. Deepdaan is a loving regional addition.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Vaishnava households pan-India — strongest in UP, Bihar and Braj" } },
+            { "number": 7, "title": "Parana — break the fast", "description": "On Dwadashi morning, within the parana window, break the fast with a simple grain meal offered first to Vishnu. The vrat is complete.", "note": "day: Dwadashi morning — 22 Jul", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Brahmavaivarta Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The mantra",
+          "mantra": {
+            "devanagari": "ॐ नमो भगवते वासुदेवाय",
+            "transliteration": "oṃ namo bhagavate vāsudevāya",
+            "meaning": "I bow to Bhagavan Vasudeva — the twelve-syllable mantra of Vishnu, open to all.",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "FASTING",
+          "title": "Choose your fast",
+          "fasting": [
+            { "name": "Nirjala", "description": "No food, no water, through the Ekadashi. Only for the able-bodied and experienced.", "recommended": false },
+            { "name": "Phalahar", "description": "Fruit, milk and water through the day. The most widely kept form.", "recommended": true },
+            { "name": "Anna-tyaag", "description": "One grain-free sattvik meal in the day. Right for pregnancy, illness, age and first-timers.", "recommended": false }
+          ],
+          "text": "The one rule the texts share is the setting aside of grains and rice. Everything beyond that is your choice — devotion, not endurance."
+        },
+        {
+          "type": "PROSE",
+          "title": "Parana — the window that completes the vrat",
+          "text": "The fast is formally broken on Dwadashi morning — 22 July 2026 — after sunrise and before the Dwadashi tithi ends. Break the fast mid-morning within the panchang's parana window for your city, offering the first food to Vishnu. A parana delayed by circumstance, done with devotion, does not undo the vrat."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "I could not arrange flowers, panchamrit or a proper thali. Is my puja too small?", "answer": "The Kamika mahatmya exists to answer exactly this: one tulsi leaf, offered with devotion, is declared greater than gold and gems. Simplicity is this Ekadashi's teaching, not its failure." },
+            { "question": "I ate grains by mistake on Ekadashi. Is the vrat destroyed?", "answer": "No. Complete the day with devotion and do the parana as planned. No text attaches punishment to an honest lapse." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "कामिका एकादशी — सम्पूर्ण विधि",
+      "heroSubtitle": "श्रावण कृष्ण एकादशी — जहाँ तुलसी का एक पत्ता सबसे बड़ा अर्पण है।",
+      "deck": "कामिका को तुलसी-पत्र की एकादशी क्यों कहते हैं, व्रत की तीन-दिवसीय लय, और पारण जो व्रत को पूर्ण करता है।",
+      "introHtml": "<p>कामिका एकादशी श्रावण के कृष्ण पक्ष में आती है। इसका माहात्म्य एक ही बात सबसे ऊपर रखता है: भक्ति से हरि को अर्पित तुलसी का एक पत्ता स्वर्ण, रत्न और बड़े यज्ञों से भारी है। व्रत हर एकादशी की सहज तीन-दिवसीय लय में चलता है — दशमी की हल्की संध्या, अन्न-रहित एकादशी, और द्वादशी का पारण।</p>",
+      "blocks": []
+    }
+  }
+}
