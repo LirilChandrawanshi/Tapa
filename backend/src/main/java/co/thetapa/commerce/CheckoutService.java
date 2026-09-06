@@ -32,15 +32,17 @@ public class CheckoutService {
     private final PincodeRepository pincodes;
     private final PaymentProvider paymentProvider;
     private final MongoTemplate mongo;
+    private final StockService stock;
 
     public CheckoutService(ProductRepository products, OrderRepository orders,
                            PincodeRepository pincodes, PaymentProvider paymentProvider,
-                           MongoTemplate mongo) {
+                           MongoTemplate mongo, StockService stock) {
         this.products = products;
         this.orders = orders;
         this.pincodes = pincodes;
         this.paymentProvider = paymentProvider;
         this.mongo = mongo;
+        this.stock = stock;
     }
 
     public record CartLine(String productSlug, int qty) {
@@ -165,6 +167,15 @@ public class CheckoutService {
             throw new ValidationFailedException(List.of(
                 "Your payment couldn't be verified. You haven't been charged twice — contact help@thetapaco.com."));
         }
+        // atomic stock reservation — the only moment inventory moves
+        String failedSlug = stock.reserveAll(order.getItems());
+        if (failedSlug != null) {
+            order.setStatus(Order.Status.CANCELLED);
+            order.setCancelledAt(Instant.now());
+            order.setRefundPaise(order.getTotalPaise());
+            order.setStatusNote("Sold out moments before payment — full refund initiated. Nothing more to do.");
+            return orders.save(order);
+        }
         order.setStatus(Order.Status.CONFIRMED);
         boolean prebook = order.getFestivalDate() != null;
         order.setStatusNote(prebook
@@ -189,11 +200,17 @@ public class CheckoutService {
             throw new ValidationFailedException(List.of(
                 "The free-cancellation window has closed. Write to help@thetapaco.com and we'll do our best."));
         }
+        boolean stockWasReserved = order.getStatus() == Order.Status.CONFIRMED
+            || order.getStatus() == Order.Status.PACKING;
         order.setStatus(Order.Status.CANCELLED);
         order.setCancelledAt(Instant.now());
         order.setRefundPaise(order.getTotalPaise());
         order.setStatusNote("Cancelled · full refund initiated");
-        return orders.save(order);
+        Order saved = orders.save(order);
+        if (stockWasReserved) {
+            stock.restoreAll(saved.getItems());
+        }
+        return saved;
     }
 
     /** TK-YYYY-NNNN via an atomic counter document. */

@@ -35,7 +35,7 @@ public class FeedbackController {
 
     @PostMapping("/notify-me")
     public ApiResponse<Map<String, Object>> notifyMe(@RequestBody NotifyBody body) {
-        if (!Set.of("kits", "purohit").contains(body.context())) {
+        if (!Set.of("kits", "purohit", "restock").contains(body.context())) {
             throw new IllegalArgumentException("Unknown notify context.");
         }
         NotifyRequest req = new NotifyRequest();

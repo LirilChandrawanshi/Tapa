@@ -25,12 +25,25 @@ public class AdminCommerceController {
     private final ProductRepository products;
     private final OrderRepository orders;
     private final PincodeRepository pincodes;
+    private final StockService stock;
+    private final co.thetapa.circle.WhatsAppProvider whatsApp;
 
     public AdminCommerceController(ProductRepository products, OrderRepository orders,
-                                   PincodeRepository pincodes) {
+                                   PincodeRepository pincodes, StockService stock,
+                                   co.thetapa.circle.WhatsAppProvider whatsApp) {
         this.products = products;
         this.orders = orders;
         this.pincodes = pincodes;
+        this.stock = stock;
+        this.whatsApp = whatsApp;
+    }
+
+    /** stock at or under 10 units, for the restock run */
+    @GetMapping("/reports/low-stock")
+    public ApiResponse<List<Product>> lowStock() {
+        return ApiResponse.ok(products.findAllByOrderByFestivalDateAsc().stream()
+            .filter(p -> p.getStock() != null && p.getStock() <= 10)
+            .toList());
     }
 
     /* products */
@@ -83,10 +96,11 @@ public class AdminCommerceController {
                                            @RequestBody StatusChange body) {
         Order order = orders.findByOrderNumber(orderNumber)
             .orElseThrow(() -> new NotFoundException("order", orderNumber));
-        List<Order.Status> allowed = TRANSITIONS.getOrDefault(order.getStatus(), List.of());
+        Order.Status previous = order.getStatus();
+        List<Order.Status> allowed = TRANSITIONS.getOrDefault(previous, List.of());
         if (!allowed.contains(body.status())) {
             throw new ValidationFailedException(List.of(
-                "Cannot move " + order.getStatus() + " → " + body.status()
+                "Cannot move " + previous + " → " + body.status()
                     + ". Allowed: " + allowed));
         }
         order.setStatus(body.status());
@@ -96,14 +110,18 @@ public class AdminCommerceController {
                 order.setTrackingId(body.trackingId());
                 order.setCourier(body.courier());
                 order.setStatusNote("Dispatched · expected by " + order.getExpectedDelivery());
-                // dispatch SMS/WhatsApp notification hooks in with the BSP integration
+                notifyDispatch(order);
             }
             case DELIVERED -> order.setStatusNote("Delivered");
             case PACKING -> order.setStatusNote("Being packed");
             case CANCELLED -> {
+                boolean stockWasReserved = previous != Order.Status.PENDING_PAYMENT;
                 order.setCancelledAt(Instant.now());
                 order.setRefundPaise(order.getTotalPaise());
                 order.setStatusNote("Cancelled · full refund initiated");
+                if (stockWasReserved) {
+                    stock.restoreAll(order.getItems());
+                }
             }
             case REFUND_INITIATED -> order.setStatusNote("Refund on its way (3–5 working days)");
             case REFUNDED -> order.setStatusNote("Refunded in full");
@@ -114,6 +132,25 @@ public class AdminCommerceController {
             order.setStatusNote(body.note());
         }
         return ApiResponse.ok(orders.save(order));
+    }
+
+    /**
+     * Dispatch notification stub: goes out through the WhatsApp provider
+     * (console in dev). In production this needs an approved UTILITY template —
+     * order/delivery messages are always-on per the notification-prefs policy.
+     */
+    private void notifyDispatch(Order order) {
+        try {
+            whatsApp.sendText(order.getPhone().replace("+", ""),
+                "Your order " + order.getOrderNumber() + " is on its way — expected by "
+                    + order.getExpectedDelivery() + ". Track: https://thetapaco.com/orders/track?on="
+                    + order.getOrderNumber() + (order.getTrackingId() == null ? ""
+                    : " · " + order.getCourier() + " " + order.getTrackingId()));
+        } catch (Exception e) {
+            // notification failure never blocks the dispatch itself
+            org.slf4j.LoggerFactory.getLogger(AdminCommerceController.class)
+                .warn("dispatch notification failed for {}: {}", order.getOrderNumber(), e.getMessage());
+        }
     }
 
     /* pincodes */

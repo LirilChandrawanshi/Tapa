@@ -29,11 +29,22 @@ public class MeController {
     private final UserRepository users;
     private final SavedRitualRepository saved;
     private final ArticleRepository articles;
+    private final co.thetapa.circle.CircleService circle;
 
-    public MeController(UserRepository users, SavedRitualRepository saved, ArticleRepository articles) {
+    public MeController(UserRepository users, SavedRitualRepository saved,
+                        ArticleRepository articles, co.thetapa.circle.CircleService circle) {
         this.users = users;
         this.saved = saved;
         this.articles = articles;
+        this.circle = circle;
+    }
+
+    /** Tapa Circle membership for the account's phone (the Circle itself stays account-less). */
+    @GetMapping("/circle")
+    public ApiResponse<Map<String, Object>> circleStatus(@AuthenticationPrincipal String userId) {
+        User user = users.findById(userId)
+            .orElseThrow(() -> new NotFoundException("user", userId));
+        return ApiResponse.ok(Map.of("status", circle.status(user.getPhone()).name()));
     }
 
     @GetMapping

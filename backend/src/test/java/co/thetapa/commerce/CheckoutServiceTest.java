@@ -39,7 +39,9 @@ class CheckoutServiceTest {
         when(orders.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(pincodes.findByPincode("110024"))
             .thenReturn(Optional.of(new PincodeServiceability("110024", true, 3, "Lajpat Nagar")));
-        service = new CheckoutService(products, orders, pincodes, new MockPaymentProvider(), mongo);
+        StockService stockService = Mockito.mock(StockService.class);
+        when(stockService.reserveAll(any())).thenReturn(null);
+        service = new CheckoutService(products, orders, pincodes, new MockPaymentProvider(), mongo, stockService);
     }
 
     private Product live(String slug, long pricePaise) {
