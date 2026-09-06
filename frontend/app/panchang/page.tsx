@@ -27,6 +27,7 @@ import {
   CALENDAR_PDF_HREF,
   CITY_LABEL,
   daysBetween,
+  fmtEnds,
   fmtLong,
   guideHref,
   mergeObservances,
@@ -62,7 +63,7 @@ function TodaySnapshot({ payload, now }: { payload: DayPayload | null; now: stri
     );
   }
   const rows: [string, string][] = [
-    ["Tithi", day.tithi ? `${day.tithi.name}${day.tithi.endsAt ? ` · till ${day.tithi.endsAt}` : ""}` : "—"],
+    ["Tithi", day.tithi ? `${day.tithi.name}${day.tithi.endsAt ? ` · ${fmtEnds(day.tithi.endsAt, day.date)}` : ""}` : "—"],
     ["Paksha", day.paksha ?? "—"],
     ["Nakshatra", day.nakshatra?.name ?? "—"],
     ["Sunrise / Sunset", day.sunrise && day.sunset ? `${day.sunrise} / ${day.sunset}` : "—"],
