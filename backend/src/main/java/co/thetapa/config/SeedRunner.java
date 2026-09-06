@@ -33,13 +33,20 @@ public class SeedRunner implements ApplicationRunner {
     private final ArticleRepository articles;
     private final GlossaryRepository glossary;
     private final co.thetapa.content.DpbValidator dpbValidator;
+    private final co.thetapa.panchang.ObservanceRepository observanceRepo;
+    private final co.thetapa.panchang.PanchangDayRepository panchangDayRepo;
     private final ObjectMapper mapper;
 
     public SeedRunner(ArticleRepository articles, GlossaryRepository glossary,
-                      co.thetapa.content.DpbValidator dpbValidator, ObjectMapper mapper) {
+                      co.thetapa.content.DpbValidator dpbValidator,
+                      co.thetapa.panchang.ObservanceRepository observanceRepo,
+                      co.thetapa.panchang.PanchangDayRepository panchangDayRepo,
+                      ObjectMapper mapper) {
         this.articles = articles;
         this.glossary = glossary;
         this.dpbValidator = dpbValidator;
+        this.observanceRepo = observanceRepo;
+        this.panchangDayRepo = panchangDayRepo;
         this.mapper = mapper;
     }
 
@@ -55,6 +62,7 @@ public class SeedRunner implements ApplicationRunner {
         }
         seedArticles(seedRoot.resolve("articles"));
         seedGlossary(seedRoot.resolve("glossary"));
+        seedPanchang(seedRoot.resolve("panchang"));
         log.info("Seeding complete");
     }
 
@@ -115,6 +123,37 @@ public class SeedRunner implements ApplicationRunner {
             glossary.save(fixture);
         }
         log.info("seeded {} glossary terms", terms.length);
+    }
+
+    private void seedPanchang(Path dir) throws IOException {
+        Path observancesFile = dir.resolve("observances-2026.json");
+        if (Files.exists(observancesFile)) {
+            var fixtures = mapper.readValue(observancesFile.toFile(),
+                co.thetapa.panchang.Observance[].class);
+            for (var fixture : fixtures) {
+                var existing = observanceRepo.findBySlug(fixture.getSlug());
+                if (existing.isPresent() && editedAfter(existing.get().getUpdatedAt(), observancesFile)) {
+                    continue;
+                }
+                existing.ifPresent(o -> fixture.setId(o.getId()));
+                observanceRepo.save(fixture);
+            }
+            log.info("seeded {} observances", fixtures.length);
+        }
+        Path daysFile = dir.resolve("days-sample.json");
+        if (Files.exists(daysFile)) {
+            var fixtures = mapper.readValue(daysFile.toFile(),
+                co.thetapa.panchang.PanchangDay[].class);
+            for (var fixture : fixtures) {
+                var existing = panchangDayRepo.findByDateAndCity(fixture.getDate(), fixture.getCity());
+                if (existing.isPresent() && editedAfter(existing.get().getUpdatedAt(), daysFile)) {
+                    continue;
+                }
+                existing.ifPresent(d -> fixture.setId(d.getId()));
+                panchangDayRepo.save(fixture);
+            }
+            log.info("seeded {} panchang days", fixtures.length);
+        }
     }
 
     private boolean editedAfter(java.time.Instant dbUpdatedAt, Path fixture) {

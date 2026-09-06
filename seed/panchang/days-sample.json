@@ -1,0 +1,47 @@
+[
+  {
+    "date": "2026-09-05", "city": "delhi-ncr",
+    "tithi": { "name": "Navami", "endsAt": "2026-09-05T21:12:00" },
+    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
+    "nakshatra": { "name": "Rohini", "endsAt": "2026-09-05T23:40:00" },
+    "yoga": "Shoolam", "karana": "Taitila",
+    "sunrise": "05:59", "sunset": "18:38", "moonrise": "23:05", "moonset": "13:10",
+    "rahuKaal": { "from": "09:10", "to": "10:44" },
+    "abhijitMuhurat": { "from": "11:53", "to": "12:44" },
+    "verified": false
+  },
+  {
+    "date": "2026-09-06", "city": "delhi-ncr",
+    "tithi": { "name": "Dashami", "endsAt": "2026-09-06T22:03:00" },
+    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
+    "nakshatra": { "name": "Mrigashira", "endsAt": "2026-09-07T01:12:00" },
+    "yoga": "Ganda", "karana": "Vanija",
+    "sunrise": "06:00", "sunset": "18:37", "moonrise": "23:52", "moonset": "14:02",
+    "rahuKaal": { "from": "17:03", "to": "18:37" },
+    "abhijitMuhurat": { "from": "11:53", "to": "12:44" },
+    "verified": false
+  },
+  {
+    "date": "2026-09-07", "city": "delhi-ncr",
+    "tithi": { "name": "Ekadashi", "endsAt": "2026-09-07T23:22:00" },
+    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
+    "nakshatra": { "name": "Ardra", "endsAt": "2026-09-08T03:05:00" },
+    "yoga": "Vriddhi", "karana": "Bava",
+    "sunrise": "06:00", "sunset": "18:36", "moonrise": null, "moonset": "14:50",
+    "rahuKaal": { "from": "07:34", "to": "09:08" },
+    "abhijitMuhurat": { "from": "11:52", "to": "12:43" },
+    "muhurats": [ { "label": "Parana (next day)", "from": "06:01", "to": "08:29", "kind": "preferred" } ],
+    "verified": false
+  },
+  {
+    "date": "2026-09-08", "city": "delhi-ncr",
+    "tithi": { "name": "Dwadashi", "endsAt": "2026-09-09T00:56:00" },
+    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
+    "nakshatra": { "name": "Punarvasu", "endsAt": "2026-09-09T05:02:00" },
+    "yoga": "Dhruva", "karana": "Kaulava",
+    "sunrise": "06:01", "sunset": "18:35", "moonrise": "00:42", "moonset": "15:35",
+    "rahuKaal": { "from": "15:28", "to": "17:02" },
+    "abhijitMuhurat": { "from": "11:52", "to": "12:43" },
+    "verified": false
+  }
+]
