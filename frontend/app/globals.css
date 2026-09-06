@@ -49,8 +49,35 @@
   --color-wa: #1f9d52;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-devanagari: "Tiro Devanagari Hindi", "Noto Sans Devanagari", serif;
+  --font-devanagari: var(--font-tiro-devanagari, "Tiro Devanagari Hindi"),
+    var(--font-noto-devanagari, "Noto Sans Devanagari"), serif;
 }
+
+/*
+ * Deity hue gradients — exact values from the Aug-30 PLP prototype.
+ * Used for ContentCard headers and thumbnails.
+ */
+.h-teej { background: linear-gradient(150deg, #1e3a16, #3e6b28); }
+.h-krishna { background: linear-gradient(150deg, #151033, #2e2260); }
+.h-shiva { background: linear-gradient(150deg, #1a1440, #3a2e70); }
+.h-ganesh { background: linear-gradient(150deg, #6b3410, #b5651d); }
+.h-devi { background: linear-gradient(150deg, #5c1a30, #a83358); }
+.h-vishnu { background: linear-gradient(150deg, #0c2a3a, #1b5670); }
+.h-earth { background: linear-gradient(150deg, #2c1c10, #6b4a28); }
+.h-thread { background: linear-gradient(150deg, #3a4420, #141a0c); }
+.h-data { background: linear-gradient(150deg, #1b3a52, #0c1a26); }
+.h-sanskar { background: linear-gradient(150deg, #4a2a5c, #241432); }
+.h-gold { background: linear-gradient(150deg, #7a4a12, #2a1408); }
+
+/* Category hero gradients — one per parent category (PLP prototype). */
+.hero-rg { background: linear-gradient(150deg, #3a0c1b 0%, #7a1838 42%, #2a0810 100%); }
+.hero-pa { background: linear-gradient(150deg, #0c1a26 0%, #1b3a52 42%, #070f17 100%); }
+.hero-dc { background: linear-gradient(150deg, #101a0e 0%, #2a3e1c 42%, #0c1006 100%); }
+.hero-rk { background: linear-gradient(150deg, #2a1408 0%, #7a4a12 42%, #1c0c04 100%); }
+
+/* System-page gradients (404 / 500) — search-system prototype. */
+.hero-404 { background: linear-gradient(155deg, #2a1408 0%, #6b3410 42%, #1c0c04 100%); }
+.hero-500 { background: linear-gradient(155deg, #1a1208 0%, #3a2a12 42%, #120c04 100%); }
 
 body {
   background-color: var(--color-bg);

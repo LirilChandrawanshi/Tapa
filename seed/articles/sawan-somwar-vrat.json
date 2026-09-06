@@ -1,0 +1,114 @@
+{
+  "slug": "sawan-somwar-vrat",
+  "type": "RITUAL_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "festive-pujans",
+  "hueClass": "h-shiva",
+  "readMinutes": 9,
+  "observanceDate": "2026-08-03",
+  "linkedObservanceSlug": "sawan-somwar-2026",
+  "circleTeaser": "Sawan Somwar tomorrow. A simple Shiva abhishek at home is enough.",
+  "reminderDaysBefore": 1,
+  "isFestival": false,
+  "isFeatured": true,
+  "heroOrder": 1,
+  "relatedSlugs": ["hariyali-teej", "nag-panchami", "shravana-putrada-ekadashi"],
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 4,
+    "sourceName": "Shiva Purana",
+    "sourceRef": "Rudra Samhita / Parvati Khanda",
+    "sourceClass": "PURANIC",
+    "confidenceNote": "The Monday vrat for Shiva in Shravana is named directly in the Purana; specific fasting forms vary by region."
+  },
+  "lang": {
+    "en": {
+      "title": "Sawan Somwar Vrat — the complete guide",
+      "heroSubtitle": "The Monday fast of Shravana, done correctly and without fear.",
+      "deck": "Why Mondays in Sawan belong to Shiva, what the scripture actually asks of you, and a vidhi you can complete at home in under an hour.",
+      "introHtml": "<p>Every Monday of the Shravana month is kept for Shiva. The vrat is simple at its core: a clean start, a sankalp, an abhishek, and a fast that suits your body. Everything else you have heard — that a broken fast angers the deity, that nirjala is mandatory, that an elaborate samagri list is required — is either regional custom or plain misconception. This guide separates the three.</p>",
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "Why this vrat",
+          "text": "He who worships Shankara on the Mondays of Shravana with water and bilva alone attains the fruit of a great yajna.",
+          "meta": { "attribution": "Shiva Purana, Rudra Samhita" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "The sankalp",
+          "sankalpa": {
+            "devanagari": "मम शिवकृपाप्राप्त्यर्थं श्रावणसोमवारव्रतं करिष्ये।",
+            "transliteration": "mama śiva-kṛpā-prāptyarthaṃ śrāvaṇa-somavāra-vrataṃ kariṣye",
+            "gloss": "For the grace of Shiva, I undertake this Shravana Monday vrat. Say it in any language you carry in your heart — no Sanskrit required."
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "What you need",
+          "samagri": [
+            { "name": "Jal (clean water)", "note": "Ganga jal if you have it; plain water is fully valid", "optional": false },
+            { "name": "Bilva leaves", "note": "3-leaf sprigs, undamaged", "optional": false },
+            { "name": "Raw milk", "note": "a small cup for abhishek", "optional": true },
+            { "name": "White flowers", "note": "", "optional": true },
+            { "name": "Diya and ghee", "note": "", "optional": false },
+            { "name": "Dhoop or agarbatti", "note": "", "optional": true },
+            { "name": "Fruit or mishri for bhog", "note": "", "optional": true }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "Vidhi — step by step",
+          "steps": [
+            { "number": 1, "title": "Bathe and clean the puja space", "description": "Morning bath, clean clothes. Wipe the altar and place the Shivling or Shiva image facing you.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 2, "title": "Take the sankalp", "description": "Sit facing east. Take water in your right palm, speak the sankalp, and let the water fall.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 3, "title": "Abhishek with water", "description": "Pour a steady, thin stream over the Shivling.", "mantraChip": "ॐ नमः शिवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 4, "title": "Abhishek with milk, then water again", "description": "Milk abhishek is loved across North India; scripture asks only for water and bilva.", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Pan-India, strongest in UP, Bihar, MP" } },
+            { "number": 5, "title": "Offer bilva leaves", "description": "Place the trifoliate leaves smooth side down on the Shivling.", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 6, "title": "Light the diya, offer dhoop and flowers", "description": "", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 7, "title": "Japa — 108 names or the panchakshari", "description": "Chant ॐ नमः शिवाय 108 times, or as many as your morning allows.", "mantraChip": "ॐ नमः शिवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 8, "title": "Aarti and bhog", "description": "Close with aarti. Offer fruit or mishri, then share it as prasad.", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "The mantra",
+          "mantra": {
+            "devanagari": "ॐ नमः शिवाय",
+            "transliteration": "oṃ namaḥ śivāya",
+            "meaning": "I bow to Shiva — the five-syllable mantra that needs no initiation.",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "FASTING",
+          "title": "Choose your fast",
+          "fasting": [
+            { "name": "Nirjala", "description": "No food, no water, sunrise to sunset. Only for the able-bodied and experienced.", "recommended": false },
+            { "name": "Sajal", "description": "Water, milk and fruit through the day. One sattvik meal after sunset puja.", "recommended": true },
+            { "name": "Phalahar", "description": "Fruit, milk, sabudana and rock-salt preparations. Right for pregnancy, illness and age.", "recommended": false }
+          ],
+          "text": "There is no nirjala mandate anywhere in the source text. The vrat is devotion, not endurance."
+        },
+        {
+          "type": "MYTHS",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "I broke my fast by mistake. Is the vrat ruined and will something bad happen?", "answer": "No. Complete the day with devotion and continue. No text attaches punishment to an honest lapse." },
+            { "question": "Can women do abhishek during Sawan?", "answer": "Yes. No Puranic source bars women from Shiva abhishek. Restrictions you may have heard are regional custom, not Dharma." },
+            { "question": "Is the vrat invalid without a priest?", "answer": "The Sawan Somwar vrat is a home observance. A purohit is a choice, never a requirement." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "सावन सोमवार व्रत — सम्पूर्ण विधि",
+      "heroSubtitle": "श्रावण के सोमवार का व्रत — शास्त्र के अनुसार, बिना भय के।",
+      "deck": "सावन के सोमवार शिव के क्यों हैं, शास्त्र वास्तव में क्या कहता है, और घर पर एक घंटे में पूरी होने वाली विधि।",
+      "introHtml": "<p>श्रावण मास का प्रत्येक सोमवार शिव के लिए रखा जाता है। व्रत का मूल सरल है: स्नान, संकल्प, अभिषेक और अपनी क्षमता के अनुसार उपवास। बाकी सब — कि टूटा व्रत अनिष्ट लाता है, कि निर्जला अनिवार्य है — या तो प्रथा है या भ्रांति। यह मार्गदर्शिका तीनों को अलग करती है।</p>",
+      "blocks": []
+    }
+  }
+}
