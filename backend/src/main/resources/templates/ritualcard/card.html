@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title th:text="${card.festivalName} + ' — Ritual Card'">Ritual Card</title>
+<style>
+  /* Self-contained: no external fonts. System stack with Devanagari fallbacks. */
+  :root {
+    --paper: #F2EDE4;
+    --ink: #2A2118;
+    --ink-soft: #6B5D4A;
+    --ink-muted: #9A8C76;
+    --border: #D8CFC0;
+    --gold: #A07800;
+    --amber: #E8A020;
+    --rose: #EF0F54;
+    --tapa-rose: #D4175A;
+    --dark: #1A1208;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--paper); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans",
+                 "Noto Sans Devanagari", "Mangal", "Kohinoor Devanagari", "Devanagari Sangam MN",
+                 Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .card {
+    width: 390px;
+    margin: 0 auto;
+    background: var(--paper);
+    padding: 20px 16px;
+  }
+  @page { size: A5 portrait; margin: 0; }
+  @media print {
+    html, body { width: 390px; }
+    .card { page-break-inside: avoid; }
+  }
+
+  /* Block 1 — header */
+  .header { text-align: center; margin-bottom: 16px; }
+  .header .glyph { font-size: 24px; color: var(--tapa-rose); margin-bottom: 4px; font-weight: 500; }
+  .header .name { font-size: 20px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .header .sub { font-size: 13px; color: var(--ink-soft); }
+
+  /* Block 2 — panchang strip */
+  .panchang {
+    background: var(--dark);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panchang .cell { text-align: center; flex: 1; padding: 0 4px; }
+  .panchang .label { font-size: 11px; color: var(--gold); font-weight: 500; letter-spacing: 0.3px; }
+  .panchang .value { font-size: 14px; font-weight: 500; color: #fff; margin-top: 2px; }
+  .panchang .value.hot { color: var(--rose); }
+  .panchang .cellsub { font-size: 11px; color: #666; }
+  .panchang .divider { width: 1px; height: 32px; background: #333; flex: none; }
+
+  /* Block 3 — samagri */
+  .samagri { margin-bottom: 14px; }
+  .section-title { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 8px; }
+  .samagri .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .samagri .col-a { border-right: 0.5px solid var(--border); padding-right: 10px; }
+  .samagri .col-b { padding-left: 10px; }
+  .samagri .group-title { font-size: 11px; color: var(--gold); font-weight: 500; margin-bottom: 6px; }
+  .samagri .items { font-size: 12px; color: var(--ink); line-height: 2; }
+
+  .rule { height: 0.5px; background: var(--border); margin: 0 0 14px; }
+
+  /* Block 4 — vidhi */
+  .vidhi { margin-bottom: 14px; }
+  .vidhi .day-sub { font-size: 11px; color: var(--ink-soft); margin: 8px 0 6px; font-style: italic; }
+  .vidhi .day-sub.first { margin-top: 0; }
+  .vidhi .step { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; }
+  .vidhi .num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--amber); color: #fff;
+    font-size: 11px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .vidhi .step.last .num { background: var(--rose); }
+  .vidhi .step-title { font-size: 12px; color: var(--ink); padding-top: 2px; line-height: 1.4; }
+
+  /* Block 5 — mantra */
+  .mantra {
+    background: var(--dark);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .mantra .label { font-size: 11px; color: var(--gold); font-weight: 500; letter-spacing: 0.3px; margin-bottom: 6px; }
+  .mantra .devanagari { font-size: 20px; color: #FFD000; font-weight: 500; margin-bottom: 4px; }
+  .mantra .translit { font-size: 13px; color: #ccc; margin-bottom: 4px; }
+  .mantra .count { font-size: 11px; color: #666; }
+
+  /* Block 6 — fasting */
+  .fasting {
+    background: #FFF8E6;
+    border: 0.5px solid #F0D080;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+  .fasting .label { font-size: 12px; font-weight: 500; color: #7A5800; margin-bottom: 4px; }
+  .fasting .lines { font-size: 12px; color: #5C4B12; line-height: 1.6; }
+  .fasting .lines b { font-weight: 500; }
+
+  /* Block 7 — footer */
+  .footer { text-align: center; padding-top: 6px; }
+  .footer .glyph { font-size: 14px; color: var(--tapa-rose); margin-bottom: 2px; }
+  .footer .line { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+  .footer .qr { margin-top: 8px; }
+  .footer .qr img { width: 64px; height: 64px; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- BLOCK 1: HEADER (always) -->
+  <div class="header" data-block="header">
+    <div class="glyph">तप्</div>
+    <div class="name" th:text="${card.festivalName}">Festival Name</div>
+    <div class="sub" th:text="${card.headerSubLine}">Date · Weekday · Tithi</div>
+  </div>
+
+  <!-- BLOCK 2: PANCHANG STRIP (always) -->
+  <div class="panchang" data-block="panchang">
+    <th:block th:each="f, it : ${card.panchang}">
+      <div class="divider" th:if="${!it.first}"></div>
+      <div class="cell">
+        <div class="label" th:text="${f.label}">Date</div>
+        <div class="value" th:classappend="${f.highlight} ? 'hot'" th:text="${f.value}">—</div>
+        <div class="cellsub" th:if="${f.sub != null}" th:text="${f.sub}"></div>
+      </div>
+    </th:block>
+  </div>
+
+  <!-- BLOCK 3: SAMAGRI CHECKLIST (conditional) -->
+  <div class="samagri" data-block="samagri" th:if="${card.samagri != null}">
+    <div class="section-title">Samagri checklist</div>
+    <div class="cols" th:if="${card.samagri.twoColumn}">
+      <div th:each="g, git : ${card.samagri.groups}"
+           th:classappend="${git.first} ? 'col-a' : 'col-b'">
+        <div class="group-title" th:if="${g.heading != null}" th:text="${g.heading}"></div>
+        <div class="items">
+          <div th:each="item : ${g.items}" th:text="'☐ ' + ${item}">☐ Item</div>
+        </div>
+      </div>
+    </div>
+    <div th:unless="${card.samagri.twoColumn}">
+      <div class="items" style="font-size:12px;line-height:2">
+        <div th:each="item : ${card.samagri.groups[0].items}" th:text="'☐ ' + ${item}">☐ Item</div>
+      </div>
+    </div>
+  </div>
+  <div class="rule" th:if="${card.samagri != null}"></div>
+
+  <!-- BLOCK 4: VIDHI (always) -->
+  <div class="vidhi" data-block="vidhi">
+    <div class="section-title">Vidhi — step by step</div>
+    <th:block th:each="s, sit : ${card.steps}">
+      <div class="day-sub" th:if="${s.subHeader != null}"
+           th:classappend="${sit.first} ? 'first'" th:text="${s.subHeader}"></div>
+      <div class="step" th:classappend="${s.last} ? 'last'">
+        <div class="num" th:text="${s.number}">1</div>
+        <div class="step-title" th:text="${s.title}">Step</div>
+      </div>
+    </th:block>
+  </div>
+  <div class="rule" th:if="${card.mantra != null or card.fasting != null}"></div>
+
+  <!-- BLOCK 5: MANTRA (conditional) -->
+  <div class="mantra" data-block="mantra" th:if="${card.mantra != null}">
+    <div class="label">Mantra</div>
+    <div class="devanagari" th:text="${card.mantra.devanagari}">ॐ नमः शिवाय</div>
+    <div class="translit" th:if="${card.mantra.transliteration != null}"
+         th:text="${card.mantra.transliteration}">Om Namah Shivaya</div>
+    <div class="count" th:text="${card.mantra.countLine}">Chant 108 times with a mala, or 11 / 21 / 51 times</div>
+  </div>
+
+  <!-- BLOCK 6: FASTING NOTE (conditional) -->
+  <div class="fasting" data-block="fasting" th:if="${card.fasting != null}">
+    <div class="label">Fasting</div>
+    <div class="lines">
+      <th:block th:each="f, fit : ${card.fasting}">
+        <b th:text="${f.name}">Nirjala</b> <span th:text="${f.text}">description</span><br th:if="${!fit.last}">
+      </th:block>
+    </div>
+  </div>
+
+  <!-- BLOCK 7: FOOTER (always) -->
+  <div class="footer" data-block="footer">
+    <div class="glyph">तप्</div>
+    <div class="line">thetapaco.com</div>
+    <div class="line" th:text="${card.sourceLine}">Source: Drik Panchang, Delhi-NCR · 2026</div>
+    <div class="qr" th:if="${qr != null}">
+      <img th:src="${qr}" alt="Open the full ritual guide" th:attr="data-qr-target=${card.guideUrl}">
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

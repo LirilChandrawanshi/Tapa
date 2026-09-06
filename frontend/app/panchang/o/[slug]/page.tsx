@@ -50,11 +50,13 @@ async function fetchSeriesMates(
 ): Promise<UpcomingObservance[]> {
   const isEkadashi = series.toLowerCase().includes("ekadashi");
   const list = await safeFetch(isEkadashi ? fetchEkadashi() : fetchUpcoming(60));
-  return (list ?? []).filter(
-    (u) =>
-      u.observance.series === series &&
-      !(u.observance.slug === selfSlug && u.observance.date === selfDate),
-  );
+  return (list ?? [])
+    .filter(
+      (u) =>
+        u.observance.series === series &&
+        !(u.observance.slug === selfSlug && u.observance.date === selfDate),
+    )
+    .sort((a, b) => a.observance.date.localeCompare(b.observance.date));
 }
 
 export default async function ObservancePage({ params }: Props) {

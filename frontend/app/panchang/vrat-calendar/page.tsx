@@ -25,7 +25,9 @@ export const metadata: Metadata = {
 
 export default async function VratCalendarPage() {
   const now = todayIst();
-  const upcoming = await safeFetch(fetchUpcoming(120));
+  const upcoming = (await safeFetch(fetchUpcoming(120)))
+    ?.slice()
+    .sort((a, b) => a.observance.date.localeCompare(b.observance.date));
 
   return (
     <main className="pb-16">

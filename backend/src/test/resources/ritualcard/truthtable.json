@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sawan-somwar-vrat",
+    "fixture": "sawanSomwar",
+    "description": "seeded shape: samagri yes, mantra yes, fasting yes -> all 7 blocks",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": ["Sawan Somwar Vrat", "☐ ", "Chant 108 times with a mala, or 11 / 21 / 51 times", "ॐ नमः शिवाय", "thetapaco.com", "Source: Drik Panchang, Delhi-NCR · 2026", "data:image/png;base64,"],
+    "mustNotContain": []
+  },
+  {
+    "id": "nag-panchami-like",
+    "fixture": "nagPanchami",
+    "description": "no samagri, no mantra, fasting yes -> conditional blocks 3+5 absent; festival field set (Muhurat)",
+    "present": ["header", "panchang", "vidhi", "fasting", "footer"],
+    "absent": ["samagri", "mantra"],
+    "mustContain": ["Muhurat"],
+    "mustNotContain": ["Parana", "Samagri checklist", "Chant"]
+  },
+  {
+    "id": "ekadashi-like",
+    "fixture": "ekadashi",
+    "description": "all blocks + ekadashi field set (Fast/Parana), two-group samagri, >8 steps capped at 8",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": ["Fast", "Parana", "At sunrise", "For the altar", "For the vrat", "Evening — parana prep"],
+    "mustNotContain": ["Muhurat", "NEVER-RENDERED-STEP-9"]
+  }
+]

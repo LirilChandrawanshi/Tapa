@@ -29,12 +29,15 @@ export const metadata: Metadata = {
     "Every festival of 2026 grouped by season, with Gregorian dates first and the tithi beneath — calculated for Delhi-NCR (IST).",
 };
 
-/** Group by seasonBlock, preserving the API's (chronological) order. */
+/** Sort chronologically, then group consecutive runs of the same season. */
 function groupBySeason(
   items: UpcomingObservance[],
 ): { season: string; items: UpcomingObservance[] }[] {
+  const sorted = items
+    .slice()
+    .sort((a, b) => a.observance.date.localeCompare(b.observance.date));
   const groups: { season: string; items: UpcomingObservance[] }[] = [];
-  for (const u of items) {
+  for (const u of sorted) {
     const season = u.observance.seasonBlock ?? "Through the year";
     const last = groups[groups.length - 1];
     if (last && last.season === season) last.items.push(u);

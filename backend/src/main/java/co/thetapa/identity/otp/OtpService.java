@@ -82,7 +82,7 @@ public class OtpService {
     }
 
     /** Accepts "9876543210", "+919876543210", "919876543210" → "+919876543210". */
-    static String normalize(String phone) {
+    public static String normalize(String phone) {
         String digits = phone == null ? "" : phone.replaceAll("[^0-9]", "");
         if (digits.length() == 10) {
             return "+91" + digits;

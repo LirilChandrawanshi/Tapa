@@ -45,13 +45,15 @@ export function fmtDate(iso: string): string {
   }).format(asUtc(iso));
 }
 
-/** "14 Sep" */
+const MONTHS_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+] as const;
+
+/** "14 Sep" (fixed abbreviations — en-GB Intl renders "Sept"). */
 export function fmtShort(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  }).format(asUtc(iso));
+  const d = asUtc(iso);
+  return `${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`;
 }
 
 /** "Monday" */
