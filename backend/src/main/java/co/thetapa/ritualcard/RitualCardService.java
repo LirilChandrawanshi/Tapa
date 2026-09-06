@@ -161,17 +161,23 @@ public class RitualCardService {
 
     // ---- PDF via Playwright -------------------------------------------------
 
-    /** Renders HTML to a single-page A5 PDF with a per-render browser context. */
+    /**
+     * Renders HTML to a single-page PDF with a per-render browser context.
+     * The spec mandates ONE sheet: width is fixed at A5 (105mm), height grows
+     * with the content (390px CSS ≙ 105mm, so px→mm scales by 105/390).
+     */
     public byte[] renderPdf(String html) {
         Browser b = sharedBrowser();
-        try (BrowserContext context = b.newContext()) {
+        try (BrowserContext context = b.newContext(
+            new Browser.NewContextOptions().setViewportSize(390, 844))) {
             Page page = context.newPage();
             page.setContent(html, new Page.SetContentOptions()
                 .setWaitUntil(com.microsoft.playwright.options.WaitUntilState.LOAD));
+            double contentPx = ((Number) page.evaluate("document.documentElement.scrollHeight")).doubleValue();
+            double heightMm = Math.max(148, Math.ceil(contentPx * 105.0 / 390.0) + 2);
             return page.pdf(new Page.PdfOptions()
-                .setPreferCSSPageSize(true)   // honors the template's @page A5
                 .setWidth("105mm")
-                .setHeight("148mm")
+                .setHeight(heightMm + "mm")
                 .setPrintBackground(true));
         }
     }
