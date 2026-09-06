@@ -30,7 +30,16 @@ type EventName =
   | "login_skipped"
   | "notify_me_submitted"
   | "pdf_downloaded"
-  | "circle_join_clicked";
+  | "circle_join_clicked"
+  // Phase 2 — commerce
+  | "kit_viewed"
+  | "kit_added_to_cart"
+  | "cart_viewed"
+  | "checkout_started"
+  | "payment_method_selected"
+  | "payment_completed"
+  | "payment_failed"
+  | "order_cancelled";
 
 interface MixpanelLike {
   track: (name: string, props?: Record<string, unknown>) => void;
