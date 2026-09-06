@@ -1,0 +1,161 @@
+/**
+ * Panchang-page helpers that sit beside lib/api.ts.
+ *
+ * Panchang pages are `force-dynamic` and must render a decent page with the
+ * backend down, so every fetch goes through `safeFetch` (error → null) and the
+ * page shows a "being verified" state instead of crashing the build.
+ */
+
+import type { Observance, UpcomingObservance } from "./types";
+
+/** Resolve a promise to null on any failure — dead backend, bad JSON, 5xx. */
+export async function safeFetch<T>(promise: Promise<T>): Promise<T | null> {
+  try {
+    return await promise;
+  } catch {
+    return null;
+  }
+}
+
+/* ── Dates ──────────────────────────────────────────────────────────────
+ * All panchang dates are IST calendar dates serialised as "YYYY-MM-DD".
+ * We parse them as UTC midnight and format with timeZone UTC so the label
+ * never shifts with the server's own zone. */
+
+const DAY_MS = 86_400_000;
+
+function asUtc(iso: string): Date {
+  return new Date(`${iso}T00:00:00Z`);
+}
+
+/** Today's calendar date in IST, as "YYYY-MM-DD". */
+export function todayIst(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
+}
+
+/** "14 September 2026" */
+export function fmtDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(asUtc(iso));
+}
+
+/** "14 Sep" */
+export function fmtShort(iso: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(asUtc(iso));
+}
+
+/** "Monday" */
+export function weekday(iso: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    timeZone: "UTC",
+  }).format(asUtc(iso));
+}
+
+/** "Monday, 14 September 2026" */
+export function fmtLong(iso: string): string {
+  return `${weekday(iso)}, ${fmtDate(iso)}`;
+}
+
+/** "14–23 September 2026" or across months "26 Sep – 11 Oct 2026". */
+export function fmtRange(startIso: string, endIso?: string): string {
+  if (!endIso || endIso === startIso) return fmtDate(startIso);
+  const s = asUtc(startIso);
+  const e = asUtc(endIso);
+  if (
+    s.getUTCMonth() === e.getUTCMonth() &&
+    s.getUTCFullYear() === e.getUTCFullYear()
+  ) {
+    return `${s.getUTCDate()}–${fmtDate(endIso)}`;
+  }
+  return `${fmtShort(startIso)} – ${fmtShort(endIso)} ${e.getUTCFullYear()}`;
+}
+
+/** Month key "2026-09" for `iso`, shifted by `offsetMonths`. */
+export function monthKey(iso: string, offsetMonths = 0): string {
+  const d = asUtc(iso);
+  d.setUTCMonth(d.getUTCMonth() + offsetMonths, 1);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Whole days from `fromIso` to `toIso` (negative if past). */
+export function daysBetween(fromIso: string, toIso: string): number {
+  return Math.round((asUtc(toIso).getTime() - asUtc(fromIso).getTime()) / DAY_MS);
+}
+
+/* ── Observance list utilities ───────────────────────────────────────── */
+
+/** Merge month payloads, de-duplicate by slug+date, sort by date. */
+export function mergeObservances(
+  ...lists: (UpcomingObservance[] | null)[]
+): UpcomingObservance[] {
+  const seen = new Set<string>();
+  const out: UpcomingObservance[] = [];
+  for (const list of lists) {
+    for (const u of list ?? []) {
+      const key = `${u.observance.slug}:${u.observance.date}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(u);
+    }
+  }
+  return out.sort((a, b) => a.observance.date.localeCompare(b.observance.date));
+}
+
+/* ── Vrat-calendar filter chips ──────────────────────────────────────── */
+
+export const VRAT_FILTERS = [
+  { key: "all", label: "All" },
+  { key: "ekadashi", label: "Ekadashi" },
+  { key: "teej", label: "Teej" },
+  { key: "sawan-somwar", label: "Sawan Somwar" },
+  { key: "purnima", label: "Purnima" },
+  { key: "amavasya", label: "Amavasya" },
+] as const;
+
+export type VratFilterKey = (typeof VRAT_FILTERS)[number]["key"];
+
+/** Match on series first, falling back to name/tithi wording. */
+export function matchesVratFilter(o: Observance, f: VratFilterKey): boolean {
+  if (f === "all") return true;
+  const hay = `${o.series ?? ""} ${o.name} ${o.tithiLabel ?? ""}`.toLowerCase();
+  switch (f) {
+    case "ekadashi":
+      return hay.includes("ekadashi");
+    case "teej":
+      return hay.includes("teej");
+    case "sawan-somwar":
+      return hay.includes("somwar") || hay.includes("somvar");
+    case "purnima":
+      return hay.includes("purnima") || hay.includes("poornima");
+    case "amavasya":
+      return hay.includes("amavasya");
+  }
+}
+
+/* ── Constants shared by the panchang pages ──────────────────────────── */
+
+/**
+ * Ritual-guide articles live at /ritual-guides/[category]/[slug]; the page
+ * resolves by slug alone (the category segment is presentational), and
+ * observances fixed to a tithi are festive pujans — so that is the segment
+ * we link through.
+ */
+export function guideHref(articleSlug: string): string {
+  return `/ritual-guides/festive-pujans/${articleSlug}`;
+}
+
+export const CITY_LABEL = "Delhi-NCR";
+export const SOURCE_LINE =
+  "Drik Panchang · calculated for Delhi-NCR (IST) · regenerates annually";
+export const CALENDAR_PDF_HREF = "/api/v1/panchang/calendar.pdf";
