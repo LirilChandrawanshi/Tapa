@@ -64,6 +64,20 @@ export function weekday(iso: string): string {
   }).format(asUtc(iso));
 }
 
+/** "till 10:03 pm" (adds "· 7 Sep" when the window ends on a later date) */
+export function fmtEnds(endsAtIso: string, dayIso?: string): string {
+  const [datePart, timePart] = endsAtIso.split("T");
+  if (!timePart) {
+    return `till ${fmtShort(endsAtIso)}`;
+  }
+  const [h, m] = timePart.split(":").map(Number);
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const suffix = h < 12 ? "am" : "pm";
+  const time = `${hour12}:${String(m).padStart(2, "0")} ${suffix}`;
+  const rollsOver = dayIso && datePart && !datePart.startsWith(dayIso.slice(0, 10));
+  return rollsOver ? `till ${time} · ${fmtShort(datePart)}` : `till ${time}`;
+}
+
 /** "Monday, 14 September 2026" */
 export function fmtLong(iso: string): string {
   return `${weekday(iso)}, ${fmtDate(iso)}`;

@@ -3,6 +3,7 @@ import { CountdownPill } from "@/components/CountdownPill";
 import { DataStateNote } from "@/components/panchang/DataMeta";
 import {
   CITY_LABEL,
+  fmtEnds,
   fmtLong,
   guideHref,
 } from "@/lib/panchangExtras";
@@ -38,7 +39,7 @@ export function PanchangFold({
         {
           key: "Tithi",
           value: day.tithi?.name ?? "Being verified",
-          sub: day.tithi?.endsAt ? `till ${day.tithi.endsAt}` : undefined,
+          sub: day.tithi?.endsAt ? fmtEnds(day.tithi.endsAt, day.date) : undefined,
         },
         {
           key: "Paksha",
@@ -48,7 +49,7 @@ export function PanchangFold({
         {
           key: "Nakshatra",
           value: day.nakshatra?.name ?? "Being verified",
-          sub: day.nakshatra?.endsAt ? `till ${day.nakshatra.endsAt}` : undefined,
+          sub: day.nakshatra?.endsAt ? fmtEnds(day.nakshatra.endsAt, day.date) : undefined,
         },
         {
           key: "Sunrise",

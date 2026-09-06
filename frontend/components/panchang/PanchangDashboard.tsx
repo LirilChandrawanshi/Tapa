@@ -1,5 +1,5 @@
 import type { PanchangDay } from "@/lib/types";
-import { CITY_LABEL, fmtLong } from "@/lib/panchangExtras";
+import { CITY_LABEL, fmtEnds, fmtLong } from "@/lib/panchangExtras";
 
 interface Cell {
   key: string;
@@ -12,7 +12,7 @@ function buildCells(day: PanchangDay): Cell[] {
     {
       key: "Tithi",
       value: day.tithi?.name ?? "—",
-      sub: day.tithi?.endsAt ? `till ${day.tithi.endsAt}` : undefined,
+      sub: day.tithi?.endsAt ? fmtEnds(day.tithi.endsAt, day.date) : undefined,
     },
     {
       key: "Paksha",
@@ -22,7 +22,7 @@ function buildCells(day: PanchangDay): Cell[] {
     {
       key: "Nakshatra",
       value: day.nakshatra?.name ?? "—",
-      sub: day.nakshatra?.endsAt ? `till ${day.nakshatra.endsAt}` : undefined,
+      sub: day.nakshatra?.endsAt ? fmtEnds(day.nakshatra.endsAt, day.date) : undefined,
     },
     {
       key: "Yoga",
