@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/*
+ * Tapa locked design tokens.
+ * Source: newest HTML prototypes (Aug 30) in the spec bundle.
+ * "These are the only colors used across the entire platform. No exceptions."
+ */
+@theme {
+  /* surfaces */
+  --color-bg: #f2ede4;
+  --color-card: #ffffff;
+  --color-ink: #1c1712;
+  --color-ink-deep: #1a1208;
+
+  /* brand + accents */
+  --color-cta: #fd066d;
+  --color-amber: #e8a020;
+  --color-gold: #a07800;
+  --color-yellow: #edab3a;
+
+  /* text */
+  --color-body: #2c2010;
+  --color-mid: #5c4b12;
+  --color-sub: #8a7a68;
+  --color-hero-text: #fffdf5;
+  --color-eyebrow-dark: #e3b567;
+
+  /* borders */
+  --color-border: #e8e0d0;
+  --color-border-light: #f0e8d8;
+
+  /* DPB classification pairs */
+  --color-dharma-bg: #e6f1e6;
+  --color-dharma-fg: #27500a;
+  --color-dharma-bd: #c9dfc9;
+  --color-pratha-bg: #fff8e6;
+  --color-pratha-fg: #a07800;
+  --color-pratha-bd: #efe0b8;
+  --color-bhranti-bg: #fef0f4;
+  --color-bhranti-fg: #4a3525;
+  --color-bhranti-bd: #d9cbb8;
+
+  /* panchang timing data (no DPB tag by design) */
+  --color-data-bg: #eef3f7;
+  --color-data-fg: #1f4460;
+  --color-data-bd: #c3d6e4;
+
+  /* whatsapp */
+  --color-wa: #1f9d52;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-devanagari: "Tiro Devanagari Hindi", "Noto Sans Devanagari", serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+}

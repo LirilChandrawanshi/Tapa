@@ -1,0 +1,23 @@
+# Infra only — run backend/frontend natively for hot reload:
+#   docker compose -f docker-compose.dev.yml up -d
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  typesense:
+    image: typesense/typesense:27.1
+    ports:
+      - "8108:8108"
+    environment:
+      TYPESENSE_API_KEY: dev-typesense-key
+      TYPESENSE_DATA_DIR: /data
+    volumes:
+      - typesense-data:/data
+
+volumes:
+  mongo-data:
+  typesense-data:

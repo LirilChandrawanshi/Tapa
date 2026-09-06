@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: tapa-backend
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/tapa}
+      auto-index-creation: true
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+tapa:
+  jwt:
+    # override in prod via TAPA_JWT_SECRET
+    secret: ${TAPA_JWT_SECRET:dev-only-secret-change-me-0123456789abcdef0123456789abcdef}
+    access-ttl-minutes: 15
+    refresh-ttl-days: 30
+  otp:
+    ttl-minutes: 5
+    resend-seconds: 28
+    max-attempts: 5
+  media:
+    root: ${TAPA_MEDIA_ROOT:../media}
+  cors:
+    allowed-origins: ${TAPA_CORS_ORIGINS:http://localhost:3000}
+
+logging:
+  level:
+    co.thetapa: DEBUG
