@@ -60,9 +60,20 @@ public class OtpService {
         return new RequestResult(resendSeconds);
     }
 
+    /**
+     * Dev master code — ONLY honoured while the console SMS provider is active
+     * (no real SMS provider configured). The moment a production provider bean
+     * exists, this path is dead. Never becomes a config flag.
+     */
+    private static final String DEV_MASTER_CODE = "000000";
+
     /** Returns the normalized phone on success; throws otherwise. */
     public String verify(String phone, String code) {
         String normalized = normalize(phone);
+        if (smsProvider instanceof ConsoleSmsProvider && DEV_MASTER_CODE.equals(code)) {
+            sessions.deleteByPhone(normalized);
+            return normalized;
+        }
         OtpSession session = sessions.findTopByPhoneOrderByCreatedAtDesc(normalized)
             .orElseThrow(() -> new OtpInvalidException("No OTP requested for this number."));
 

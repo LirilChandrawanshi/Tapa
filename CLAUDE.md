@@ -30,5 +30,7 @@ dharmic concepts, glossary, search, accounts, ritual-card PDFs, custom admin).
 ## Dev
 - No Docker on this machine: `make db` (local mongod on .data/mongo), `make backend`,
   `make frontend`. Compose files exist for portable/prod use.
+- Dev login: any 10-digit number + OTP `000000` (works only while ConsoleSmsProvider
+  is active — dead the moment a real SMS provider bean exists). `9876543210` = admin.
 - Tests: `cd backend && mvn verify` (Testcontainers needs Docker — skip locally,
   runs in CI), `cd frontend && npm run typecheck && npm run build`.
