@@ -20,14 +20,23 @@ public class SecurityConfig {
     @Value("${tapa.cors.allowed-origins}")
     private List<String> allowedOrigins;
 
+    private final co.thetapa.identity.JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(co.thetapa.identity.JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthFilter,
+                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                // JWT filter + role gating for /me and /admin arrive with M6/M9
+                .requestMatchers("/api/v1/me/**").authenticated()
+                .requestMatchers("/api/v1/admin/**").hasAnyRole("EDITOR", "ADMIN")
                 .requestMatchers("/api/v1/**", "/actuator/health", "/actuator/info").permitAll()
                 .anyRequest().denyAll());
         return http.build();
