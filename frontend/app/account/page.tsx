@@ -16,6 +16,7 @@ import {
   type SavedRitual,
 } from "@/lib/auth";
 import { getMyBookings } from "@/lib/booking";
+import { getMyMandaliRequests } from "@/lib/mandali";
 import { getMyOrders } from "@/lib/orders";
 
 function initialsOf(name: string, phone: string): string {
@@ -64,6 +65,7 @@ export default function AccountPage() {
   const [savedOpen, setSavedOpen] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
   const [bookingCount, setBookingCount] = useState(0);
+  const [mandaliCount, setMandaliCount] = useState(0);
   const [circleStatus, setCircleStatus] = useState<string>("NONE");
   const [gateOpen, setGateOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
@@ -71,12 +73,13 @@ export default function AccountPage() {
   const [removing, setRemoving] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [meRes, savedRes, ordersRes, bookingsRes, circleRes] =
+    const [meRes, savedRes, ordersRes, bookingsRes, mandaliRes, circleRes] =
       await Promise.all([
         getMe(),
         getSavedRituals(),
         getMyOrders(),
         getMyBookings(),
+        getMyMandaliRequests(),
         fetch("/api/v1/me/circle", {
           credentials: "include",
           cache: "no-store",
@@ -88,6 +91,7 @@ export default function AccountPage() {
     setSavedItems(savedRes.ok ? savedRes.data : []);
     setOrderCount(ordersRes.ok ? (ordersRes.data ?? []).length : 0);
     setBookingCount(bookingsRes.ok ? (bookingsRes.data ?? []).length : 0);
+    setMandaliCount(mandaliRes.ok ? (mandaliRes.data ?? []).length : 0);
     setCircleStatus(circleRes?.data?.status ?? "NONE");
     setLoading(false);
   }, []);
@@ -331,6 +335,16 @@ export default function AccountPage() {
           <span aria-hidden>🪔</span>
           <span className="flex-1 font-semibold text-body">Puja Bookings</span>
           <span className="text-[12px] text-sub">{bookingCount}</span>
+          <span aria-hidden className="text-[11px] text-sub">
+            ›
+          </span>
+        </Link>
+
+        {/* Mandali Requests */}
+        <Link href="/bhajan-mandali/track" className={`${ROW} hover:bg-bg/60`}>
+          <span aria-hidden>🎶</span>
+          <span className="flex-1 font-semibold text-body">Mandali Requests</span>
+          <span className="text-[12px] text-sub">{mandaliCount}</span>
           <span aria-hidden className="text-[11px] text-sub">
             ›
           </span>
