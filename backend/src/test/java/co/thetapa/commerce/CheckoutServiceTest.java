@@ -41,7 +41,9 @@ class CheckoutServiceTest {
             .thenReturn(Optional.of(new PincodeServiceability("110024", true, 3, "Lajpat Nagar")));
         StockService stockService = Mockito.mock(StockService.class);
         when(stockService.reserveAll(any())).thenReturn(null);
-        service = new CheckoutService(products, orders, pincodes, new MockPaymentProvider(), mongo, stockService);
+        co.thetapa.flags.FeatureFlagService flags = Mockito.mock(co.thetapa.flags.FeatureFlagService.class);
+        when(flags.all()).thenReturn(Map.of("kits_launched", true, "purohit_tab_visible", true));
+        service = new CheckoutService(products, orders, pincodes, new MockPaymentProvider(), mongo, stockService, flags);
     }
 
     private Product live(String slug, long pricePaise) {

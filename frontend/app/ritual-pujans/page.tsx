@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CategoryHero } from "@/components/CategoryHero";
 import { SectionHeader } from "@/components/SectionHeader";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { PhaseClosed } from "@/components/PhaseClosed";
 import { getFlags } from "@/lib/flags";
 import { fetchProducts } from "@/lib/shop";
 import { getSection } from "@/lib/taxonomy";
@@ -19,6 +20,10 @@ const ANTI_UPSELL =
   "You do not need a kit to pray — every guide is free. These are for when you want the sourcing done.";
 
 export default async function RitualPujansPage() {
+  const __flags = await getFlags();
+  if (!__flags.kits_launched) {
+    return <PhaseClosed section="kits" />;
+  }
   const section = getSection("ritual-pujans");
   const [flags, products] = await Promise.all([getFlags(), fetchProducts()]);
 

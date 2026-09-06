@@ -33,16 +33,19 @@ public class CheckoutService {
     private final PaymentProvider paymentProvider;
     private final MongoTemplate mongo;
     private final StockService stock;
+    private final co.thetapa.flags.FeatureFlagService flags;
 
     public CheckoutService(ProductRepository products, OrderRepository orders,
                            PincodeRepository pincodes, PaymentProvider paymentProvider,
-                           MongoTemplate mongo, StockService stock) {
+                           MongoTemplate mongo, StockService stock,
+                           co.thetapa.flags.FeatureFlagService flags) {
         this.products = products;
         this.orders = orders;
         this.pincodes = pincodes;
         this.paymentProvider = paymentProvider;
         this.mongo = mongo;
         this.stock = stock;
+        this.flags = flags;
     }
 
     public record CartLine(String productSlug, int qty) {
@@ -56,6 +59,12 @@ public class CheckoutService {
     }
 
     public CheckoutResult checkout(CheckoutRequest request, String userId) {
+        // the phase gate is authoritative here, not just in the UI — no orders
+        // exist until the marketing team flips kits_launched
+        if (!Boolean.TRUE.equals(flags.all().get(co.thetapa.flags.FeatureFlagService.KITS_LAUNCHED))) {
+            throw new ValidationFailedException(List.of(
+                "Ritual Pujans has not opened for orders yet. Join the notify list and we'll tell you the moment pre-booking opens."));
+        }
         List<String> errors = new ArrayList<>();
 
         if (request.items() == null || request.items().isEmpty()) {

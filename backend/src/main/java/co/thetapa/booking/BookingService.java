@@ -29,15 +29,17 @@ public class BookingService {
     private final BookingRepository bookings;
     private final PaymentProvider paymentProvider;
     private final MongoTemplate mongo;
+    private final co.thetapa.flags.FeatureFlagService flags;
 
     public BookingService(PujaTypeRepository pujaTypes, PurohitRepository purohits,
                           BookingRepository bookings, PaymentProvider paymentProvider,
-                          MongoTemplate mongo) {
+                          MongoTemplate mongo, co.thetapa.flags.FeatureFlagService flags) {
         this.pujaTypes = pujaTypes;
         this.purohits = purohits;
         this.bookings = bookings;
         this.paymentProvider = paymentProvider;
         this.mongo = mongo;
+        this.flags = flags;
     }
 
     private static final List<Booking.Status> BLOCKING =
@@ -98,6 +100,11 @@ public class BookingService {
     }
 
     public BookingResult book(BookingRequest request, String userId) {
+        if (!Boolean.TRUE.equals(flags.all().get(
+            co.thetapa.flags.FeatureFlagService.PUROHIT_TAB_VISIBLE))) {
+            throw new ValidationFailedException(List.of(
+                "Purohit booking has not opened yet. Leave your number on the notify list and we'll call you first."));
+        }
         PujaType puja = pujaTypes.findBySlug(request.pujaSlug())
             .orElseThrow(() -> new NotFoundException("puja", request.pujaSlug()));
         PujaType.Variant variant = puja.getVariants().stream()

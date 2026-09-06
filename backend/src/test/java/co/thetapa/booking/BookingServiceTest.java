@@ -37,7 +37,9 @@ class BookingServiceTest {
         when(mongo.findAndModify(any(), any(), any(), eq(Map.class), eq("counters")))
             .thenReturn(Map.of("seq", 1));
         when(bookings.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        service = new BookingService(pujaTypes, purohits, bookings, new MockPaymentProvider(), mongo);
+        co.thetapa.flags.FeatureFlagService flags = Mockito.mock(co.thetapa.flags.FeatureFlagService.class);
+        when(flags.all()).thenReturn(Map.of("kits_launched", true, "purohit_tab_visible", true));
+        service = new BookingService(pujaTypes, purohits, bookings, new MockPaymentProvider(), mongo, flags);
 
         PujaType rudra = new PujaType();
         rudra.setSlug("rudrabhishek");

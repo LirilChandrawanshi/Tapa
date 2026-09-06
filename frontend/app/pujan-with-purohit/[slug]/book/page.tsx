@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhaseClosed } from "@/components/PhaseClosed";
+import { getFlags } from "@/lib/flags";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -16,6 +18,10 @@ interface Props {
 }
 
 export default async function BookPujaPage({ params }: Props) {
+  const __flags = await getFlags();
+  if (!__flags.purohit_tab_visible) {
+    return <PhaseClosed section="purohit" />;
+  }
   const { slug } = await params;
   const [puja, catalog] = await Promise.all([fetchPuja(slug), fetchPujas()]);
   if (!puja) notFound();

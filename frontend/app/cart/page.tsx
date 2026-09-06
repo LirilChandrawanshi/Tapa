@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhaseClosed } from "@/components/PhaseClosed";
+import { getFlags } from "@/lib/flags";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CartView } from "@/components/shop/CartView";
 
@@ -7,7 +9,13 @@ export const metadata: Metadata = {
   description: "Review your pujan bag before checkout.",
 };
 
-export default function CartPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CartPage() {
+  const flags = await getFlags();
+  if (!flags.kits_launched) {
+    return <PhaseClosed section="kits" />;
+  }
   return (
     <div>
       <Breadcrumb

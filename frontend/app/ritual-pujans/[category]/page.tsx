@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhaseClosed } from "@/components/PhaseClosed";
+import { getFlags } from "@/lib/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -30,6 +32,10 @@ export default async function RitualPujansCategoryPage({
 }: {
   params: Promise<{ category: string }>;
 }) {
+  const __flags = await getFlags();
+  if (!__flags.kits_launched) {
+    return <PhaseClosed section="kits" />;
+  }
   const { category } = await params;
   const child = categoryLink(category);
   if (!child) notFound();

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhaseClosed } from "@/components/PhaseClosed";
+import { getFlags } from "@/lib/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -22,6 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PujaDetailPage({ params }: Props) {
+  const __flags = await getFlags();
+  if (!__flags.purohit_tab_visible) {
+    return <PhaseClosed section="purohit" />;
+  }
   const { slug } = await params;
   const [puja, catalog] = await Promise.all([fetchPuja(slug), fetchPujas()]);
 

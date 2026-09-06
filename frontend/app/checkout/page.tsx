@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhaseClosed } from "@/components/PhaseClosed";
+import { getFlags } from "@/lib/flags";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CheckoutView } from "@/components/shop/CheckoutView";
 
@@ -7,7 +9,13 @@ export const metadata: Metadata = {
   description: "Delivery address and payment — prepaid only, no COD.",
 };
 
-export default function CheckoutPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CheckoutPage() {
+  const flags = await getFlags();
+  if (!flags.kits_launched) {
+    return <PhaseClosed section="kits" />;
+  }
   return (
     <div>
       <Breadcrumb

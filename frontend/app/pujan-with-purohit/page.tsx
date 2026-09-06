@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PhaseClosed } from "@/components/PhaseClosed";
+import { getFlags } from "@/lib/flags";
 import Link from "next/link";
 import { CategoryHero } from "@/components/CategoryHero";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -105,6 +107,10 @@ function PujaRow({ puja, slots }: { puja: PujaType; slots: TimeSlot[] }) {
 }
 
 export default async function PujanWithPurohitPage() {
+  const __flags = await getFlags();
+  if (!__flags.purohit_tab_visible) {
+    return <PhaseClosed section="purohit" />;
+  }
   const catalog = await fetchPujas();
   const pujas = sortPujas(catalog.items.filter((p) => p.active !== false));
 
