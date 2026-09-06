@@ -78,3 +78,14 @@ Run before each release. Setup: `make db`, seed once (`make seed`), then
       kits appear (last) in search; flip back off reverts all three.
 - [ ] Policy pages render; Grievance Officer named (replace placeholder!) before
       commerce goes public.
+
+## Phase 5 — Bhajan Mandali
+- [ ] Flag off → /bhajan-mandali shows "opens soon"; request API 422s.
+- [ ] Flag on → 6 types listed; request form → TM- number, "confirm within 24 hours".
+- [ ] Admin confirm requires a quoted price; track shows the quote; decline is gentle.
+- [ ] Requester cancel while REQUESTED/CONFIRMED; wrong phone can't see the request.
+
+## Automated
+- [ ] `cd frontend && npm run build && npm run test:e2e` — 27/27 (backend must be up).
+- [ ] `cd backend && mvn test` — 55/55.
+- [ ] GET /api/v1/panchang/calendar.pdf and /api/v1/cards/sawan-somwar-vrat.pdf render.

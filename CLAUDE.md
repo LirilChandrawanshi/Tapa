@@ -32,5 +32,8 @@ dharmic concepts, glossary, search, accounts, ritual-card PDFs, custom admin).
   `make frontend`. Compose files exist for portable/prod use.
 - Dev login: any 10-digit number + OTP `000000` (works only while ConsoleSmsProvider
   is active — dead the moment a real SMS provider bean exists). `9876543210` = admin.
-- Tests: `cd backend && mvn verify` (Testcontainers needs Docker — skip locally,
-  runs in CI), `cd frontend && npm run typecheck && npm run build`.
+- Tests: `cd backend && mvn test` (55 unit tests, no Docker needed);
+  `cd frontend && npm run typecheck && npm run build`; E2E: `npm run build && npm run test:e2e`
+  (27 Playwright tests, backend must be up on :8080).
+- Launch gates: kits_launched / purohit_tab_visible / mandali_visible in /admin/flags —
+  server-authoritative, ~3s propagation. All OFF until business sign-off.
