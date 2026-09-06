@@ -9,11 +9,13 @@
 export interface Flags {
   readonly kits_launched: boolean;
   readonly purohit_tab_visible: boolean;
+  readonly mandali_visible: boolean;
 }
 
 export const DEFAULT_FLAGS: Flags = {
   kits_launched: false,
   purohit_tab_visible: false,
+  mandali_visible: false,
 };
 
 const API_BASE =
@@ -44,6 +46,10 @@ export async function getFlags(): Promise<Flags> {
         typeof record.purohit_tab_visible === "boolean"
           ? record.purohit_tab_visible
           : DEFAULT_FLAGS.purohit_tab_visible,
+      mandali_visible:
+        typeof record.mandali_visible === "boolean"
+          ? record.mandali_visible
+          : DEFAULT_FLAGS.mandali_visible,
     };
   } catch {
     return DEFAULT_FLAGS;

@@ -1,0 +1,98 @@
+[
+  {
+    "slug": "sundarkand",
+    "name": "Sundarkand Path",
+    "nameHi": "सुन्दरकाण्ड पाठ",
+    "description": "Group devotional — home or temple. The full Sundarkand sung end to end by a live mandali, with the household joining the chaupais.",
+    "inclusions": [
+      "5–7 member singing group",
+      "Harmonium, dholak, tabla",
+      "Full Sundarkand paath — 2–3 hrs",
+      "Closing aarti and prasad vitaran"
+    ],
+    "startingPricePaise": 450000,
+    "seasonNote": "All year — Tuesdays and Saturdays fill first",
+    "hueClass": "h-gold",
+    "active": true
+  },
+  {
+    "slug": "mata-ki-chowki",
+    "name": "Mata Ki Chowki",
+    "nameHi": "माता की चौकी",
+    "description": "An evening of Devi bhajans around the decorated chowki — the Navratri favourite that families book all year for manautis.",
+    "inclusions": [
+      "5–7 member singing group",
+      "Harmonium, dholak, tabla",
+      "Devi bhajans and jagran set — 3–4 hrs",
+      "Chowki shringar guidance"
+    ],
+    "startingPricePaise": 750000,
+    "seasonNote": "Navratri / all-year",
+    "hueClass": "h-devi",
+    "active": true
+  },
+  {
+    "slug": "shyam-darbaar",
+    "name": "Shyam Darbaar",
+    "nameHi": "श्याम दरबार",
+    "description": "An overnight darbaar of Khatu Shyam bhajans — kirtan through the night, the way the festival-season sankirtans are held.",
+    "inclusions": [
+      "7+ member mandali with lead gayak",
+      "Harmonium, dholak, tabla, jhanjh",
+      "Overnight kirtan — dusk to early morning",
+      "Shyam dhwaja and darbaar setup guidance"
+    ],
+    "startingPricePaise": 1100000,
+    "seasonNote": "Overnight event — festival season",
+    "hueClass": "h-krishna",
+    "active": true
+  },
+  {
+    "slug": "ram-darbaar",
+    "name": "Ram Darbaar",
+    "nameHi": "राम दरबार",
+    "description": "Ram bhajans and Ramcharitmanas chaupais sung before the Ram Darbaar — for griha pravesh, birthdays and thanksgiving gatherings.",
+    "inclusions": [
+      "5–7 member singing group",
+      "Harmonium, dholak, tabla",
+      "Ram bhajan and chaupai set — 2–3 hrs",
+      "Closing aarti"
+    ],
+    "startingPricePaise": 550000,
+    "seasonNote": "Group devotional — home or temple",
+    "hueClass": "h-vishnu",
+    "active": true
+  },
+  {
+    "slug": "shiva-stotra-satsang",
+    "name": "Shiva Stotra Satsang",
+    "nameHi": "शिव स्तोत्र सत्संग",
+    "description": "A scheduled satsang of Shiva stotras — Rudrashtakam, Shiv Tandav and Lingashtakam sung with the meanings explained between them.",
+    "inclusions": [
+      "5 member satsang group",
+      "Harmonium, tabla",
+      "Stotra recitation with meanings — 2 hrs",
+      "Closing Shiva aarti"
+    ],
+    "startingPricePaise": 500000,
+    "seasonNote": "Group devotional — scheduled",
+    "hueClass": "h-shiva",
+    "active": true
+  },
+  {
+    "slug": "generic-mix",
+    "name": "Generic Mix",
+    "nameHi": "मिश्रित भजन संध्या",
+    "description": "A flexible devotional set built around your occasion — bhajans across deities, chosen with you on the confirmation call.",
+    "inclusions": [
+      "5–7 member singing group",
+      "Harmonium, dholak, tabla",
+      "Flexible bhajan set — 2–3 hrs",
+      "Set list agreed on the confirmation call"
+    ],
+    "startingPricePaise": 450000,
+    "seasonNote": "Flexible devotional set",
+    "hueClass": "h-ganesh",
+    "active": true
+  }
+]

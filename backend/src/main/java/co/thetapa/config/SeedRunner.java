@@ -39,6 +39,7 @@ public class SeedRunner implements ApplicationRunner {
     private final co.thetapa.commerce.PincodeRepository pincodeRepo;
     private final co.thetapa.booking.PujaTypeRepository pujaTypeRepo;
     private final co.thetapa.booking.PurohitRepository purohitRepo;
+    private final co.thetapa.mandali.MandaliTypeRepository mandaliTypeRepo;
     private final ObjectMapper mapper;
 
     public SeedRunner(ArticleRepository articles, GlossaryRepository glossary,
@@ -49,6 +50,7 @@ public class SeedRunner implements ApplicationRunner {
                       co.thetapa.commerce.PincodeRepository pincodeRepo,
                       co.thetapa.booking.PujaTypeRepository pujaTypeRepo,
                       co.thetapa.booking.PurohitRepository purohitRepo,
+                      co.thetapa.mandali.MandaliTypeRepository mandaliTypeRepo,
                       ObjectMapper mapper) {
         this.articles = articles;
         this.glossary = glossary;
@@ -59,6 +61,7 @@ public class SeedRunner implements ApplicationRunner {
         this.pincodeRepo = pincodeRepo;
         this.pujaTypeRepo = pujaTypeRepo;
         this.purohitRepo = purohitRepo;
+        this.mandaliTypeRepo = mandaliTypeRepo;
         this.mapper = mapper;
     }
 
@@ -77,6 +80,7 @@ public class SeedRunner implements ApplicationRunner {
         seedPanchang(seedRoot.resolve("panchang"));
         seedProducts(seedRoot.resolve("products"));
         seedBooking(seedRoot.resolve("booking"));
+        seedMandali(seedRoot.resolve("mandali"));
         log.info("Seeding complete");
     }
 
@@ -225,6 +229,25 @@ public class SeedRunner implements ApplicationRunner {
                 purohitRepo.save(fixture);
             }
             log.info("seeded {} purohits", fixtures.length);
+        }
+    }
+
+    private void seedMandali(Path dir) throws IOException {
+        // NOTE: startingPricePaise in the fixture (except sundarkand's locked
+        // ₹4,500) are working numbers pending Komal's sign-off — adjust via the
+        // admin mandali-types editor, not by re-seeding.
+        Path typesFile = dir.resolve("mandali-types.json");
+        if (Files.exists(typesFile)) {
+            var fixtures = mapper.readValue(typesFile.toFile(), co.thetapa.mandali.MandaliType[].class);
+            for (var fixture : fixtures) {
+                var existing = mandaliTypeRepo.findBySlug(fixture.getSlug());
+                if (existing.isPresent() && editedAfter(existing.get().getUpdatedAt(), typesFile)) {
+                    continue;
+                }
+                existing.ifPresent(t -> fixture.setId(t.getId()));
+                mandaliTypeRepo.save(fixture);
+            }
+            log.info("seeded {} mandali types", fixtures.length);
         }
     }
 

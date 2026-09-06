@@ -9,7 +9,7 @@ import { NotifyMe } from "@/components/home/NotifyMe";
 export function PhaseClosed({
   section,
 }: {
-  section: "kits" | "purohit";
+  section: "kits" | "purohit" | "mandali";
 }) {
   const copy =
     section === "kits"
@@ -19,12 +19,20 @@ export function PhaseClosed({
           body: "Samagri kits for every ritual guide — sourced, weighed and sealed, delivered before the date. Leave your number and we'll tell you the moment pre-booking opens. Until then, every guide is free.",
           context: "kits" as const,
         }
-      : {
-          eyebrow: "PUJAN WITH PUROHIT",
-          title: "Purohit booking opens soon",
-          body: "Vetted purohits who perform the full vidhi and explain it as they go — samagri included. Leave your number and we'll call you first when booking opens.",
-          context: "purohit" as const,
-        };
+      : section === "mandali"
+        ? {
+            eyebrow: "BHAJAN MANDALI",
+            title: "Mandali booking opens soon",
+            body: "Live devotional singers for your home or temple gathering — Sundarkand, Mata Ki Chowki, Shyam Darbaar and more. Leave your number and we'll message you first when booking opens.",
+            // rides the purohit notify list — the closest live context the API accepts
+            context: "purohit" as const,
+          }
+        : {
+            eyebrow: "PUJAN WITH PUROHIT",
+            title: "Purohit booking opens soon",
+            body: "Vetted purohits who perform the full vidhi and explain it as they go — samagri included. Leave your number and we'll call you first when booking opens.",
+            context: "purohit" as const,
+          };
 
   return (
     <main className="mx-auto max-w-[760px] px-4 py-14 md:px-10">

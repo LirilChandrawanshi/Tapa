@@ -14,6 +14,7 @@ import { checkAdminAccess, type AdminAccess } from "@/lib/admin";
 const NAV: { href: string; label: string }[] = [
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/bookings", label: "Bookings" },
+  { href: "/admin/mandali", label: "Mandali" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/purohits", label: "Purohits" },
   { href: "/admin/articles", label: "Articles" },

@@ -13,6 +13,7 @@ public class FeatureFlagService {
 
     public static final String KITS_LAUNCHED = "kits_launched";
     public static final String PUROHIT_TAB_VISIBLE = "purohit_tab_visible";
+    public static final String MANDALI_VISIBLE = "mandali_visible";
 
     private final FeatureFlagRepository repository;
     private final org.springframework.context.ApplicationEventPublisher events;
@@ -27,6 +28,7 @@ public class FeatureFlagService {
     void bootstrapDefaults() {
         ensure(KITS_LAUNCHED, false);
         ensure(PUROHIT_TAB_VISIBLE, false);
+        ensure(MANDALI_VISIBLE, false);
     }
 
     private void ensure(String key, boolean defaultValue) {

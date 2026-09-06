@@ -79,10 +79,13 @@ function ComingSoonTile({
 export function Footer({
   kitsLaunched = false,
   purohitVisible = false,
+  mandaliVisible = false,
 }: {
   kitsLaunched?: boolean;
   /** DB flag `purohit_tab_visible` — turns the coming-soon tile into a live link. */
   purohitVisible?: boolean;
+  /** DB flag `mandali_visible` — turns the Bhajan Mandali tile into a live link. */
+  mandaliVisible?: boolean;
 }) {
   const rk = getSection("ritual-pujans");
   const sitemapSections = TAXONOMY.filter(
@@ -212,11 +215,28 @@ export function Footer({
                 copy="Book a verified purohit for your home."
               />
             )}
-            <ComingSoonTile
-              title="Bhajan Mandali"
-              when="Coming soon"
-              copy="Sundarkand · Mata Ki Chowki · Shyam Darbaar · Jagran."
-            />
+            {mandaliVisible ? (
+              <div>
+                <p className="mb-[10px] border-b border-white/10 pb-[9px] text-[14.5px] font-bold text-hero-text">
+                  Bhajan Mandali
+                </p>
+                <Link
+                  href="/bhajan-mandali"
+                  className="block py-1 text-xs font-semibold text-cta"
+                >
+                  Book a Mandali ›
+                </Link>
+                <span className="block text-[11.5px] leading-[1.6] text-sub">
+                  Sundarkand · Mata Ki Chowki · Shyam Darbaar · Jagran.
+                </span>
+              </div>
+            ) : (
+              <ComingSoonTile
+                title="Bhajan Mandali"
+                when="Coming soon"
+                copy="Sundarkand · Mata Ki Chowki · Shyam Darbaar · Jagran."
+              />
+            )}
           </div>
         </div>
       </div>

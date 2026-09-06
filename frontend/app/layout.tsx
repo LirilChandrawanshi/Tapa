@@ -42,7 +42,7 @@ export default async function RootLayout({
         <AnnounceBar />
         <TopNav kitsLaunched={flags.kits_launched} />
         {children}
-        <Footer kitsLaunched={flags.kits_launched} purohitVisible={flags.purohit_tab_visible} />
+        <Footer kitsLaunched={flags.kits_launched} purohitVisible={flags.purohit_tab_visible} mandaliVisible={flags.mandali_visible} />
       </body>
     </html>
   );
