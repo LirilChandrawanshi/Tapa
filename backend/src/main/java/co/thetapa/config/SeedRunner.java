@@ -35,18 +35,24 @@ public class SeedRunner implements ApplicationRunner {
     private final co.thetapa.content.DpbValidator dpbValidator;
     private final co.thetapa.panchang.ObservanceRepository observanceRepo;
     private final co.thetapa.panchang.PanchangDayRepository panchangDayRepo;
+    private final co.thetapa.commerce.ProductRepository productRepo;
+    private final co.thetapa.commerce.PincodeRepository pincodeRepo;
     private final ObjectMapper mapper;
 
     public SeedRunner(ArticleRepository articles, GlossaryRepository glossary,
                       co.thetapa.content.DpbValidator dpbValidator,
                       co.thetapa.panchang.ObservanceRepository observanceRepo,
                       co.thetapa.panchang.PanchangDayRepository panchangDayRepo,
+                      co.thetapa.commerce.ProductRepository productRepo,
+                      co.thetapa.commerce.PincodeRepository pincodeRepo,
                       ObjectMapper mapper) {
         this.articles = articles;
         this.glossary = glossary;
         this.dpbValidator = dpbValidator;
         this.observanceRepo = observanceRepo;
         this.panchangDayRepo = panchangDayRepo;
+        this.productRepo = productRepo;
+        this.pincodeRepo = pincodeRepo;
         this.mapper = mapper;
     }
 
@@ -63,6 +69,7 @@ public class SeedRunner implements ApplicationRunner {
         seedArticles(seedRoot.resolve("articles"));
         seedGlossary(seedRoot.resolve("glossary"));
         seedPanchang(seedRoot.resolve("panchang"));
+        seedProducts(seedRoot.resolve("products"));
         log.info("Seeding complete");
     }
 
@@ -153,6 +160,35 @@ public class SeedRunner implements ApplicationRunner {
                 panchangDayRepo.save(fixture);
             }
             log.info("seeded {} panchang days", fixtures.length);
+        }
+    }
+
+    private void seedProducts(Path dir) throws IOException {
+        Path file = dir.resolve("products.json");
+        if (Files.exists(file)) {
+            var fixtures = mapper.readValue(file.toFile(), co.thetapa.commerce.Product[].class);
+            for (var fixture : fixtures) {
+                var existing = productRepo.findBySlug(fixture.getSlug());
+                if (existing.isPresent() && editedAfter(existing.get().getUpdatedAt(), file)) {
+                    continue;
+                }
+                existing.ifPresent(p -> fixture.setId(p.getId()));
+                productRepo.save(fixture);
+            }
+            log.info("seeded {} products", fixtures.length);
+        }
+        // launch serviceability: a starter Delhi-NCR pincode set, admin-extendable
+        if (pincodeRepo.count() == 0) {
+            String[][] pins = {
+                {"110001", "Connaught Place"}, {"110016", "Hauz Khas"}, {"110017", "Malviya Nagar"},
+                {"110024", "Lajpat Nagar"}, {"110048", "Greater Kailash"}, {"110085", "Rohini"},
+                {"201301", "Noida Sec 1-12"}, {"201303", "Noida Sec 44"}, {"122002", "Gurugram DLF"},
+                {"122018", "Gurugram Sec 56"}, {"121001", "Faridabad"}, {"201010", "Ghaziabad"}
+            };
+            for (String[] pin : pins) {
+                pincodeRepo.save(new co.thetapa.commerce.PincodeServiceability(pin[0], true, 3, pin[1]));
+            }
+            log.info("seeded {} serviceable pincodes", pins.length);
         }
     }
 
