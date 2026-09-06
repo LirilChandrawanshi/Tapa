@@ -37,7 +37,12 @@ import {
 } from "@/lib/panchangExtras";
 import type { DayPayload } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+/**
+ * ISR at 5 minutes — this dashboard renders "today" strings server-side
+ * (todayIst()), so a short window keeps the day rollover tight while the
+ * `panchang` tag purges it instantly on admin edits.
+ */
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Panchang — Today's Tithi, Vrat & Festival Dates | Tapa",

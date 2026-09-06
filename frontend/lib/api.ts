@@ -46,7 +46,10 @@ async function get<T>(
 
 /** Content */
 export const fetchArticle = (slug: string) =>
-  get<Article>(`/articles/${slug}`, { tags: [`article:${slug}`] });
+  get<Article>(`/articles/${slug}`, {
+    revalidate: 3600,
+    tags: [`article:${slug}`, "articles"],
+  });
 
 export const fetchArticles = (params: {
   category?: string;
@@ -59,48 +62,61 @@ export const fetchArticles = (params: {
   if (params.subCategory) q.set("subCategory", params.subCategory);
   if (params.page) q.set("page", String(params.page));
   if (params.size) q.set("size", String(params.size));
-  return get<Paged<Article>>(`/articles?${q}`);
+  return get<Paged<Article>>(`/articles?${q}`, {
+    revalidate: 900,
+    tags: ["articles"],
+  });
 };
 
-export const fetchFeatured = () => get<Article[]>("/articles/featured");
+export const fetchFeatured = () =>
+  get<Article[]>("/articles/featured", { revalidate: 900, tags: ["articles"] });
 
 /** Glossary */
 export const fetchGlossary = (category?: string) =>
   get<{ items: GlossaryTerm[]; mostLookedUp: GlossaryTerm[] }>(
     category ? `/glossary?category=${category}` : "/glossary",
-    { revalidate: 3600 },
+    { revalidate: 3600, tags: ["glossary"] },
   );
 
 /** Panchang — 24h data with a shorter edge so "today" rolls over correctly */
 export const fetchPanchangToday = (city?: string) =>
   get<DayPayload>(city ? `/panchang/today?city=${city}` : "/panchang/today", {
     revalidate: 900,
+    tags: ["panchang"],
   });
 
 export const fetchPanchangDate = (date: string, city?: string) =>
   get<DayPayload>(
     city ? `/panchang/date/${date}?city=${city}` : `/panchang/date/${date}`,
-    { revalidate: 3600 },
+    { revalidate: 3600, tags: ["panchang"] },
   );
 
 export const fetchUpcoming = (limit = 10) =>
   get<UpcomingObservance[]>(`/panchang/upcoming?limit=${limit}`, {
     revalidate: 900,
+    tags: ["panchang"],
   });
 
 export const fetchFestivals = () =>
-  get<UpcomingObservance[]>("/panchang/festivals", { revalidate: 3600 });
+  get<UpcomingObservance[]>("/panchang/festivals", {
+    revalidate: 3600,
+    tags: ["panchang"],
+  });
 
 export const fetchFestival = (slug: string) =>
   get<{ observance: UpcomingObservance["observance"]; countdownDays: number }>(
     `/panchang/festival/${slug}`,
-    { revalidate: 900 },
+    { revalidate: 900, tags: ["panchang"] },
   );
 
 export const fetchCalendarMonth = (month: string) =>
   get<UpcomingObservance[]>(`/panchang/calendar/${month}`, {
     revalidate: 3600,
+    tags: ["panchang"],
   });
 
 export const fetchEkadashi = () =>
-  get<UpcomingObservance[]>("/panchang/ekadashi", { revalidate: 3600 });
+  get<UpcomingObservance[]>("/panchang/ekadashi", {
+    revalidate: 3600,
+    tags: ["panchang"],
+  });

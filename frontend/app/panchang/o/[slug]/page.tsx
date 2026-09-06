@@ -23,7 +23,12 @@ import {
 } from "@/lib/panchangExtras";
 import type { UpcomingObservance } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // ISR — purged via the `panchang` tag
+
+/** No build-time enumeration — the backend may be down during `next build`. */
+export function generateStaticParams(): { slug: string }[] {
+  return [];
+}
 
 interface Props {
   params: Promise<{ slug: string }>;

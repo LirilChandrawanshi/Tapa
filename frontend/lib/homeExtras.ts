@@ -71,7 +71,9 @@ function asCard(value: unknown): HomeCard | null {
  */
 export async function fetchHomeSafe(): Promise<HomePayload | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/home`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/api/v1/home`, {
+      next: { revalidate: 300, tags: ["home", "panchang", "articles", "flags"] },
+    });
     if (!res.ok) return null;
     const body = (await res.json().catch(() => null)) as {
       data?: unknown;

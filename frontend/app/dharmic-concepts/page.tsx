@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CategoryLanding } from "@/components/listing/CategoryLanding";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // ISR — purged via the `articles` tag on publish
 
 export const metadata: Metadata = {
   title: "Dharmic Concepts",

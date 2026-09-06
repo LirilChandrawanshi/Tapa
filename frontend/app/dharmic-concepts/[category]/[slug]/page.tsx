@@ -7,7 +7,12 @@ import { fetchArticleSafe } from "@/lib/articleExtras";
  * Concepts carry no timing blocks, and the source card labels the claim
  * "CORE CLAIM" (driven by article.type inside ArticleView).
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // ISR — purged via `article:{slug}` / `articles` tags
+
+/** No build-time enumeration — the backend may be down during `next build`. */
+export function generateStaticParams(): { category: string; slug: string }[] {
+  return [];
+}
 
 type Params = { params: Promise<{ category: string; slug: string }> };
 

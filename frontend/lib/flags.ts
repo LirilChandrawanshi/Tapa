@@ -24,12 +24,17 @@ const API_BASE =
 export async function getFlags(): Promise<Flags> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/flags`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 300, tags: ["flags"] },
     });
     if (!res.ok) return DEFAULT_FLAGS;
-    const data: unknown = await res.json();
-    if (typeof data !== "object" || data === null) return DEFAULT_FLAGS;
-    const record = data as Record<string, unknown>;
+    const body: unknown = await res.json();
+    if (typeof body !== "object" || body === null) return DEFAULT_FLAGS;
+    // the API envelope is {data: {...flags}}; tolerate a bare object too
+    const envelope = body as Record<string, unknown>;
+    const inner = envelope.data;
+    const record = (
+      typeof inner === "object" && inner !== null ? inner : envelope
+    ) as Record<string, unknown>;
     return {
       kits_launched:
         typeof record.kits_launched === "boolean"

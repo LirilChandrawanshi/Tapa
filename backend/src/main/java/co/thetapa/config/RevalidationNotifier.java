@@ -33,6 +33,8 @@ public class RevalidationNotifier {
     private static final Duration TIMEOUT = Duration.ofSeconds(3);
 
     private final HttpClient http = HttpClient.newBuilder()
+        // Next's node server mishandles the h2c upgrade — stay on HTTP/1.1
+        .version(HttpClient.Version.HTTP_1_1)
         .connectTimeout(TIMEOUT)
         .build();
 
@@ -57,6 +59,13 @@ public class RevalidationNotifier {
     @EventListener
     public void onPanchangDayUpdated(PanchangDayUpdatedEvent event) {
         notifyFrontend(List.of("panchang", "home"));
+    }
+
+    /** Marketing flag flips (kits_launched…) must hit the live site instantly. */
+    @Async
+    @EventListener
+    public void onFlagChanged(co.thetapa.flags.FeatureFlagService.FlagChangedEvent event) {
+        notifyFrontend(List.of("flags", "home", "articles"));
     }
 
     private void notifyFrontend(List<String> tags) {

@@ -15,7 +15,7 @@ import {
   todayIst,
 } from "@/lib/panchangExtras";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // ISR — purged via the `panchang` tag
 
 export const metadata: Metadata = {
   title: "2026 Vrat Calendar — Every Ekadashi, Teej, Purnima & Amavasya | Tapa",

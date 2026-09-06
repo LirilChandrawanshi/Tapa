@@ -62,20 +62,25 @@ export default function AccountPage() {
   const [savedItems, setSavedItems] = useState<SavedRitual[]>([]);
   const [savedOpen, setSavedOpen] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
+  const [circleStatus, setCircleStatus] = useState<string>("NONE");
   const [gateOpen, setGateOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const [langBusy, setLangBusy] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [meRes, savedRes, ordersRes] = await Promise.all([
+    const [meRes, savedRes, ordersRes, circleRes] = await Promise.all([
       getMe(),
       getSavedRituals(),
       getMyOrders(),
+      fetch("/api/v1/me/circle", { credentials: "include", cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
     ]);
     setMe(meRes.ok ? meRes.data : null);
     setSavedItems(savedRes.ok ? savedRes.data : []);
     setOrderCount(ordersRes.ok ? (ordersRes.data ?? []).length : 0);
+    setCircleStatus(circleRes?.data?.status ?? "NONE");
     setLoading(false);
   }, []);
 
@@ -204,8 +209,12 @@ export default function AccountPage() {
       <div className="mt-6 grid grid-cols-3 gap-2">
         {[
           { value: String(savedCount), label: "Saved Rituals", note: "with 🔖" },
-          { value: "0", label: "Bookings", note: "opens with Phase 2" },
-          { value: "—", label: "Tapa Circle", note: "join on WhatsApp" },
+          { value: String(orderCount), label: "Orders", note: "kits ordered" },
+          circleStatus === "ACTIVE"
+            ? { value: "●", label: "Tapa Circle", note: "Active — reminders on" }
+            : circleStatus === "STOPPED"
+              ? { value: "◌", label: "Tapa Circle", note: "left — rejoin any time" }
+              : { value: "—", label: "Tapa Circle", note: "join on WhatsApp" },
         ].map((tile) => (
           <div
             key={tile.label}

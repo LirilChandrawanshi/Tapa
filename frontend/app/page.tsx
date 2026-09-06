@@ -22,7 +22,7 @@ import { todayIst } from "@/lib/panchangExtras";
  * One composed fetch (GET /api/v1/home); the backend may be down, so every
  * section carries its own fallback — nothing renders blank.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function Home() {
   const now = todayIst();

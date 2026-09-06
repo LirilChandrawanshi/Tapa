@@ -108,7 +108,80 @@
       "heroSubtitle": "श्रावण के सोमवार का व्रत — शास्त्र के अनुसार, बिना भय के।",
       "deck": "सावन के सोमवार शिव के क्यों हैं, शास्त्र वास्तव में क्या कहता है, और घर पर एक घंटे में पूरी होने वाली विधि।",
       "introHtml": "<p>श्रावण मास का प्रत्येक सोमवार शिव के लिए रखा जाता है। व्रत का मूल सरल है: स्नान, संकल्प, अभिषेक और अपनी क्षमता के अनुसार उपवास। बाकी सब — कि टूटा व्रत अनिष्ट लाता है, कि निर्जला अनिवार्य है — या तो प्रथा है या भ्रांति। यह मार्गदर्शिका तीनों को अलग करती है।</p>",
-      "blocks": []
+      "blocks": [
+        {
+          "type": "SIGNIFICANCE_QUOTE",
+          "title": "यह व्रत क्यों",
+          "text": "जो श्रावण के सोमवारों को केवल जल और बिल्वपत्र से शंकर की पूजा करता है, वह महायज्ञ का फल पाता है।",
+          "meta": { "attribution": "शिव पुराण, रुद्र संहिता" }
+        },
+        {
+          "type": "SANKALPA",
+          "title": "संकल्प",
+          "sankalpa": {
+            "devanagari": "मम शिवकृपाप्राप्त्यर्थं श्रावणसोमवारव्रतं करिष्ये।",
+            "transliteration": "mama śiva-kṛpā-prāptyarthaṃ śrāvaṇa-somavāra-vrataṃ kariṣye",
+            "gloss": "शिव की कृपा-प्राप्ति के लिए मैं यह श्रावण सोमवार व्रत करता/करती हूँ। जो भाषा हृदय के निकट हो, उसी में कहें — संस्कृत आवश्यक नहीं।"
+          }
+        },
+        {
+          "type": "SAMAGRI",
+          "title": "क्या-क्या चाहिए",
+          "samagri": [
+            { "name": "जल (स्वच्छ पानी)", "note": "गंगाजल हो तो उत्तम; सादा जल भी पूर्णतः मान्य है", "optional": false },
+            { "name": "बिल्वपत्र", "note": "तीन पत्तियों वाले, अखंडित", "optional": false },
+            { "name": "कच्चा दूध", "note": "अभिषेक के लिए एक छोटा कटोरा", "optional": true },
+            { "name": "सफेद फूल", "note": "", "optional": true },
+            { "name": "दीपक और घी", "note": "", "optional": false },
+            { "name": "धूप या अगरबत्ती", "note": "", "optional": true },
+            { "name": "भोग के लिए फल या मिश्री", "note": "", "optional": true }
+          ]
+        },
+        {
+          "type": "VIDHI",
+          "title": "विधि — चरण दर चरण",
+          "steps": [
+            { "number": 1, "title": "स्नान करें और पूजा स्थान स्वच्छ करें", "description": "प्रातः स्नान, स्वच्छ वस्त्र। चौकी पोंछकर शिवलिंग या शिव-प्रतिमा अपने सम्मुख रखें।", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 2, "title": "संकल्प लें", "description": "पूर्व दिशा की ओर मुख करके बैठें। दाहिनी हथेली में जल लें, संकल्प बोलें और जल छोड़ दें।", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 3, "title": "जल से अभिषेक", "description": "शिवलिंग पर धीमी, पतली धारा में जल अर्पित करें।", "mantraChip": "ॐ नमः शिवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 4, "title": "दूध से अभिषेक, फिर पुनः जल", "description": "दूध का अभिषेक उत्तर भारत में अत्यंत प्रिय है; शास्त्र केवल जल और बिल्वपत्र माँगता है।", "dpb": { "classification": "PRATHA", "confidenceScore": 2, "prathaScope": "Pan-India, strongest in UP, Bihar, MP" } },
+            { "number": 5, "title": "बिल्वपत्र अर्पित करें", "description": "त्रिदल बिल्वपत्र चिकनी ओर नीचे करके शिवलिंग पर रखें।", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 6, "title": "दीपक जलाएँ, धूप और फूल अर्पित करें", "description": "", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } },
+            { "number": 7, "title": "जप — 108 नाम या पंचाक्षरी", "description": "ॐ नमः शिवाय का 108 बार जप करें, या जितना आपका प्रातःकाल अनुमति दे।", "mantraChip": "ॐ नमः शिवाय", "dpb": { "classification": "DHARMA", "confidenceScore": 5, "sourceName": "Shiva Purana" } },
+            { "number": 8, "title": "आरती और भोग", "description": "आरती से समापन करें। फल या मिश्री अर्पित करें, फिर प्रसाद रूप में बाँटें।", "dpb": { "classification": "DHARMA", "confidenceScore": 4, "sourceName": "Shiva Purana" } }
+          ]
+        },
+        {
+          "type": "MANTRA",
+          "title": "मंत्र",
+          "mantra": {
+            "devanagari": "ॐ नमः शिवाय",
+            "transliteration": "oṃ namaḥ śivāya",
+            "meaning": "मैं शिव को प्रणाम करता हूँ — पाँच अक्षरों का यह मंत्र, जिसके लिए किसी दीक्षा की आवश्यकता नहीं।",
+            "defaultCount": 108,
+            "presets": [11, 21, 51, 108]
+          }
+        },
+        {
+          "type": "FASTING",
+          "title": "अपना उपवास चुनें",
+          "fasting": [
+            { "name": "निर्जला", "description": "सूर्योदय से सूर्यास्त तक न अन्न, न जल। केवल स्वस्थ और अनुभवी व्रतियों के लिए।", "recommended": false },
+            { "name": "सजल", "description": "दिन भर जल, दूध और फल। संध्या पूजा के बाद एक सात्त्विक भोजन।", "recommended": true },
+            { "name": "फलाहार", "description": "फल, दूध, साबूदाना और सेंधा नमक के व्यंजन। गर्भावस्था, अस्वस्थता और वृद्धावस्था के लिए उचित।", "recommended": false }
+          ],
+          "text": "मूल ग्रंथ में कहीं भी निर्जला का आदेश नहीं है। व्रत भक्ति है, सहनशक्ति की परीक्षा नहीं।"
+        },
+        {
+          "type": "MYTHS",
+          "title": "सामान्य चिंताएँ — उत्तर सहित",
+          "myths": [
+            { "question": "मुझसे भूल में व्रत टूट गया। क्या व्रत नष्ट हो गया और कुछ अशुभ होगा?", "answer": "नहीं। दिन को भक्ति के साथ पूर्ण करें और आगे बढ़ें। किसी भी ग्रंथ में सच्ची भूल के लिए दंड नहीं है।" },
+            { "question": "क्या स्त्रियाँ सावन में अभिषेक कर सकती हैं?", "answer": "हाँ। कोई भी पौराणिक स्रोत स्त्रियों को शिव-अभिषेक से नहीं रोकता। जो प्रतिबंध आपने सुने हों, वे क्षेत्रीय प्रथा हैं, धर्म नहीं।" },
+            { "question": "क्या पुरोहित के बिना व्रत अधूरा है?", "answer": "सावन सोमवार व्रत घर का अनुष्ठान है। पुरोहित एक विकल्प है, आवश्यकता कभी नहीं।" }
+          ]
+        }
+      ]
     }
   }
 }

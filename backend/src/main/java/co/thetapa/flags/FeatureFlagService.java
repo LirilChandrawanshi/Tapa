@@ -15,9 +15,12 @@ public class FeatureFlagService {
     public static final String PUROHIT_TAB_VISIBLE = "purohit_tab_visible";
 
     private final FeatureFlagRepository repository;
+    private final org.springframework.context.ApplicationEventPublisher events;
 
-    public FeatureFlagService(FeatureFlagRepository repository) {
+    public FeatureFlagService(FeatureFlagRepository repository,
+                              org.springframework.context.ApplicationEventPublisher events) {
         this.repository = repository;
+        this.events = events;
     }
 
     @PostConstruct
@@ -43,6 +46,12 @@ public class FeatureFlagService {
         FeatureFlag flag = repository.findByKey(key).orElseGet(() -> new FeatureFlag(key, value));
         flag.setValue(value);
         flag.setUpdatedBy(updatedBy);
-        return repository.save(flag);
+        FeatureFlag saved = repository.save(flag);
+        // marketing flips must reach the site immediately, not on cache expiry
+        events.publishEvent(new FlagChangedEvent(key, value));
+        return saved;
+    }
+
+    public record FlagChangedEvent(String key, boolean value) {
     }
 }

@@ -21,7 +21,7 @@ import {
 } from "@/lib/panchangExtras";
 import type { UpcomingObservance } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // ISR — purged via the `panchang` tag
 
 export const metadata: Metadata = {
   title: "Festival Calendar 2026 — Season by Season | Tapa",

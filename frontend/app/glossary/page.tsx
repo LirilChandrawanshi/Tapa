@@ -8,7 +8,7 @@ import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { fetchGlossary } from "@/lib/api";
 import type { GlossaryTerm } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // ISR — purged via the `glossary` tag
 
 export const metadata: Metadata = {
   title: "Glossary",

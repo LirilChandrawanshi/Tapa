@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { SubCategoryListing } from "@/components/listing/SubCategoryListing";
 import { subCategoryLabel } from "@/lib/articleExtras";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // ISR — purged via the `articles` tag on publish
+
+/** No build-time enumeration — the backend may be down during `next build`. */
+export function generateStaticParams(): { category: string }[] {
+  return [];
+}
 
 type Params = { params: Promise<{ category: string }> };
 
