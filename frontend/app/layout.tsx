@@ -6,6 +6,11 @@ import { TopNav } from "@/components/TopNav";
 import { getFlags } from "@/lib/flags";
 import "./globals.css";
 
+/**
+ * Primary Devanagari face — the wordmark तप् and all `font-devanagari`
+ * text render in this. Preloaded: it is above the fold on every page
+ * (TopNav logo), and its two subsets are small (~84KB total).
+ */
 const tiroDevanagari = Tiro_Devanagari_Hindi({
   weight: "400",
   subsets: ["devanagari", "latin"],
@@ -13,10 +18,19 @@ const tiroDevanagari = Tiro_Devanagari_Hindi({
   display: "swap",
 });
 
+/**
+ * Fallback-only face: `--font-devanagari` always tries Tiro first, so Noto
+ * is fetched only for glyphs Tiro lacks. `preload: false` keeps its ~121KB
+ * Devanagari subset out of the critical request graph (it was the single
+ * biggest contributor to simulated mobile LCP); the @font-face rule still
+ * ships, so the browser lazily fetches it if it is ever actually needed.
+ * Latin subset dropped — Tiro already covers Latin inside Devanagari runs.
+ */
 const notoSansDevanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari", "latin"],
+  subsets: ["devanagari"],
   variable: "--font-noto-devanagari",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
