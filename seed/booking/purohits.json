@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "pt-keshav-shastri",
+    "name": "Pt. Keshav Shastri",
+    "phone": "+919800000001",
+    "rating": 4.8,
+    "pujaCount": 127,
+    "languages": ["Hindi", "Sanskrit"],
+    "pujaTypeSlugs": ["rudrabhishek", "satyanarayan-katha", "navratri-ghatsthapna"],
+    "cities": ["delhi-ncr"],
+    "unavailableSlots": [],
+    "verified": true,
+    "active": true,
+    "lineageNote": "Kashi-trained · 3rd generation"
+  },
+  {
+    "slug": "pt-anand-mishra",
+    "name": "Pt. Anand Mishra",
+    "phone": "+919800000002",
+    "rating": 4.6,
+    "pujaCount": 89,
+    "languages": ["Hindi", "English"],
+    "pujaTypeSlugs": ["rudrabhishek", "satyanarayan-katha"],
+    "cities": ["delhi-ncr"],
+    "unavailableSlots": ["early-morning"],
+    "verified": true,
+    "active": true,
+    "lineageNote": "Explains every step as he goes"
+  },
+  {
+    "slug": "pt-raghunath-tiwari",
+    "name": "Pt. Raghunath Tiwari",
+    "phone": "+919800000003",
+    "rating": 4.9,
+    "pujaCount": 214,
+    "languages": ["Hindi", "Sanskrit", "Bhojpuri"],
+    "pujaTypeSlugs": ["satyanarayan-katha", "navratri-ghatsthapna", "musical-mandali"],
+    "cities": ["delhi-ncr"],
+    "unavailableSlots": [],
+    "verified": true,
+    "active": true,
+    "lineageNote": "Katha voice the whole colony gathers for"
+  },
+  {
+    "slug": "pt-devdutt-joshi",
+    "name": "Pt. Devdutt Joshi",
+    "phone": "+919800000004",
+    "rating": 4.7,
+    "pujaCount": 61,
+    "languages": ["Hindi", "Sanskrit", "English"],
+    "pujaTypeSlugs": ["rudrabhishek", "musical-mandali"],
+    "cities": ["delhi-ncr"],
+    "unavailableSlots": ["evening"],
+    "verified": true,
+    "active": true,
+    "lineageNote": "Haridwar gurukul · leads the mandali himself"
+  }
+]

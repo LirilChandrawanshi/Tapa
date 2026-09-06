@@ -1,0 +1,71 @@
+[
+  {
+    "slug": "rudrabhishek",
+    "name": "Rudrabhishek",
+    "nameHi": "रुद्राभिषेक",
+    "description": "The abhishek of Shiva with the Rudram chanting — the core Shaiva puja for the home.",
+    "vidhiOverview": "The purohit performs sankalp in your name, the Rudram-path abhishek with the prescribed dravyas, bilva archana, and the closing aarti. You participate — nothing happens over your head.",
+    "vidhiPreviewSteps": ["Sankalp in the family's name", "Kalash and Ganesh sthapana", "Rudram-path abhishek", "Bilva archana", "Aarti and prasad"],
+    "hueClass": "h-shiva",
+    "variants": [
+      { "key": "sankshipt", "name": "Sankshipt", "duration": "45 min", "scope": "core vidhi", "pricePaise": 710000 },
+      { "key": "vistrit", "name": "Vistrit", "duration": "2.5 hrs", "scope": "full path with havan", "pricePaise": 1400000 }
+    ],
+    "allowedSlots": ["early-morning", "morning"],
+    "kitIncludedDefault": true,
+    "kitNote": "Abhishek dravyas, bilva, havan samagri for Vistrit — everything arrives the day before.",
+    "linkedGuideSlug": "sawan-somwar-vrat",
+    "active": true
+  },
+  {
+    "slug": "satyanarayan-katha",
+    "name": "Satyanarayan Katha",
+    "nameHi": "सत्यनारायण कथा",
+    "description": "The Purnima katha of Satyanarayan — gratitude, prasad and the five adhyayas read properly.",
+    "vidhiOverview": "Sankalp, sthapana, the five adhyayas of the katha with their pauses explained, havan when chosen, and panchamrit prasad.",
+    "vidhiPreviewSteps": ["Sankalp and kalash sthapana", "Ganesh and Navagraha puja", "The five adhyayas", "Havan (with-havan variant)", "Aarti and panjiri prasad"],
+    "hueClass": "h-vishnu",
+    "variants": [
+      { "key": "katha", "name": "Katha", "duration": "1.5 hrs", "scope": "katha only", "pricePaise": 710000 },
+      { "key": "katha-havan", "name": "Katha with Havan", "duration": "2.5 hrs", "scope": "katha + havan", "pricePaise": 1200000 }
+    ],
+    "allowedSlots": ["morning", "afternoon", "evening"],
+    "kitIncludedDefault": true,
+    "kitNote": "Katha samagri, panchamrit set and panjiri ingredients included.",
+    "active": true
+  },
+  {
+    "slug": "musical-mandali",
+    "name": "Musical Mandali",
+    "nameHi": "संगीत मंडली",
+    "description": "A purohit-led musical satsang — bhajan, path and aarti with harmonium and dholak.",
+    "vidhiOverview": "A 5–7 member group leads two hours of bhajan and path suited to the occasion, closing with collective aarti.",
+    "vidhiPreviewSteps": ["Occasion-matched bhajan set", "Path (Sundarkand or Vishnu Sahasranama)", "Collective aarti"],
+    "hueClass": "h-krishna",
+    "variants": [
+      { "key": "standard", "name": "Standard", "duration": "2 hrs", "scope": "5-member mandali", "pricePaise": 800000 }
+    ],
+    "allowedSlots": ["afternoon", "evening"],
+    "kitIncludedDefault": false,
+    "kitNote": "Instruments travel with the mandali; puja samagri optional.",
+    "active": true
+  },
+  {
+    "slug": "navratri-ghatsthapna",
+    "name": "Navratri Ghatsthapna",
+    "nameHi": "नवरात्रि घटस्थापना",
+    "description": "The kalash sthapana that opens the nine nights — done in the correct morning muhurat.",
+    "vidhiOverview": "The purohit performs the ghatasthapana in the prescribed pratipada window: kalash, barley bed, akhand jyoti guidance and the first Devi puja.",
+    "vidhiPreviewSteps": ["Muhurat-timed sankalp", "Kalash and barley sthapana", "Akhand jyoti setup", "First-day Devi puja"],
+    "hueClass": "h-devi",
+    "variants": [
+      { "key": "standard", "name": "Standard", "duration": "1 hr", "scope": "ghatasthapana + first puja", "pricePaise": 950000 }
+    ],
+    "allowedSlots": ["early-morning", "morning"],
+    "kitIncludedDefault": true,
+    "kitNote": "Kalash set, barley, chunri and the first-day samagri included.",
+    "annual": true,
+    "seasonNote": "Bookable for 12 October 2026 (Ashwin Shukla Pratipada).",
+    "active": true
+  }
+]

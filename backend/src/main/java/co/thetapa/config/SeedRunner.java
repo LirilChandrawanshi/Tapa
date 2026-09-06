@@ -37,6 +37,8 @@ public class SeedRunner implements ApplicationRunner {
     private final co.thetapa.panchang.PanchangDayRepository panchangDayRepo;
     private final co.thetapa.commerce.ProductRepository productRepo;
     private final co.thetapa.commerce.PincodeRepository pincodeRepo;
+    private final co.thetapa.booking.PujaTypeRepository pujaTypeRepo;
+    private final co.thetapa.booking.PurohitRepository purohitRepo;
     private final ObjectMapper mapper;
 
     public SeedRunner(ArticleRepository articles, GlossaryRepository glossary,
@@ -45,6 +47,8 @@ public class SeedRunner implements ApplicationRunner {
                       co.thetapa.panchang.PanchangDayRepository panchangDayRepo,
                       co.thetapa.commerce.ProductRepository productRepo,
                       co.thetapa.commerce.PincodeRepository pincodeRepo,
+                      co.thetapa.booking.PujaTypeRepository pujaTypeRepo,
+                      co.thetapa.booking.PurohitRepository purohitRepo,
                       ObjectMapper mapper) {
         this.articles = articles;
         this.glossary = glossary;
@@ -53,6 +57,8 @@ public class SeedRunner implements ApplicationRunner {
         this.panchangDayRepo = panchangDayRepo;
         this.productRepo = productRepo;
         this.pincodeRepo = pincodeRepo;
+        this.pujaTypeRepo = pujaTypeRepo;
+        this.purohitRepo = purohitRepo;
         this.mapper = mapper;
     }
 
@@ -70,6 +76,7 @@ public class SeedRunner implements ApplicationRunner {
         seedGlossary(seedRoot.resolve("glossary"));
         seedPanchang(seedRoot.resolve("panchang"));
         seedProducts(seedRoot.resolve("products"));
+        seedBooking(seedRoot.resolve("booking"));
         log.info("Seeding complete");
     }
 
@@ -189,6 +196,35 @@ public class SeedRunner implements ApplicationRunner {
                 pincodeRepo.save(new co.thetapa.commerce.PincodeServiceability(pin[0], true, 3, pin[1]));
             }
             log.info("seeded {} serviceable pincodes", pins.length);
+        }
+    }
+
+    private void seedBooking(Path dir) throws IOException {
+        Path pujasFile = dir.resolve("puja-types.json");
+        if (Files.exists(pujasFile)) {
+            var fixtures = mapper.readValue(pujasFile.toFile(), co.thetapa.booking.PujaType[].class);
+            for (var fixture : fixtures) {
+                var existing = pujaTypeRepo.findBySlug(fixture.getSlug());
+                if (existing.isPresent() && editedAfter(existing.get().getUpdatedAt(), pujasFile)) {
+                    continue;
+                }
+                existing.ifPresent(p -> fixture.setId(p.getId()));
+                pujaTypeRepo.save(fixture);
+            }
+            log.info("seeded {} puja types", fixtures.length);
+        }
+        Path purohitsFile = dir.resolve("purohits.json");
+        if (Files.exists(purohitsFile)) {
+            var fixtures = mapper.readValue(purohitsFile.toFile(), co.thetapa.booking.Purohit[].class);
+            for (var fixture : fixtures) {
+                var existing = purohitRepo.findBySlug(fixture.getSlug());
+                if (existing.isPresent() && editedAfter(existing.get().getUpdatedAt(), purohitsFile)) {
+                    continue;
+                }
+                existing.ifPresent(p -> fixture.setId(p.getId()));
+                purohitRepo.save(fixture);
+            }
+            log.info("seeded {} purohits", fixtures.length);
         }
     }
 
