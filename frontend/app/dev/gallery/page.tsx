@@ -216,7 +216,7 @@ export default function GalleryPage() {
             <CompactRow
               title="What is a vrat?"
               subtitle="6 min read · plain language, no citations"
-              href="/ritual-guides/beginners-guides/what-is-a-vrat"
+              href="/ritual-guides/festive-pujans/sawan-somwar-vrat"
             />
             <CompactRow
               title="Your first puja at home"

@@ -62,9 +62,9 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
             description: "No tags, no citations, no Sanskrit to look up",
             lead: true,
           },
-          { label: "What Is a Vrat", href: "/ritual-guides/beginners-guides/what-is-a-vrat" },
-          { label: "Your First Puja at Home", href: "/ritual-guides/beginners-guides/first-puja-at-home" },
-          { label: "The Seven Kandas", href: "/ritual-guides/beginners-guides/the-seven-kandas" },
+          { label: "Sawan Somwar Vrat", href: "/ritual-guides/festive-pujans/sawan-somwar-vrat" },
+          { label: "Aja Ekadashi", href: "/ritual-guides/all-year-pujans/aja-ekadashi" },
+          { label: "Hariyali Teej", href: "/ritual-guides/festive-pujans/hariyali-teej" },
         ],
       },
       {
@@ -73,12 +73,12 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
           {
             label: "Festive Pujans",
             href: rg.children[1].href,
-            description: "Fixed to a tithi — 18 guides",
+            description: "Fixed to a tithi",
           },
           {
             label: "All-Year Pujans",
             href: rg.children[2].href,
-            description: "Recurring observances — 9 guides",
+            description: "Recurring observances",
           },
           {
             label: "Sanskar & Life Events",
@@ -94,21 +94,19 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
           {
             label: "Hartalika Teej",
             href: "/ritual-guides/festive-pujans/hartalika-teej",
-            description: "13 September",
+            description: "14 September",
             dot: "#3E8B4A",
-            when: "IN 6 DAYS",
           },
           {
             label: "Ganesh Chaturthi",
-            href: "/ritual-guides/festive-pujans/ganesh-chaturthi",
-            description: "14 September",
+            href: "/panchang/o/ganesh-chaturthi-2026",
+            description: "15 September",
             dot: "#B5651D",
-            when: "IN 7 DAYS",
           },
           {
             label: "Sharad Navratri",
-            href: "/ritual-guides/festive-pujans/sharad-navratri",
-            description: "11 October",
+            href: "/panchang/o/sharad-navratri-2026",
+            description: "12 October",
             dot: "#A83358",
           },
         ],
@@ -121,7 +119,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       copy: "Dharma, Pratha or Bhranti — with a confidence score you can check against a named text.",
       cta: "Our editorial method ›",
     },
-    footNote: "34 guides live · 21 more by December",
+    footNote: "7 guides live · more landing weekly",
     footLink: { label: "Browse all ›", href: rg.href },
   },
 
@@ -131,7 +129,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
         heading: "RIGHT NOW",
         liveNow: {
           label: "TODAY · DELHI-NCR",
-          value: "Bhadrapada Krishna Ekadashi",
+          value: "Tithi, nakshatra, Rahu Kaal — live",
         },
         links: [
           {
@@ -148,7 +146,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
           {
             label: "Vrat Calendar",
             href: pa.children[1].href,
-            description: "142 dates this year",
+            description: "Every Ekadashi, Teej and Purnima",
           },
           {
             label: "Festival Calendar",
@@ -170,8 +168,8 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
             href: pa.children[3].href,
             description: "How the lunar day works",
           },
-          { label: "How to Read a Panchang", href: "/panchang/how-to-read" },
-          { label: "Why dates differ by city", href: "/panchang/why-dates-differ" },
+          { label: "Grahan & Sutak, explained", href: "/dharmic-concepts/meanings-practices/eclipse-explainer" },
+          { label: "The Glossary", href: "/glossary" },
         ],
       },
     ],
@@ -192,15 +190,15 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
         heading: "START HERE",
         links: [
           {
-            label: "Why is bilva dear to Mahadev?",
-            href: "/dharmic-concepts/materials/bilva",
-            description: "The leaf, the story, the offering rules",
+            label: "Grahan & Sutak — what actually applies",
+            href: "/dharmic-concepts/meanings-practices/eclipse-explainer",
+            description: "The rule that decides everything: visibility",
             lead: true,
           },
           {
-            label: "Three Stories, One Thread",
-            href: "/dharmic-concepts/meanings-practices/raksha-sutra",
-            description: "Wife, friend, devotee — not siblings",
+            label: "Sutak, in forty words",
+            href: "/glossary#sutak",
+            description: "It applies only where the eclipse is visible",
           },
         ],
       },
@@ -225,9 +223,9 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       {
         heading: "IN THE SERIES",
         links: [
-          { label: "Bilva", href: "/dharmic-concepts/materials/bilva", pill: "live" },
-          { label: "Tulsi", href: "/dharmic-concepts/materials/tulsi", pill: "soon" },
-          { label: "Durva", href: "/dharmic-concepts/materials/durva", pill: "soon" },
+          { label: "Bilva", href: "/glossary#bilva", pill: "live" },
+          { label: "Kalash", href: "/glossary#kalash", pill: "live" },
+          { label: "Panchamrit", href: "/glossary#panchamrit", pill: "live" },
         ],
       },
     ],
@@ -235,7 +233,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       tone: "amber",
       eyebrow: "LOOK UP ANY TERM",
       title: "The Glossary",
-      copy: "142 words defined once, in plain language, with the Devanagari and how to say it.",
+      copy: "Every term defined once, in plain language, with the Devanagari and how to say it.",
       cta: "Open the glossary ›",
     },
     footNote: "Paragraph only. No tables. Every concept sourced to a named text.",
@@ -274,30 +272,29 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
         heading: "OPEN FOR PRE-BOOKING",
         links: [
           {
-            label: "Ganesh Sthapana Kit",
-            href: "/ritual-pujans/by-festival/ganesh-sthapana-kit",
-            description: "₹1,650",
-            when: "ORDER BY 10 SEP",
-          },
-          {
-            label: "Hartalika Teej Kit",
-            href: "/ritual-pujans/by-festival/hartalika-teej-kit",
-            description: "₹950",
-            when: "ORDER BY 9 SEP",
-          },
-          {
-            label: "Shakti Kit",
-            href: "/ritual-pujans/by-festival/shakti-kit",
+            label: "Shakti Ritual Kit",
+            href: "/ritual-pujans/p/shakti-navratri-kit",
             description: "₹1,751 · Navratri",
+            when: "ORDER BY 1 OCT",
+          },
+          {
+            label: "Shubh Ekadash Diyas",
+            href: "/ritual-pujans/p/shubh-ekadash-diyas",
+            description: "₹751 · in stock",
+          },
+          {
+            label: "Sundarkand Path Kit",
+            href: "/ritual-pujans/p/sundarkand-path-kit",
+            description: "₹951 · opens soon",
           },
         ],
       },
       {
         heading: "BEFORE YOU BUY",
         links: [
-          { label: "What is in a kit", href: "/help/what-is-in-a-kit" },
-          { label: "Delivery and cut-offs", href: "/help/delivery" },
-          { label: "Cancellations and refunds", href: "/help/cancellations" },
+          { label: "You do not need a kit", href: "/about" },
+          { label: "Delivery and cut-offs", href: "/policies/shipping" },
+          { label: "Cancellations and refunds", href: "/policies/cancellation" },
         ],
       },
     ],

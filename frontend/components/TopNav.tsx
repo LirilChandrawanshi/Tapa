@@ -287,9 +287,9 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
           <div className="flex flex-col gap-[2px] border-b border-border-light px-4 py-[14px]">
             {[
               { label: "Glossary", href: "/glossary" },
-              { label: "Scripture References", href: "/scripture-references" },
+              { label: "Scripture References", href: "/editorial-method" },
               { label: "Our Editorial Method", href: "/editorial-method" },
-              { label: "Contact", href: "/contact" },
+              { label: "Contact", href: "/about" },
             ].map((link) => (
               <Link
                 key={link.href}

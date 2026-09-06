@@ -226,22 +226,22 @@ export function Footer({
         <div className="grid gap-[22px] border-b border-white/[0.07] pt-[34px] pb-9 md:grid-cols-[1.05fr_1fr_1fr_1.15fr] md:gap-9">
           <div>
             <p className={COLUMN_HEADING}>About</p>
-            <Link href="/why-tapa" className={COLUMN_LINK}>
+            <Link href="/about" className={COLUMN_LINK}>
               Why <span className="font-devanagari">तप्</span>
             </Link>
             <Link href="/editorial-method" className={COLUMN_LINK}>
               Our Editorial Method
             </Link>
-            <Link href="/scripture-references" className={COLUMN_LINK}>
+            <Link href="/editorial-method" className={COLUMN_LINK}>
               Scripture References
             </Link>
             <Link href="/glossary" className={COLUMN_LINK}>
               Glossary
             </Link>
-            <Link href="/circle" className={COLUMN_LINK}>
+            <Link href="/tapa-circle" className={COLUMN_LINK}>
               The Tapa Circle
             </Link>
-            <Link href="/purohit-network" className={COLUMN_LINK}>
+            <Link href="/work-with-us" className={COLUMN_LINK}>
               Join the Purohit Network
             </Link>
           </div>
@@ -252,10 +252,10 @@ export function Footer({
             <span className={LOCKED_LINK}>Shipping &amp; Delivery</span>
             <span className={LOCKED_LINK}>Returns &amp; Refunds</span>
             <span className={LOCKED_LINK}>Cancellations</span>
-            <Link href="/faqs" className={COLUMN_LINK}>
+            <Link href="/editorial-method" className={COLUMN_LINK}>
               FAQs
             </Link>
-            <Link href="/contact" className={COLUMN_LINK}>
+            <Link href="/about" className={COLUMN_LINK}>
               Contact Support
             </Link>
           </div>
@@ -264,13 +264,13 @@ export function Footer({
             <Link href="/account" className={COLUMN_LINK}>
               My Account
             </Link>
-            <Link href="/account/saved" className={COLUMN_LINK}>
+            <Link href="/account" className={COLUMN_LINK}>
               Saved Rituals
             </Link>
-            <Link href="/account/reminders" className={COLUMN_LINK}>
+            <Link href="/account" className={COLUMN_LINK}>
               My Reminders
             </Link>
-            <Link href="/account/notifications" className={COLUMN_LINK}>
+            <Link href="/account" className={COLUMN_LINK}>
               Notification Preferences
             </Link>
             <span className={`${COLUMN_LINK} cursor-default`}>
@@ -343,7 +343,7 @@ export function Footer({
             correction.
           </p>
           <Link
-            href="/corrections"
+            href="/report-correction"
             className="text-[12.5px] font-bold text-cta"
           >
             Report a correction ›

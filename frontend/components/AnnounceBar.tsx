@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const UTILITY_LINKS = [
-  { label: "Scripture References", href: "/scripture-references" },
+  { label: "Scripture References", href: "/editorial-method" },
   { label: "Glossary", href: "/glossary" },
   { label: "Our Editorial Method", href: "/editorial-method" },
 ] as const;
