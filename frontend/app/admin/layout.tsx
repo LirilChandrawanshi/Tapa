@@ -12,6 +12,8 @@ import { usePathname } from "next/navigation";
 import { checkAdminAccess, type AdminAccess } from "@/lib/admin";
 
 const NAV: { href: string; label: string }[] = [
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/products", label: "Products" },
   { href: "/admin/articles", label: "Articles" },
   { href: "/admin/panchang", label: "Panchang" },
   { href: "/admin/observances", label: "Observances" },

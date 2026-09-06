@@ -15,6 +15,7 @@ import {
   type Me,
   type SavedRitual,
 } from "@/lib/auth";
+import { getMyOrders } from "@/lib/orders";
 
 function initialsOf(name: string, phone: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -60,15 +61,21 @@ export default function AccountPage() {
   const [me, setMe] = useState<Me | null>(null);
   const [savedItems, setSavedItems] = useState<SavedRitual[]>([]);
   const [savedOpen, setSavedOpen] = useState(false);
+  const [orderCount, setOrderCount] = useState(0);
   const [gateOpen, setGateOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const [langBusy, setLangBusy] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [meRes, savedRes] = await Promise.all([getMe(), getSavedRituals()]);
+    const [meRes, savedRes, ordersRes] = await Promise.all([
+      getMe(),
+      getSavedRituals(),
+      getMyOrders(),
+    ]);
     setMe(meRes.ok ? meRes.data : null);
     setSavedItems(savedRes.ok ? savedRes.data : []);
+    setOrderCount(ordersRes.ok ? (ordersRes.data ?? []).length : 0);
     setLoading(false);
   }, []);
 
@@ -292,16 +299,15 @@ export default function AccountPage() {
           )}
         </div>
 
-        {/* Booking History */}
-        <div className={`${ROW} cursor-not-allowed opacity-55`}>
-          <span aria-hidden>🧾</span>
-          <span className="flex-1 font-semibold text-body">
-            Booking History
+        {/* Orders */}
+        <Link href="/account/orders" className={`${ROW} hover:bg-bg/60`}>
+          <span aria-hidden>📦</span>
+          <span className="flex-1 font-semibold text-body">Orders</span>
+          <span className="text-[12px] text-sub">{orderCount}</span>
+          <span aria-hidden className="text-[11px] text-sub">
+            ›
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-sub">
-            Phase 2
-          </span>
-        </div>
+        </Link>
 
         {/* My Reminders */}
         <div className={`${ROW} cursor-not-allowed opacity-55`}>

@@ -48,3 +48,33 @@ Run before each release. Setup: `make db`, seed once (`make seed`), then
       joining.
 - [ ] Report-a-correction and all three work-with-us forms validate + submit;
       entries appear in the admin inboxes.
+
+## Phase 2 — Commerce
+- [ ] /ritual-pujans PLP shows 3 availability states (PRE-BOOK w/ order-by date,
+      IN STOCK, OPENS SOON w/ notify capture).
+- [ ] PDP pincode check: 110024 → "delivers in ~3 days"; 560001 → not serviceable.
+- [ ] Add diyas ×2 to cart → free delivery kicks in at ₹999 (₹1,502 total, ₹0 delivery);
+      single diya set shows ₹49 delivery + "add ₹248 more" hint.
+- [ ] Checkout with no COD option anywhere; 422 errors render fear-free inline.
+- [ ] Mock payment confirm → order confirmed page (TK- number, expected date,
+      what-happens-next); order lands in /account/orders after claim.
+- [ ] Guest tracking: order number + phone; wrong phone = not found; cancel inside
+      the window → "full refund initiated".
+- [ ] Admin /admin/orders: CONFIRMED → PACKING → DISPATCHED (tracking id) → DELIVERED;
+      illegal jumps rejected with the allowed list.
+- [ ] Pre-book past order-by date is rejected at checkout.
+
+## Phase 2 — Tapa Circle
+- [ ] /tapa-circle join → wa.me deep link; status polls PENDING.
+- [ ] Webhook JOIN (with X-Webhook-Token) → ACTIVE, T1 in provider log within 5s.
+- [ ] STOP (or रोकें) → T3 + STOPPED, no further sends; DELETE → purged in 7 days.
+- [ ] Wrong webhook token → 401.
+- [ ] T2 fires only for verified observances, evening before, once per member
+      per occasion; nothing on quiet days.
+- [ ] /admin/circle dashboard shows members by status + failed-flagged sends.
+
+## Phase 2 — Launch gate
+- [ ] Flip kits_launched in /admin/flags → nav tab goes live, home shelf switches,
+      kits appear (last) in search; flip back off reverts all three.
+- [ ] Policy pages render; Grievance Officer named (replace placeholder!) before
+      commerce goes public.
