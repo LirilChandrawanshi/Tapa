@@ -20,3 +20,8 @@ media/*
 .idea/
 *.iml
 .vscode/
+
+# e2e artifacts
+frontend/e2e/.auth/
+frontend/test-results/
+frontend/playwright-report/

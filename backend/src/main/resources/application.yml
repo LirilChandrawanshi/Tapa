@@ -33,7 +33,7 @@ tapa:
   media:
     root: ${TAPA_MEDIA_ROOT:../media}
   cors:
-    allowed-origins: ${TAPA_CORS_ORIGINS:http://localhost:3000}
+    allowed-origins: ${TAPA_CORS_ORIGINS:http://localhost:*}
 
 logging:
   level:
