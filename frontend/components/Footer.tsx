@@ -332,10 +332,13 @@ export function Footer({ kitsLaunched = false }: { kitsLaunched?: boolean }) {
         <div className="pt-6 pb-[30px]">
           <div className="mb-4 flex flex-wrap gap-x-5 gap-y-[9px] border-b border-white/[0.06] pb-4">
             {[
-              { label: "Terms of Use", href: "/terms" },
-              { label: "Privacy Policy", href: "/privacy" },
-              { label: "Grievance Redressal", href: "/grievance" },
-              { label: "Sitemap", href: "/sitemap" },
+              { label: "Terms of Use", href: "/policies/terms" },
+              { label: "Privacy Policy", href: "/policies/privacy" },
+              { label: "Cancellation", href: "/policies/cancellation" },
+              { label: "Refunds", href: "/policies/refund" },
+              { label: "Shipping & Delivery", href: "/policies/shipping" },
+              { label: "Grievance Redressal", href: "/policies/grievance-redressal" },
+              { label: "Sitemap", href: "/sitemap.xml" },
             ].map((link) => (
               <Link
                 key={link.href}
@@ -350,8 +353,8 @@ export function Footer({ kitsLaunched = false }: { kitsLaunched?: boolean }) {
             GRIEVANCE OFFICER
           </p>
           <p className="text-xs leading-[1.85] text-sub">
-            Response within 48 hours, per Consumer Protection (E-Commerce)
-            Rules, 2020.
+            [Name pending appointment] · grievance@thetapaco.com — response
+            within 48 hours, per Consumer Protection (E-Commerce) Rules, 2020.
           </p>
           <p className="mt-3 text-[11.5px] leading-[1.8] text-[#5C4E36]">
             Tale Scale Networks Private Limited · Gurgaon, Haryana

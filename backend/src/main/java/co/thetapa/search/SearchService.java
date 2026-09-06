@@ -54,15 +54,21 @@ public class SearchService {
     private final ObservanceRepository observances;
     private final SearchQueryRepository queryLog;
     private final PopularSearchRepository popular;
+    private final co.thetapa.commerce.ProductRepository products;
+    private final co.thetapa.flags.FeatureFlagService flags;
 
     public SearchService(GlossaryRepository glossary, ArticleRepository articles,
                          ObservanceRepository observances, SearchQueryRepository queryLog,
-                         PopularSearchRepository popular) {
+                         PopularSearchRepository popular,
+                         co.thetapa.commerce.ProductRepository products,
+                         co.thetapa.flags.FeatureFlagService flags) {
         this.glossary = glossary;
         this.articles = articles;
         this.observances = observances;
         this.queryLog = queryLog;
         this.popular = popular;
+        this.products = products;
+        this.flags = flags;
     }
 
     public SearchResponse search(String rawQuery) {
@@ -101,13 +107,32 @@ public class SearchService {
             }
         }
 
-        int total = glossaryHits.size() + guideHits.size() + dateHits.size();
+        // kits are always the LAST group and only surface once the shelf is live
+        List<Hit> kitHits = new ArrayList<>();
+        boolean kitsLaunched = Boolean.TRUE.equals(flags.all().get(
+            co.thetapa.flags.FeatureFlagService.KITS_LAUNCHED));
+        if (kitsLaunched && !tokens.isEmpty()) {
+            for (var product : products.findAllByOrderByFestivalDateAsc()) {
+                if (product.getAvailability() == co.thetapa.commerce.Product.Availability.COMING_SOON) {
+                    continue;
+                }
+                if (matches(tokens, product.getTitle(), product.getSeason(), product.getDescription())) {
+                    kitHits.add(new Hit(Hit.TYPE_KIT, product.getTitle(),
+                        "₹" + (product.getPricePaise() / 100) + " · "
+                            + product.getItems().size() + " items",
+                        "/ritual-pujans/p/" + product.getSlug(),
+                        product.getHueClass(), product.getAvailability().name()));
+                }
+            }
+        }
+
+        int total = glossaryHits.size() + guideHits.size() + dateHits.size() + kitHits.size();
         List<String> didYouMean = total == 0 ? suggest(query) : List.of();
 
         logQuery(query, total);
 
         return new SearchResponse(query, total,
-            cap(glossaryHits), cap(guideHits), cap(dateHits), List.of(),
+            cap(glossaryHits), cap(guideHits), cap(dateHits), cap(kitHits),
             didYouMean, popular.findByActiveTrueOrderByOrderAsc());
     }
 
