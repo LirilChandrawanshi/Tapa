@@ -76,7 +76,14 @@ function ComingSoonTile({
   );
 }
 
-export function Footer({ kitsLaunched = false }: { kitsLaunched?: boolean }) {
+export function Footer({
+  kitsLaunched = false,
+  purohitVisible = false,
+}: {
+  kitsLaunched?: boolean;
+  /** DB flag `purohit_tab_visible` — turns the coming-soon tile into a live link. */
+  purohitVisible?: boolean;
+}) {
   const rk = getSection("ritual-pujans");
   const sitemapSections = TAXONOMY.filter(
     (s) => s.gatedBy !== "kits_launched" || kitsLaunched,
@@ -137,13 +144,13 @@ export function Footer({ kitsLaunched = false }: { kitsLaunched?: boolean }) {
               Save rituals and manage reminders
             </span>
             <Link
-              href="/signin"
+              href="/sign-in"
               className="flex-1 rounded-[20px] border-[1.5px] border-white/[0.22] px-5 py-[10px] text-center text-[13px] font-semibold whitespace-nowrap text-hero-text md:flex-none"
             >
               Sign in
             </Link>
             <Link
-              href="/signin"
+              href="/sign-in"
               className="flex-1 rounded-[20px] bg-cta px-[22px] py-[11px] text-center text-[13px] font-bold whitespace-nowrap text-white md:flex-none"
             >
               Create account
@@ -183,11 +190,28 @@ export function Footer({ kitsLaunched = false }: { kitsLaunched?: boolean }) {
                 copy="Samagri kits for every ritual guide, delivered before the date. Full amount at pre-booking; cancellable within 48 hours."
               />
             )}
-            <ComingSoonTile
-              title="Purohit & Puja"
-              when="Opening November 2026"
-              copy="Book a verified purohit for your home."
-            />
+            {purohitVisible ? (
+              <div>
+                <p className="mb-[10px] border-b border-white/10 pb-[9px] text-[14.5px] font-bold text-hero-text">
+                  Purohit &amp; Puja
+                </p>
+                <Link
+                  href="/pujan-with-purohit"
+                  className="block py-1 text-xs font-semibold text-cta"
+                >
+                  Book a Purohit ›
+                </Link>
+                <span className="block text-[11.5px] leading-[1.6] text-sub">
+                  Book a verified purohit for your home.
+                </span>
+              </div>
+            ) : (
+              <ComingSoonTile
+                title="Purohit & Puja"
+                when="Opening November 2026"
+                copy="Book a verified purohit for your home."
+              />
+            )}
             <ComingSoonTile
               title="Bhajan Mandali"
               when="Coming soon"

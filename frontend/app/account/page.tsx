@@ -15,6 +15,7 @@ import {
   type Me,
   type SavedRitual,
 } from "@/lib/auth";
+import { getMyBookings } from "@/lib/booking";
 import { getMyOrders } from "@/lib/orders";
 
 function initialsOf(name: string, phone: string): string {
@@ -62,6 +63,7 @@ export default function AccountPage() {
   const [savedItems, setSavedItems] = useState<SavedRitual[]>([]);
   const [savedOpen, setSavedOpen] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
+  const [bookingCount, setBookingCount] = useState(0);
   const [circleStatus, setCircleStatus] = useState<string>("NONE");
   const [gateOpen, setGateOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
@@ -69,17 +71,23 @@ export default function AccountPage() {
   const [removing, setRemoving] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [meRes, savedRes, ordersRes, circleRes] = await Promise.all([
-      getMe(),
-      getSavedRituals(),
-      getMyOrders(),
-      fetch("/api/v1/me/circle", { credentials: "include", cache: "no-store" })
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => null),
-    ]);
+    const [meRes, savedRes, ordersRes, bookingsRes, circleRes] =
+      await Promise.all([
+        getMe(),
+        getSavedRituals(),
+        getMyOrders(),
+        getMyBookings(),
+        fetch("/api/v1/me/circle", {
+          credentials: "include",
+          cache: "no-store",
+        })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null),
+      ]);
     setMe(meRes.ok ? meRes.data : null);
     setSavedItems(savedRes.ok ? savedRes.data : []);
     setOrderCount(ordersRes.ok ? (ordersRes.data ?? []).length : 0);
+    setBookingCount(bookingsRes.ok ? (bookingsRes.data ?? []).length : 0);
     setCircleStatus(circleRes?.data?.status ?? "NONE");
     setLoading(false);
   }, []);
@@ -313,6 +321,16 @@ export default function AccountPage() {
           <span aria-hidden>📦</span>
           <span className="flex-1 font-semibold text-body">Orders</span>
           <span className="text-[12px] text-sub">{orderCount}</span>
+          <span aria-hidden className="text-[11px] text-sub">
+            ›
+          </span>
+        </Link>
+
+        {/* Puja Bookings */}
+        <Link href="/account/bookings" className={`${ROW} hover:bg-bg/60`}>
+          <span aria-hidden>🪔</span>
+          <span className="flex-1 font-semibold text-body">Puja Bookings</span>
+          <span className="text-[12px] text-sub">{bookingCount}</span>
           <span aria-hidden className="text-[11px] text-sub">
             ›
           </span>

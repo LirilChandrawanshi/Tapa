@@ -188,7 +188,7 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
             </Link>
             <LangToggle className="hidden lg:flex" />
             <Link
-              href="/signin"
+              href="/sign-in"
               className="hidden rounded-[10px] bg-cta px-5 py-[11px] text-[13.5px] font-bold whitespace-nowrap text-white lg:block"
             >
               Sign in
@@ -304,7 +304,7 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
 
           <div className="p-4">
             <Link
-              href="/signin"
+              href="/sign-in"
               onClick={() => setDrawerOpen(false)}
               className="mb-[9px] block w-full rounded-xl bg-cta py-[14px] text-center text-[14.5px] font-bold text-white"
             >
