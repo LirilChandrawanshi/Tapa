@@ -15,6 +15,7 @@ import {
   type Me,
   type SavedRitual,
 } from "@/lib/auth";
+import { getReminders } from "@/lib/account";
 import { getMyBookings } from "@/lib/booking";
 import { getMyMandaliRequests } from "@/lib/mandali";
 import { getMyOrders } from "@/lib/orders";
@@ -66,32 +67,43 @@ export default function AccountPage() {
   const [orderCount, setOrderCount] = useState(0);
   const [bookingCount, setBookingCount] = useState(0);
   const [mandaliCount, setMandaliCount] = useState(0);
+  const [reminderCount, setReminderCount] = useState(0);
   const [circleStatus, setCircleStatus] = useState<string>("NONE");
+  const [circleOpen, setCircleOpen] = useState(false);
   const [gateOpen, setGateOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const [langBusy, setLangBusy] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [meRes, savedRes, ordersRes, bookingsRes, mandaliRes, circleRes] =
-      await Promise.all([
-        getMe(),
-        getSavedRituals(),
-        getMyOrders(),
-        getMyBookings(),
-        getMyMandaliRequests(),
-        fetch("/api/v1/me/circle", {
-          credentials: "include",
-          cache: "no-store",
-        })
-          .then((r) => (r.ok ? r.json() : null))
-          .catch(() => null),
-      ]);
+    const [
+      meRes,
+      savedRes,
+      ordersRes,
+      bookingsRes,
+      mandaliRes,
+      remindersRes,
+      circleRes,
+    ] = await Promise.all([
+      getMe(),
+      getSavedRituals(),
+      getMyOrders(),
+      getMyBookings(),
+      getMyMandaliRequests(),
+      getReminders(),
+      fetch("/api/v1/me/circle", {
+        credentials: "include",
+        cache: "no-store",
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]);
     setMe(meRes.ok ? meRes.data : null);
     setSavedItems(savedRes.ok ? savedRes.data : []);
     setOrderCount(ordersRes.ok ? (ordersRes.data ?? []).length : 0);
     setBookingCount(bookingsRes.ok ? (bookingsRes.data ?? []).length : 0);
     setMandaliCount(mandaliRes.ok ? (mandaliRes.data ?? []).length : 0);
+    setReminderCount(remindersRes.ok ? (remindersRes.data ?? []).length : 0);
     setCircleStatus(circleRes?.data?.status ?? "NONE");
     setLoading(false);
   }, []);
@@ -222,11 +234,6 @@ export default function AccountPage() {
         {[
           { value: String(savedCount), label: "Saved Rituals", note: "with 🔖" },
           { value: String(orderCount), label: "Orders", note: "kits ordered" },
-          circleStatus === "ACTIVE"
-            ? { value: "●", label: "Tapa Circle", note: "Active — reminders on" }
-            : circleStatus === "STOPPED"
-              ? { value: "◌", label: "Tapa Circle", note: "left — rejoin any time" }
-              : { value: "—", label: "Tapa Circle", note: "join on WhatsApp" },
         ].map((tile) => (
           <div
             key={tile.label}
@@ -241,7 +248,70 @@ export default function AccountPage() {
             <div className="mt-[2px] text-[10.5px] text-sub">{tile.note}</div>
           </div>
         ))}
+        {/* Circle tile — tappable, opens the manage sheet below */}
+        <button
+          type="button"
+          aria-expanded={circleOpen}
+          onClick={() => setCircleOpen((v) => !v)}
+          className={`rounded-xl border px-3 py-4 text-center hover:bg-bg/60 ${
+            circleOpen ? "border-cta bg-card" : "border-border bg-card"
+          }`}
+        >
+          <div className="text-[22px] font-bold leading-none text-ink">
+            {circleStatus === "ACTIVE"
+              ? "●"
+              : circleStatus === "STOPPED"
+                ? "◌"
+                : "—"}
+          </div>
+          <div className="mt-[6px] text-[11.5px] font-bold text-body">
+            Tapa Circle
+          </div>
+          <div className="mt-[2px] text-[10.5px] text-sub">
+            {circleStatus === "ACTIVE"
+              ? "Active — reminders on"
+              : circleStatus === "STOPPED"
+                ? "left — rejoin any time"
+                : "join on WhatsApp"}
+            {" "}
+            <span aria-hidden className="text-cta">
+              {circleOpen ? "▴" : "▾"}
+            </span>
+          </div>
+        </button>
       </div>
+
+      {/* Circle manage sheet */}
+      {circleOpen && (
+        <div className="mt-2 rounded-xl border border-border bg-card px-4 py-4">
+          <p className="text-[13px] font-bold text-ink">
+            {circleStatus === "ACTIVE"
+              ? "You're in the Tapa Circle."
+              : circleStatus === "STOPPED"
+                ? "You've left the Tapa Circle."
+                : "You're not in the Tapa Circle yet."}
+          </p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-sub">
+            Reminders arrive the evening before each vrat — one WhatsApp
+            message, free, for every vrat on the calendar.
+          </p>
+          {circleStatus === "ACTIVE" ? (
+            <p className="mt-2 border-t border-border-light pt-2 text-[12.5px] leading-relaxed text-sub">
+              To leave, reply <b className="text-body">STOP</b> on WhatsApp —
+              takes effect immediately, and we never message that number again.
+            </p>
+          ) : (
+            <Link
+              href="/tapa-circle"
+              className="mt-3 inline-block rounded-lg border border-wa px-4 py-[8px] text-[12.5px] font-bold text-wa hover:bg-wa hover:text-white"
+            >
+              {circleStatus === "STOPPED"
+                ? "Rejoin the Circle"
+                : "Join the Circle"}
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* rows */}
       <div className="mt-6 divide-y divide-border-light overflow-hidden rounded-2xl border border-border bg-card">
@@ -351,13 +421,14 @@ export default function AccountPage() {
         </Link>
 
         {/* My Reminders */}
-        <div className={`${ROW} cursor-not-allowed opacity-55`}>
+        <Link href="/account/reminders" className={`${ROW} hover:bg-bg/60`}>
           <span aria-hidden>⏰</span>
           <span className="flex-1 font-semibold text-body">My Reminders</span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-sub">
-            coming soon
+          <span className="text-[12px] text-sub">{reminderCount}</span>
+          <span aria-hidden className="text-[11px] text-sub">
+            ›
           </span>
-        </div>
+        </Link>
 
         {/* Language */}
         <div className={ROW}>
@@ -393,15 +464,15 @@ export default function AccountPage() {
         </div>
 
         {/* Notification Preferences */}
-        <div className={`${ROW} cursor-not-allowed opacity-55`}>
+        <Link href="/account/notifications" className={`${ROW} hover:bg-bg/60`}>
           <span aria-hidden>🔔</span>
           <span className="flex-1 font-semibold text-body">
             Notification Preferences
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-sub">
-            coming soon
+          <span aria-hidden className="text-[11px] text-sub">
+            ›
           </span>
-        </div>
+        </Link>
 
         {/* Help & Support */}
         <a href="mailto:help@thetapaco.com" className={`${ROW} hover:bg-bg/60`}>
@@ -421,6 +492,20 @@ export default function AccountPage() {
           <span aria-hidden>↩</span>
           <span className="flex-1 font-bold text-cta">Log out</span>
         </button>
+      </div>
+
+      {/* danger zone */}
+      <div className="mt-4 overflow-hidden rounded-2xl border border-red-300 bg-card">
+        <Link href="/account/delete" className={`${ROW} hover:bg-red-50`}>
+          <span aria-hidden>🗑</span>
+          <span className="flex-1 font-bold text-red-600">
+            Delete my account
+          </span>
+          <span className="text-[11.5px] text-sub">permanent</span>
+          <span aria-hidden className="text-[11px] text-red-400">
+            ›
+          </span>
+        </Link>
       </div>
     </main>
   );

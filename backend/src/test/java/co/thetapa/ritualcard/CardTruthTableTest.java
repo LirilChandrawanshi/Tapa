@@ -30,7 +30,8 @@ class CardTruthTableTest {
 
     record Row(String id, String fixture, String description,
                List<String> present, List<String> absent,
-               List<String> mustContain, List<String> mustNotContain) {
+               List<String> mustContain, List<String> mustNotContain,
+               List<String> containOnce) {
     }
 
     @BeforeAll
@@ -72,11 +73,24 @@ class CardTruthTableTest {
         for (String s : row.mustNotContain()) {
             assertFalse(html.contains(s), row.id() + ": unexpected content: " + s);
         }
+        // day sub-headers appear exactly once per day group (dedupe rule)
+        if (row.containOnce() != null) {
+            for (String s : row.containOnce()) {
+                assertEquals(1, countOccurrences(html, s),
+                    row.id() + ": expected exactly once: " + s);
+            }
+        }
 
-        // structural invariants: <=8 steps, exactly one rose (last) step circle
+        // structural invariants: <=8 steps, exactly one rose (last) step circle,
+        // no rose panchang values (labels gold / values white per spec), and no
+        // raw "day:" note prefixes leaking into the card
         assertTrue(model.steps().size() <= 8, row.id() + ": more than 8 vidhi steps rendered");
         assertEquals(1, countOccurrences(html, "class=\"step last\""),
             row.id() + ": exactly one last (rose) step expected");
+        assertFalse(html.contains("value hot"),
+            row.id() + ": panchang strip values must never carry the rose highlight");
+        assertFalse(html.contains("day:"),
+            row.id() + ": raw day-note prefix leaked into the rendered card");
     }
 
     private static String render(CardModel model) {

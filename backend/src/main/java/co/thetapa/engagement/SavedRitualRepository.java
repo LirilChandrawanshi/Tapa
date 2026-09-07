@@ -12,4 +12,6 @@ public interface SavedRitualRepository extends MongoRepository<SavedRitual, Stri
     Optional<SavedRitual> findByUserIdAndArticleSlug(String userId, String articleSlug);
 
     long countByUserId(String userId);
+
+    void deleteByUserId(String userId);
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   availabilityChip,
   formatPaise,
+  prebookClosed,
   type Product,
 } from "@/lib/shop";
 
@@ -13,7 +14,7 @@ export function productHref(p: Product): string {
 function cardCta(p: Product): string {
   switch (p.availability) {
     case "PREBOOK":
-      return "Pre-book ›";
+      return prebookClosed(p) ? "Pre-booking closed" : "Pre-book ›";
     case "LIVE":
       return "Add to cart ›";
     case "COMING_SOON":
@@ -28,7 +29,7 @@ function cardCta(p: Product): string {
  * eyebrow, title, price (with struck MRP) and an availability chip.
  */
 export function ProductCard({ product: p }: { product: Product }) {
-  const soldOut = p.availability === "SOLD_OUT";
+  const soldOut = p.availability === "SOLD_OUT" || prebookClosed(p);
   return (
     <Link
       href={productHref(p)}

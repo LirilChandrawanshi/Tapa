@@ -58,6 +58,8 @@ public class Order {
     private Instant dispatchedAt;
     private Instant cancelledAt;
     private Long refundPaise;
+    /** buyer-picked cancellation reason (optional, never required) */
+    private String cancelReason;
 
     @CreatedDate
     private Instant createdAt;
@@ -116,6 +118,8 @@ public class Order {
     public void setCancelledAt(Instant cancelledAt) { this.cancelledAt = cancelledAt; }
     public Long getRefundPaise() { return refundPaise; }
     public void setRefundPaise(Long refundPaise) { this.refundPaise = refundPaise; }
+    public String getCancelReason() { return cancelReason; }
+    public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

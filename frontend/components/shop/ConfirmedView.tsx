@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getMe } from "@/lib/auth";
+import { claimGuestOrders } from "@/lib/orders";
+import { OtpFlow } from "@/components/auth/OtpFlow";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import {
   fetchOrder,
@@ -26,6 +28,8 @@ export function ConfirmedView() {
   const phone = params.get("phone") ?? "";
   const [state, setState] = useState<State>({ kind: "loading" });
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [claimed, setClaimed] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
 
   useEffect(() => {
     if (!orderNumber || !phone) {
@@ -133,30 +137,53 @@ export function ConfirmedView() {
         )}
       </div>
 
-      {/* Keep-this-order card — one OTP, never a wall. */}
+      {/* Keep-this-order card — one inline OTP, never a wall (#164/#185). */}
       {signedIn === false && (
         <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
-          <p className="mb-1 text-[13.5px] font-bold text-ink">
-            Keep this order on your account
-          </p>
-          <p className="mb-3 text-[12.5px] leading-relaxed text-sub">
-            One OTP attaches this order to your account — tracking, invoice
-            and cancellation in one place. No password, no form.
-          </p>
-          <Link
-            href="/sign-in?next=/account"
-            className="inline-block rounded-[9px] bg-ink px-5 py-[9px] text-[12.5px] font-bold text-white"
-          >
-            Sign in with OTP ›
-          </Link>
+          {!showOtp ? (
+            <>
+              <p className="mb-1 text-[13.5px] font-bold text-ink">
+                Keep this order on your account
+              </p>
+              <p className="mb-3 text-[12.5px] leading-relaxed text-sub">
+                One OTP attaches this order to your account — tracking,
+                invoice and cancellation in one place. No password, no form.
+                Use the number this order was placed with:{" "}
+                <b className="text-body">+91 {phone}</b>.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowOtp(true)}
+                className="inline-block rounded-[9px] bg-ink px-5 py-[9px] text-[12.5px] font-bold text-white"
+              >
+                Sign in with OTP ›
+              </button>
+            </>
+          ) : (
+            <OtpFlow
+              context="signin"
+              heading="Keep this order on your account"
+              onSuccess={() => {
+                setSignedIn(true);
+                setClaimed(true);
+                // attaches every guest order on this phone — safe to call often
+                void claimGuestOrders();
+              }}
+              onDismiss={() => setShowOtp(false)}
+              dismissLabel="Not now — the order is safe either way"
+            />
+          )}
         </div>
       )}
       {signedIn === true && (
         <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
           <p className="text-[13px] text-body">
-            This order is saved to your account.{" "}
-            <Link href="/account" className="font-bold text-cta">
-              View your orders ›
+            {claimed ? "Done — no password, ever." : "This order is saved to your account."}{" "}
+            <Link
+              href={`/account/orders/${encodeURIComponent(order.orderNumber)}`}
+              className="font-bold text-cta"
+            >
+              {claimed ? "Order attached to your account ›" : "View your orders ›"}
             </Link>
           </p>
         </div>

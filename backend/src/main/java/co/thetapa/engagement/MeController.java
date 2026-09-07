@@ -81,14 +81,18 @@ public class MeController {
         return ApiResponse.ok(Map.of("updated", true));
     }
 
-    /** Saved rituals sorted by what is closest (upcoming observance first), not save date. */
+    /**
+     * Saved rituals in three tiers: upcoming dated (soonest first), then
+     * undated evergreen guides (most recently saved first), then past dated
+     * ones last (the UI dims them with a "returns next year" badge).
+     */
     @GetMapping("/saved")
     public ApiResponse<?> savedRituals(@AuthenticationPrincipal String userId) {
         LocalDate today = LocalDate.now(co.thetapa.panchang.PanchangService.IST);
         var items = saved.findByUserId(userId).stream()
             .map(s -> {
                 Optional<Article> article = articles.findBySlug(s.getArticleSlug());
-                return Map.of(
+                return Map.<String, Object>of(
                     "articleSlug", s.getArticleSlug(),
                     "savedAt", s.getSavedAt(),
                     "title", article.map(a -> a.getLang().get("en").title()).orElse(s.getArticleSlug()),
@@ -97,12 +101,19 @@ public class MeController {
                     "past", article.map(Article::getObservanceDate).map(d -> d.isBefore(today)).orElse(false)
                 );
             })
-            .sorted(Comparator.comparing(m -> {
-                String d = (String) m.get("observanceDate");
-                // upcoming dates first by proximity; undated/past sink to the end
-                if (d.isEmpty()) return "9999-98";
-                return LocalDate.parse(d).isBefore(today) ? "9999-99" + d : d;
-            }))
+            .sorted(Comparator
+                .comparingInt((Map<String, Object> m) -> {
+                    String d = (String) m.get("observanceDate");
+                    if (d.isEmpty()) return 1;                             // undated in the middle
+                    return LocalDate.parse(d).isBefore(today) ? 2 : 0;     // past sinks, upcoming leads
+                })
+                .thenComparing(m -> {
+                    String d = (String) m.get("observanceDate");
+                    // upcoming: soonest first; past: keep date order too
+                    return d.isEmpty() ? "" : d;
+                })
+                .thenComparing(m -> (java.time.Instant) m.get("savedAt"),
+                    Comparator.nullsLast(Comparator.reverseOrder())))       // undated: recently saved first
             .toList();
         return ApiResponse.ok(items);
     }

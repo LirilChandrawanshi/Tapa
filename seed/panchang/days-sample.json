@@ -1,47 +1,2146 @@
 [
   {
-    "date": "2026-09-05", "city": "delhi-ncr",
-    "tithi": { "name": "Navami", "endsAt": "2026-09-05T21:12:00" },
-    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
-    "nakshatra": { "name": "Rohini", "endsAt": "2026-09-05T23:40:00" },
-    "yoga": "Shoolam", "karana": "Taitila",
-    "sunrise": "05:59", "sunset": "18:38", "moonrise": "23:05", "moonset": "13:10",
-    "rahuKaal": { "from": "09:10", "to": "10:44" },
-    "abhijitMuhurat": { "from": "11:53", "to": "12:44" },
+    "date": "2026-09-05",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Navami",
+      "endsAt": "2026-09-05T21:12:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Rohini",
+      "endsAt": "2026-09-05T23:40:00"
+    },
+    "yoga": "Shoolam",
+    "karana": "Taitila",
+    "sunrise": "05:59",
+    "sunset": "18:38",
+    "moonrise": "23:05",
+    "moonset": "13:10",
+    "rahuKaal": {
+      "from": "09:10",
+      "to": "10:44"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:44"
+    },
     "verified": false
   },
   {
-    "date": "2026-09-06", "city": "delhi-ncr",
-    "tithi": { "name": "Dashami", "endsAt": "2026-09-06T22:03:00" },
-    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
-    "nakshatra": { "name": "Mrigashira", "endsAt": "2026-09-07T01:12:00" },
-    "yoga": "Ganda", "karana": "Vanija",
-    "sunrise": "06:00", "sunset": "18:37", "moonrise": "23:52", "moonset": "14:02",
-    "rahuKaal": { "from": "17:03", "to": "18:37" },
-    "abhijitMuhurat": { "from": "11:53", "to": "12:44" },
+    "date": "2026-09-06",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dashami",
+      "endsAt": "2026-09-06T22:03:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Mrigashira",
+      "endsAt": "2026-09-07T01:12:00"
+    },
+    "yoga": "Ganda",
+    "karana": "Vanija",
+    "sunrise": "06:00",
+    "sunset": "18:37",
+    "moonrise": "23:52",
+    "moonset": "14:02",
+    "rahuKaal": {
+      "from": "17:03",
+      "to": "18:37"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:44"
+    },
     "verified": false
   },
   {
-    "date": "2026-09-07", "city": "delhi-ncr",
-    "tithi": { "name": "Ekadashi", "endsAt": "2026-09-07T23:22:00" },
-    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
-    "nakshatra": { "name": "Ardra", "endsAt": "2026-09-08T03:05:00" },
-    "yoga": "Vriddhi", "karana": "Bava",
-    "sunrise": "06:00", "sunset": "18:36", "moonrise": null, "moonset": "14:50",
-    "rahuKaal": { "from": "07:34", "to": "09:08" },
-    "abhijitMuhurat": { "from": "11:52", "to": "12:43" },
-    "muhurats": [ { "label": "Parana (next day)", "from": "06:01", "to": "08:29", "kind": "preferred" } ],
+    "date": "2026-09-07",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ekadashi",
+      "endsAt": "2026-09-07T23:22:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Ardra",
+      "endsAt": "2026-09-08T03:05:00"
+    },
+    "yoga": "Vriddhi",
+    "karana": "Bava",
+    "sunrise": "06:00",
+    "sunset": "18:36",
+    "moonrise": null,
+    "moonset": "14:50",
+    "rahuKaal": {
+      "from": "07:34",
+      "to": "09:08"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:43"
+    },
+    "muhurats": [
+      {
+        "label": "Parana (next day)",
+        "from": "06:01",
+        "to": "08:29",
+        "kind": "preferred"
+      }
+    ],
     "verified": false
   },
   {
-    "date": "2026-09-08", "city": "delhi-ncr",
-    "tithi": { "name": "Dwadashi", "endsAt": "2026-09-09T00:56:00" },
-    "paksha": "Krishna", "lunarMonth": "Bhadrapada",
-    "nakshatra": { "name": "Punarvasu", "endsAt": "2026-09-09T05:02:00" },
-    "yoga": "Dhruva", "karana": "Kaulava",
-    "sunrise": "06:01", "sunset": "18:35", "moonrise": "00:42", "moonset": "15:35",
-    "rahuKaal": { "from": "15:28", "to": "17:02" },
-    "abhijitMuhurat": { "from": "11:52", "to": "12:43" },
+    "date": "2026-09-08",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwadashi",
+      "endsAt": "2026-09-09T00:56:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Punarvasu",
+      "endsAt": "2026-09-09T05:02:00"
+    },
+    "yoga": "Dhruva",
+    "karana": "Kaulava",
+    "sunrise": "06:01",
+    "sunset": "18:35",
+    "moonrise": "00:42",
+    "moonset": "15:35",
+    "rahuKaal": {
+      "from": "15:28",
+      "to": "17:02"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:43"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-09",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Trayodashi",
+      "endsAt": "2026-09-10T01:30:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Pushya",
+      "endsAt": "2026-09-10T04:35:00"
+    },
+    "yoga": "Vyaghata",
+    "karana": "Gara",
+    "sunrise": "06:02",
+    "sunset": "18:34",
+    "moonrise": "01:34",
+    "moonset": "13:43",
+    "rahuKaal": {
+      "from": "12:18",
+      "to": "13:52"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:43"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-10",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturdashi",
+      "endsAt": "2026-09-11T01:50:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Ashlesha",
+      "endsAt": "2026-09-11T03:58:00"
+    },
+    "yoga": "Harshana",
+    "karana": "Vishti",
+    "sunrise": "06:02",
+    "sunset": "18:33",
+    "moonrise": "02:26",
+    "moonset": "14:43",
+    "rahuKaal": {
+      "from": "13:51",
+      "to": "15:25"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:42"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-11",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Amavasya",
+      "endsAt": "2026-09-12T01:55:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Magha",
+      "endsAt": "2026-09-12T03:11:00"
+    },
+    "yoga": "Vajra",
+    "karana": "Chatushpada",
+    "sunrise": "06:03",
+    "sunset": "18:32",
+    "moonrise": "03:18",
+    "moonset": "15:42",
+    "rahuKaal": {
+      "from": "10:43",
+      "to": "12:17"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:41"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-12",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Pratipada",
+      "endsAt": "2026-09-13T01:40:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Purva Phalguni",
+      "endsAt": "2026-09-13T02:16:00"
+    },
+    "yoga": "Siddhi",
+    "karana": "Taitila",
+    "sunrise": "06:04",
+    "sunset": "18:31",
+    "moonrise": "04:10",
+    "moonset": "16:40",
+    "rahuKaal": {
+      "from": "09:10",
+      "to": "10:44"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:41"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-13",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwitiya",
+      "endsAt": "2026-09-14T01:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Uttara Phalguni",
+      "endsAt": "2026-09-14T01:15:00"
+    },
+    "yoga": "Vyatipata",
+    "karana": "Vanija",
+    "sunrise": "06:04",
+    "sunset": "18:30",
+    "moonrise": "05:02",
+    "moonset": "17:37",
+    "rahuKaal": {
+      "from": "16:56",
+      "to": "18:30"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:41"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-14",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Tritiya",
+      "endsAt": "2026-09-15T00:25:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Hasta",
+      "endsAt": "2026-09-15T00:11:00"
+    },
+    "yoga": "Variyana",
+    "karana": "Bava",
+    "sunrise": "06:05",
+    "sunset": "18:29",
+    "moonrise": "05:54",
+    "moonset": "18:33",
+    "rahuKaal": {
+      "from": "07:38",
+      "to": "09:11"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:41"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-15",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturthi",
+      "endsAt": "2026-09-15T23:40:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Chitra",
+      "endsAt": "2026-09-15T23:06:00"
+    },
+    "yoga": "Parigha",
+    "karana": "Kaulava",
+    "sunrise": "06:06",
+    "sunset": "18:28",
+    "moonrise": "06:46",
+    "moonset": "19:26",
+    "rahuKaal": {
+      "from": "15:22",
+      "to": "16:55"
+    },
+    "abhijitMuhurat": {
+      "from": "11:53",
+      "to": "12:41"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-16",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Panchami",
+      "endsAt": "2026-09-16T22:50:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Swati",
+      "endsAt": "2026-09-16T22:03:00"
+    },
+    "yoga": "Shiva",
+    "karana": "Gara",
+    "sunrise": "06:06",
+    "sunset": "18:27",
+    "moonrise": "07:38",
+    "moonset": "20:17",
+    "rahuKaal": {
+      "from": "12:16",
+      "to": "13:49"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-17",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Shashthi",
+      "endsAt": "2026-09-17T21:55:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Vishakha",
+      "endsAt": "2026-09-17T21:05:00"
+    },
+    "yoga": "Siddha",
+    "karana": "Vishti",
+    "sunrise": "06:07",
+    "sunset": "18:26",
+    "moonrise": "08:30",
+    "moonset": "21:07",
+    "rahuKaal": {
+      "from": "13:48",
+      "to": "15:21"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-18",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Saptami",
+      "endsAt": "2026-09-18T21:00:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Anuradha",
+      "endsAt": "2026-09-18T20:14:00"
+    },
+    "yoga": "Sadhya",
+    "karana": "Balava",
+    "sunrise": "06:07",
+    "sunset": "18:25",
+    "moonrise": "09:22",
+    "moonset": "21:55",
+    "rahuKaal": {
+      "from": "10:43",
+      "to": "12:16"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-19",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ashtami",
+      "endsAt": "2026-09-19T20:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Jyeshtha",
+      "endsAt": "2026-09-19T19:32:00"
+    },
+    "yoga": "Shubha",
+    "karana": "Taitila",
+    "sunrise": "06:08",
+    "sunset": "18:24",
+    "moonrise": "10:14",
+    "moonset": "22:42",
+    "rahuKaal": {
+      "from": "09:12",
+      "to": "10:44"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-20",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Navami",
+      "endsAt": "2026-09-20T19:10:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Mula",
+      "endsAt": "2026-09-20T19:00:00"
+    },
+    "yoga": "Shukla",
+    "karana": "Vanija",
+    "sunrise": "06:09",
+    "sunset": "18:24",
+    "moonrise": "11:06",
+    "moonset": "23:27",
+    "rahuKaal": {
+      "from": "16:52",
+      "to": "18:24"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-21",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dashami",
+      "endsAt": "2026-09-21T18:15:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Purva Ashadha",
+      "endsAt": "2026-09-21T18:39:00"
+    },
+    "yoga": "Brahma",
+    "karana": "Bava",
+    "sunrise": "06:09",
+    "sunset": "18:23",
+    "moonrise": "11:58",
+    "moonset": "00:11",
+    "rahuKaal": {
+      "from": "07:40",
+      "to": "09:12"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-22",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ekadashi",
+      "endsAt": "2026-09-22T17:25:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Uttara Ashadha",
+      "endsAt": "2026-09-22T18:30:00"
+    },
+    "yoga": "Indra",
+    "karana": "Kaulava",
+    "sunrise": "06:10",
+    "sunset": "18:22",
+    "moonrise": "12:50",
+    "moonset": "00:54",
+    "rahuKaal": {
+      "from": "15:19",
+      "to": "16:50"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-23",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwadashi",
+      "endsAt": "2026-09-23T16:40:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Shravana",
+      "endsAt": "2026-09-23T18:32:00"
+    },
+    "yoga": "Vaidhriti",
+    "karana": "Gara",
+    "sunrise": "06:11",
+    "sunset": "18:21",
+    "moonrise": "13:42",
+    "moonset": "01:38",
+    "rahuKaal": {
+      "from": "12:16",
+      "to": "13:47"
+    },
+    "abhijitMuhurat": {
+      "from": "11:52",
+      "to": "12:40"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-24",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Trayodashi",
+      "endsAt": "2026-09-24T16:00:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Dhanishta",
+      "endsAt": "2026-09-24T18:44:00"
+    },
+    "yoga": "Vishkambha",
+    "karana": "Vishti",
+    "sunrise": "06:11",
+    "sunset": "18:20",
+    "moonrise": "14:34",
+    "moonset": "02:21",
+    "rahuKaal": {
+      "from": "13:46",
+      "to": "15:17"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:39"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-25",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturdashi",
+      "endsAt": "2026-09-25T15:25:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Shatabhisha",
+      "endsAt": "2026-09-25T19:05:00"
+    },
+    "yoga": "Priti",
+    "karana": "Balava",
+    "sunrise": "06:12",
+    "sunset": "18:19",
+    "moonrise": "15:26",
+    "moonset": "03:05",
+    "rahuKaal": {
+      "from": "10:44",
+      "to": "12:15"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:39"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-26",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Purnima",
+      "endsAt": "2026-09-26T15:00:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Bhadrapada",
+    "nakshatra": {
+      "name": "Purva Bhadrapada",
+      "endsAt": "2026-09-26T19:33:00"
+    },
+    "yoga": "Ayushman",
+    "karana": "Taitila",
+    "sunrise": "06:13",
+    "sunset": "18:18",
+    "moonrise": "16:18",
+    "moonset": "03:50",
+    "rahuKaal": {
+      "from": "09:14",
+      "to": "10:44"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:39"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-27",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Pratipada",
+      "endsAt": "2026-09-27T14:40:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Uttara Bhadrapada",
+      "endsAt": "2026-09-27T20:06:00"
+    },
+    "yoga": "Saubhagya",
+    "karana": "Vanija",
+    "sunrise": "06:13",
+    "sunset": "18:17",
+    "moonrise": "17:10",
+    "moonset": "04:37",
+    "rahuKaal": {
+      "from": "16:46",
+      "to": "18:17"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:39"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-28",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwitiya",
+      "endsAt": "2026-09-28T14:15:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Revati",
+      "endsAt": "2026-09-28T20:41:00"
+    },
+    "yoga": "Shobhana",
+    "karana": "Bava",
+    "sunrise": "06:14",
+    "sunset": "18:16",
+    "moonrise": "18:02",
+    "moonset": "05:25",
+    "rahuKaal": {
+      "from": "07:44",
+      "to": "09:14"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:39"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-29",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Tritiya",
+      "endsAt": "2026-09-29T13:45:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Ashwini",
+      "endsAt": "2026-09-29T21:15:00"
+    },
+    "yoga": "Atiganda",
+    "karana": "Kaulava",
+    "sunrise": "06:15",
+    "sunset": "18:15",
+    "moonrise": "18:54",
+    "moonset": "06:15",
+    "rahuKaal": {
+      "from": "15:15",
+      "to": "16:45"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:39"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-09-30",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturthi",
+      "endsAt": "2026-09-30T13:10:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Bharani",
+      "endsAt": "2026-09-30T21:46:00"
+    },
+    "yoga": "Sukarman",
+    "karana": "Gara",
+    "sunrise": "06:15",
+    "sunset": "18:14",
+    "moonrise": "19:46",
+    "moonset": "07:06",
+    "rahuKaal": {
+      "from": "12:14",
+      "to": "13:44"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:37"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-01",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Panchami",
+      "endsAt": "2026-10-01T12:30:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Krittika",
+      "endsAt": "2026-10-01T22:11:00"
+    },
+    "yoga": "Dhriti",
+    "karana": "Vishti",
+    "sunrise": "06:16",
+    "sunset": "18:13",
+    "moonrise": "20:38",
+    "moonset": "07:59",
+    "rahuKaal": {
+      "from": "13:44",
+      "to": "15:13"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:37"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-02",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Shashthi",
+      "endsAt": "2026-10-02T11:45:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Rohini",
+      "endsAt": "2026-10-02T22:28:00"
+    },
+    "yoga": "Shoolam",
+    "karana": "Balava",
+    "sunrise": "06:17",
+    "sunset": "18:12",
+    "moonrise": "21:30",
+    "moonset": "08:55",
+    "rahuKaal": {
+      "from": "10:45",
+      "to": "12:14"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:37"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-03",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Saptami",
+      "endsAt": "2026-10-03T10:55:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Mrigashira",
+      "endsAt": "2026-10-03T22:35:00"
+    },
+    "yoga": "Ganda",
+    "karana": "Taitila",
+    "sunrise": "06:17",
+    "sunset": "18:11",
+    "moonrise": "22:22",
+    "moonset": "09:52",
+    "rahuKaal": {
+      "from": "09:15",
+      "to": "10:44"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:37"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-04",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ashtami",
+      "endsAt": "2026-10-04T08:25:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Ardra",
+      "endsAt": "2026-10-04T22:32:00"
+    },
+    "yoga": "Vriddhi",
+    "karana": "Vanija",
+    "sunrise": "06:18",
+    "sunset": "18:10",
+    "moonrise": "23:14",
+    "moonset": "10:50",
+    "rahuKaal": {
+      "from": "16:41",
+      "to": "18:10"
+    },
+    "abhijitMuhurat": {
+      "from": "11:51",
+      "to": "12:37"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-05",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dashami",
+      "endsAt": "2026-10-06T03:25:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Punarvasu",
+      "endsAt": "2026-10-05T22:17:00"
+    },
+    "yoga": "Dhruva",
+    "karana": "Bava",
+    "sunrise": "06:18",
+    "sunset": "18:09",
+    "moonrise": null,
+    "moonset": "11:49",
+    "rahuKaal": {
+      "from": "07:46",
+      "to": "09:15"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-06",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ekadashi",
+      "endsAt": "2026-10-07T04:20:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Pushya",
+      "endsAt": "2026-10-06T21:50:00"
+    },
+    "yoga": "Vyaghata",
+    "karana": "Kaulava",
+    "sunrise": "06:19",
+    "sunset": "18:08",
+    "moonrise": "00:58",
+    "moonset": "12:49",
+    "rahuKaal": {
+      "from": "15:10",
+      "to": "16:39"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false,
+    "muhurats": [
+      {
+        "label": "Parana (next day)",
+        "from": "06:22",
+        "to": "08:36",
+        "kind": "preferred"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-07",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwadashi",
+      "endsAt": "2026-10-08T05:05:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Ashlesha",
+      "endsAt": "2026-10-07T21:13:00"
+    },
+    "yoga": "Harshana",
+    "karana": "Gara",
+    "sunrise": "06:20",
+    "sunset": "18:07",
+    "moonrise": "01:50",
+    "moonset": "13:50",
+    "rahuKaal": {
+      "from": "12:13",
+      "to": "13:41"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-08",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Trayodashi",
+      "endsAt": "2026-10-09T05:40:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Magha",
+      "endsAt": "2026-10-08T20:26:00"
+    },
+    "yoga": "Vajra",
+    "karana": "Vishti",
+    "sunrise": "06:20",
+    "sunset": "18:06",
+    "moonrise": "02:42",
+    "moonset": "14:51",
+    "rahuKaal": {
+      "from": "13:41",
+      "to": "15:09"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-09",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturdashi",
+      "endsAt": "2026-10-10T05:55:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Purva Phalguni",
+      "endsAt": "2026-10-09T19:31:00"
+    },
+    "yoga": "Siddhi",
+    "karana": "Balava",
+    "sunrise": "06:21",
+    "sunset": "18:05",
+    "moonrise": "03:34",
+    "moonset": "15:51",
+    "rahuKaal": {
+      "from": "10:45",
+      "to": "12:13"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-10",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Amavasya",
+      "endsAt": "2026-10-11T08:15:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Uttara Phalguni",
+      "endsAt": "2026-10-10T18:30:00"
+    },
+    "yoga": "Vyatipata",
+    "karana": "Naga",
+    "sunrise": "06:22",
+    "sunset": "18:04",
+    "moonrise": "04:26",
+    "moonset": "16:50",
+    "rahuKaal": {
+      "from": "09:17",
+      "to": "10:45"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-11",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Amavasya",
+      "endsAt": "2026-10-11T08:15:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Hasta",
+      "endsAt": "2026-10-11T17:26:00"
+    },
+    "yoga": "Variyana",
+    "karana": "Kimstughna",
+    "sunrise": "06:22",
+    "sunset": "18:03",
+    "moonrise": "05:18",
+    "moonset": "17:48",
+    "rahuKaal": {
+      "from": "16:35",
+      "to": "18:03"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:35"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-12",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Pratipada",
+      "endsAt": "2026-10-12T10:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Chitra",
+      "endsAt": "2026-10-12T16:21:00"
+    },
+    "yoga": "Parigha",
+    "karana": "Bava",
+    "sunrise": "06:23",
+    "sunset": "18:03",
+    "moonrise": "06:10",
+    "moonset": "18:45",
+    "rahuKaal": {
+      "from": "07:50",
+      "to": "09:18"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false,
+    "muhurats": [
+      {
+        "label": "Ghatasthapana",
+        "from": "06:25",
+        "to": "08:00",
+        "kind": "auspicious"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-13",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwitiya",
+      "endsAt": "2026-10-13T11:35:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Swati",
+      "endsAt": "2026-10-13T15:18:00"
+    },
+    "yoga": "Shiva",
+    "karana": "Kaulava",
+    "sunrise": "06:24",
+    "sunset": "18:02",
+    "moonrise": "07:02",
+    "moonset": "19:41",
+    "rahuKaal": {
+      "from": "15:07",
+      "to": "16:34"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:36"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-14",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Tritiya",
+      "endsAt": "2026-10-14T12:50:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Vishakha",
+      "endsAt": "2026-10-14T14:20:00"
+    },
+    "yoga": "Siddha",
+    "karana": "Gara",
+    "sunrise": "06:24",
+    "sunset": "18:01",
+    "moonrise": "07:54",
+    "moonset": "20:34",
+    "rahuKaal": {
+      "from": "12:12",
+      "to": "13:39"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:35"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-15",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturthi",
+      "endsAt": "2026-10-15T13:50:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Anuradha",
+      "endsAt": "2026-10-15T13:29:00"
+    },
+    "yoga": "Sadhya",
+    "karana": "Vishti",
+    "sunrise": "06:25",
+    "sunset": "18:00",
+    "moonrise": "08:46",
+    "moonset": "21:25",
+    "rahuKaal": {
+      "from": "13:39",
+      "to": "15:06"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:35"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-16",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Panchami",
+      "endsAt": "2026-10-16T14:30:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Jyeshtha",
+      "endsAt": "2026-10-16T12:47:00"
+    },
+    "yoga": "Shubha",
+    "karana": "Balava",
+    "sunrise": "06:26",
+    "sunset": "17:59",
+    "moonrise": "09:38",
+    "moonset": "22:15",
+    "rahuKaal": {
+      "from": "10:45",
+      "to": "12:12"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:35"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-17",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Shashthi",
+      "endsAt": "2026-10-17T12:20:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Mula",
+      "endsAt": "2026-10-17T12:15:00"
+    },
+    "yoga": "Shukla",
+    "karana": "Taitila",
+    "sunrise": "06:26",
+    "sunset": "17:58",
+    "moonrise": "10:30",
+    "moonset": "23:03",
+    "rahuKaal": {
+      "from": "09:19",
+      "to": "10:45"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:35"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-18",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Saptami",
+      "endsAt": "2026-10-18T10:10:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Purva Ashadha",
+      "endsAt": "2026-10-18T11:54:00"
+    },
+    "yoga": "Brahma",
+    "karana": "Vanija",
+    "sunrise": "06:27",
+    "sunset": "17:57",
+    "moonrise": "11:22",
+    "moonset": "23:50",
+    "rahuKaal": {
+      "from": "16:30",
+      "to": "17:57"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:35"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-19",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ashtami",
+      "endsAt": "2026-10-19T08:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Uttara Ashadha",
+      "endsAt": "2026-10-19T11:45:00"
+    },
+    "yoga": "Indra",
+    "karana": "Bava",
+    "sunrise": "06:28",
+    "sunset": "17:56",
+    "moonrise": "12:14",
+    "moonset": "00:35",
+    "rahuKaal": {
+      "from": "07:54",
+      "to": "09:20"
+    },
+    "abhijitMuhurat": {
+      "from": "11:50",
+      "to": "12:34"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-20",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Navami",
+      "endsAt": "2026-10-20T07:55:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Shravana",
+      "endsAt": "2026-10-20T11:47:00"
+    },
+    "yoga": "Vaidhriti",
+    "karana": "Kaulava",
+    "sunrise": "06:28",
+    "sunset": "17:55",
+    "moonrise": "13:06",
+    "moonset": "01:19",
+    "rahuKaal": {
+      "from": "15:03",
+      "to": "16:29"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:33"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-21",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ekadashi",
+      "endsAt": "2026-10-22T03:55:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Dhanishta",
+      "endsAt": "2026-10-21T11:59:00"
+    },
+    "yoga": "Vishkambha",
+    "karana": "Gara",
+    "sunrise": "06:29",
+    "sunset": "17:54",
+    "moonrise": "13:58",
+    "moonset": "02:02",
+    "rahuKaal": {
+      "from": "12:11",
+      "to": "13:37"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:33"
+    },
+    "verified": false,
+    "muhurats": [
+      {
+        "label": "Parana (next day)",
+        "from": "06:28",
+        "to": "08:40",
+        "kind": "preferred"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-22",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwadashi",
+      "endsAt": "2026-10-23T02:20:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Shatabhisha",
+      "endsAt": "2026-10-22T12:20:00"
+    },
+    "yoga": "Priti",
+    "karana": "Vishti",
+    "sunrise": "06:29",
+    "sunset": "17:53",
+    "moonrise": "14:50",
+    "moonset": "02:46",
+    "rahuKaal": {
+      "from": "13:36",
+      "to": "15:02"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:33"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-23",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Trayodashi",
+      "endsAt": "2026-10-24T01:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Purva Bhadrapada",
+      "endsAt": "2026-10-23T12:48:00"
+    },
+    "yoga": "Ayushman",
+    "karana": "Balava",
+    "sunrise": "06:30",
+    "sunset": "17:52",
+    "moonrise": "15:42",
+    "moonset": "03:29",
+    "rahuKaal": {
+      "from": "10:45",
+      "to": "12:11"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:33"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-24",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturdashi",
+      "endsAt": "2026-10-25T00:10:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Uttara Bhadrapada",
+      "endsAt": "2026-10-24T13:21:00"
+    },
+    "yoga": "Saubhagya",
+    "karana": "Taitila",
+    "sunrise": "06:31",
+    "sunset": "17:51",
+    "moonrise": "16:34",
+    "moonset": "04:13",
+    "rahuKaal": {
+      "from": "09:21",
+      "to": "10:46"
+    },
+    "abhijitMuhurat": {
+      "from": "11:49",
+      "to": "12:33"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-25",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Purnima",
+      "endsAt": "2026-10-25T23:35:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Ashwin",
+    "nakshatra": {
+      "name": "Revati",
+      "endsAt": "2026-10-25T13:56:00"
+    },
+    "yoga": "Shobhana",
+    "karana": "Vanija",
+    "sunrise": "06:31",
+    "sunset": "17:50",
+    "moonrise": "17:26",
+    "moonset": "04:58",
+    "rahuKaal": {
+      "from": "16:25",
+      "to": "17:50"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:32"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-26",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Pratipada",
+      "endsAt": "2026-10-26T23:20:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Ashwini",
+      "endsAt": "2026-10-26T14:30:00"
+    },
+    "yoga": "Atiganda",
+    "karana": "Bava",
+    "sunrise": "06:32",
+    "sunset": "17:49",
+    "moonrise": "18:18",
+    "moonset": "05:45",
+    "rahuKaal": {
+      "from": "07:56",
+      "to": "09:21"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:32"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-27",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwitiya",
+      "endsAt": "2026-10-27T23:25:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Bharani",
+      "endsAt": "2026-10-27T15:01:00"
+    },
+    "yoga": "Sukarman",
+    "karana": "Kaulava",
+    "sunrise": "06:33",
+    "sunset": "17:48",
+    "moonrise": "19:10",
+    "moonset": "06:33",
+    "rahuKaal": {
+      "from": "14:59",
+      "to": "16:23"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:32"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-28",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Tritiya",
+      "endsAt": "2026-10-28T23:55:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Krittika",
+      "endsAt": "2026-10-28T15:26:00"
+    },
+    "yoga": "Dhriti",
+    "karana": "Gara",
+    "sunrise": "06:33",
+    "sunset": "17:47",
+    "moonrise": "20:02",
+    "moonset": "07:23",
+    "rahuKaal": {
+      "from": "12:10",
+      "to": "13:34"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:32"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-29",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturthi",
+      "endsAt": "2026-10-30T00:45:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Rohini",
+      "endsAt": "2026-10-29T15:43:00"
+    },
+    "yoga": "Shoolam",
+    "karana": "Vishti",
+    "sunrise": "06:34",
+    "sunset": "17:46",
+    "moonrise": "20:54",
+    "moonset": "08:14",
+    "rahuKaal": {
+      "from": "13:34",
+      "to": "14:58"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:32"
+    },
+    "verified": false,
+    "muhurats": [
+      {
+        "label": "Moonrise (Karwa Chauth)",
+        "from": "20:54",
+        "to": "21:40",
+        "kind": "auspicious"
+      }
+    ]
+  },
+  {
+    "date": "2026-10-30",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Panchami",
+      "endsAt": "2026-10-31T01:45:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Mrigashira",
+      "endsAt": "2026-10-30T15:50:00"
+    },
+    "yoga": "Ganda",
+    "karana": "Balava",
+    "sunrise": "06:35",
+    "sunset": "17:45",
+    "moonrise": "21:46",
+    "moonset": "09:07",
+    "rahuKaal": {
+      "from": "10:46",
+      "to": "12:10"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:32"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-10-31",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Shashthi",
+      "endsAt": "2026-11-01T02:40:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Ardra",
+      "endsAt": "2026-10-31T15:47:00"
+    },
+    "yoga": "Vriddhi",
+    "karana": "Taitila",
+    "sunrise": "06:35",
+    "sunset": "17:44",
+    "moonrise": "22:38",
+    "moonset": "10:03",
+    "rahuKaal": {
+      "from": "09:22",
+      "to": "10:45"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-01",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Saptami",
+      "endsAt": "2026-11-02T03:20:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Punarvasu",
+      "endsAt": "2026-11-01T15:32:00"
+    },
+    "yoga": "Dhruva",
+    "karana": "Vanija",
+    "sunrise": "06:36",
+    "sunset": "17:43",
+    "moonrise": "23:30",
+    "moonset": "11:00",
+    "rahuKaal": {
+      "from": "16:19",
+      "to": "17:43"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-02",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ashtami",
+      "endsAt": "2026-11-03T03:40:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Pushya",
+      "endsAt": "2026-11-02T15:05:00"
+    },
+    "yoga": "Vyaghata",
+    "karana": "Bava",
+    "sunrise": "06:37",
+    "sunset": "17:42",
+    "moonrise": null,
+    "moonset": "11:58",
+    "rahuKaal": {
+      "from": "08:00",
+      "to": "09:23"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-03",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Navami",
+      "endsAt": "2026-11-04T02:30:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Ashlesha",
+      "endsAt": "2026-11-03T14:28:00"
+    },
+    "yoga": "Harshana",
+    "karana": "Kaulava",
+    "sunrise": "06:37",
+    "sunset": "17:41",
+    "moonrise": "01:14",
+    "moonset": "12:57",
+    "rahuKaal": {
+      "from": "14:55",
+      "to": "16:18"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-04",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dashami",
+      "endsAt": "2026-11-05T01:00:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Magha",
+      "endsAt": "2026-11-04T13:41:00"
+    },
+    "yoga": "Vajra",
+    "karana": "Gara",
+    "sunrise": "06:38",
+    "sunset": "17:41",
+    "moonrise": "02:06",
+    "moonset": "13:57",
+    "rahuKaal": {
+      "from": "12:09",
+      "to": "13:32"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-05",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Ekadashi",
+      "endsAt": "2026-11-05T23:15:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Purva Phalguni",
+      "endsAt": "2026-11-05T12:46:00"
+    },
+    "yoga": "Siddhi",
+    "karana": "Vishti",
+    "sunrise": "06:39",
+    "sunset": "17:40",
+    "moonrise": "02:58",
+    "moonset": "14:58",
+    "rahuKaal": {
+      "from": "13:32",
+      "to": "14:54"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false,
+    "muhurats": [
+      {
+        "label": "Parana (next day)",
+        "from": "06:38",
+        "to": "08:46",
+        "kind": "preferred"
+      }
+    ]
+  },
+  {
+    "date": "2026-11-06",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwadashi",
+      "endsAt": "2026-11-06T21:30:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Uttara Phalguni",
+      "endsAt": "2026-11-06T11:45:00"
+    },
+    "yoga": "Vyatipata",
+    "karana": "Balava",
+    "sunrise": "06:39",
+    "sunset": "17:39",
+    "moonrise": "03:50",
+    "moonset": "15:59",
+    "rahuKaal": {
+      "from": "10:46",
+      "to": "12:09"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:31"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-07",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Trayodashi",
+      "endsAt": "2026-11-07T19:45:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Hasta",
+      "endsAt": "2026-11-07T10:41:00"
+    },
+    "yoga": "Variyana",
+    "karana": "Taitila",
+    "sunrise": "06:40",
+    "sunset": "17:38",
+    "moonrise": "04:42",
+    "moonset": "16:59",
+    "rahuKaal": {
+      "from": "09:24",
+      "to": "10:46"
+    },
+    "abhijitMuhurat": {
+      "from": "11:48",
+      "to": "12:30"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-08",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturdashi",
+      "endsAt": "2026-11-08T18:05:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Chitra",
+      "endsAt": "2026-11-08T09:36:00"
+    },
+    "yoga": "Parigha",
+    "karana": "Vanija",
+    "sunrise": "06:40",
+    "sunset": "17:37",
+    "moonrise": "05:34",
+    "moonset": "17:58",
+    "rahuKaal": {
+      "from": "16:14",
+      "to": "17:37"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:29"
+    },
+    "verified": false,
+    "muhurats": [
+      {
+        "label": "Lakshmi Puja (pradosh)",
+        "from": "18:05",
+        "to": "19:59",
+        "kind": "preferred"
+      }
+    ]
+  },
+  {
+    "date": "2026-11-09",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Amavasya",
+      "endsAt": "2026-11-09T16:40:00"
+    },
+    "paksha": "Krishna",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Swati",
+      "endsAt": "2026-11-09T08:33:00"
+    },
+    "yoga": "Shiva",
+    "karana": "Naga",
+    "sunrise": "06:41",
+    "sunset": "17:36",
+    "moonrise": "06:26",
+    "moonset": "18:56",
+    "rahuKaal": {
+      "from": "08:02",
+      "to": "09:24"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:29"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-10",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Pratipada",
+      "endsAt": "2026-11-10T15:40:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Vishakha",
+      "endsAt": "2026-11-10T07:35:00"
+    },
+    "yoga": "Siddha",
+    "karana": "Kaulava",
+    "sunrise": "06:42",
+    "sunset": "17:35",
+    "moonrise": "07:18",
+    "moonset": "19:53",
+    "rahuKaal": {
+      "from": "14:51",
+      "to": "16:13"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:29"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-11",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Dwitiya",
+      "endsAt": "2026-11-11T15:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Anuradha",
+      "endsAt": "2026-11-11T07:27:00"
+    },
+    "yoga": "Sadhya",
+    "karana": "Gara",
+    "sunrise": "06:42",
+    "sunset": "17:34",
+    "moonrise": "08:10",
+    "moonset": "20:49",
+    "rahuKaal": {
+      "from": "12:08",
+      "to": "13:29"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:29"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-12",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Tritiya",
+      "endsAt": "2026-11-12T14:55:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Jyeshtha",
+      "endsAt": "2026-11-12T07:28:00"
+    },
+    "yoga": "Shubha",
+    "karana": "Vishti",
+    "sunrise": "06:43",
+    "sunset": "17:33",
+    "moonrise": "09:02",
+    "moonset": "21:42",
+    "rahuKaal": {
+      "from": "13:29",
+      "to": "14:50"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:29"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-13",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Chaturthi",
+      "endsAt": "2026-11-13T15:15:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Mula",
+      "endsAt": "2026-11-13T07:29:00"
+    },
+    "yoga": "Shukla",
+    "karana": "Balava",
+    "sunrise": "06:44",
+    "sunset": "17:32",
+    "moonrise": "09:54",
+    "moonset": "22:33",
+    "rahuKaal": {
+      "from": "10:47",
+      "to": "12:08"
+    },
+    "abhijitMuhurat": {
+      "from": "11:47",
+      "to": "12:29"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-14",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Panchami",
+      "endsAt": "2026-11-14T16:05:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Purva Ashadha",
+      "endsAt": "2026-11-14T07:29:00"
+    },
+    "yoga": "Brahma",
+    "karana": "Taitila",
+    "sunrise": "06:44",
+    "sunset": "17:31",
+    "moonrise": "10:46",
+    "moonset": "23:23",
+    "rahuKaal": {
+      "from": "09:25",
+      "to": "10:46"
+    },
+    "abhijitMuhurat": {
+      "from": "11:46",
+      "to": "12:28"
+    },
+    "verified": false
+  },
+  {
+    "date": "2026-11-15",
+    "city": "delhi-ncr",
+    "tithi": {
+      "name": "Shashthi",
+      "endsAt": "2026-11-15T17:25:00"
+    },
+    "paksha": "Shukla",
+    "lunarMonth": "Kartik",
+    "nakshatra": {
+      "name": "Uttara Ashadha",
+      "endsAt": "2026-11-15T07:30:00"
+    },
+    "yoga": "Indra",
+    "karana": "Vanija",
+    "sunrise": "06:45",
+    "sunset": "17:30",
+    "moonrise": "11:38",
+    "moonset": "00:11",
+    "rahuKaal": {
+      "from": "16:09",
+      "to": "17:30"
+    },
+    "abhijitMuhurat": {
+      "from": "11:46",
+      "to": "12:28"
+    },
     "verified": false
   }
 ]

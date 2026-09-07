@@ -6,28 +6,86 @@ import co.thetapa.content.ArticleType;
 import co.thetapa.content.Block;
 import co.thetapa.panchang.Observance;
 import co.thetapa.panchang.PanchangDay;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-/** In-memory article/observance/panchang fixtures for the truth-table tests. */
+/**
+ * Article/observance/panchang fixtures for the truth-table tests: three
+ * hand-built shapes plus the real seed fixtures, addressed as
+ * {@code "seed:<article-slug>"} and loaded from the repo's {@code seed/}
+ * directory through the same Jackson mapping the seeder uses.
+ */
 final class CardFixtures {
 
     record Fixture(Article article, Observance observance, PanchangDay day) {
     }
 
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
     private CardFixtures() {
     }
 
     static Fixture byName(String name) {
+        if (name.startsWith("seed:")) {
+            return fromSeed(name.substring("seed:".length()));
+        }
         return switch (name) {
             case "sawanSomwar" -> sawanSomwar();
             case "nagPanchami" -> nagPanchami();
             case "ekadashi" -> ekadashi();
             default -> throw new IllegalArgumentException("unknown fixture: " + name);
         };
+    }
+
+    // ---- real seed fixtures -------------------------------------------------
+
+    /** Loads seed/articles/&lt;slug&gt;.json + its linked observance + panchang day (if seeded). */
+    static Fixture fromSeed(String slug) {
+        Path root = seedRoot();
+        try {
+            Article article = MAPPER.readValue(root.resolve("articles/" + slug + ".json").toFile(),
+                Article.class);
+            Observance observance = null;
+            if (article.getLinkedObservanceSlug() != null) {
+                observance = Arrays.stream(MAPPER.readValue(
+                        root.resolve("panchang/observances-2026.json").toFile(), Observance[].class))
+                    .filter(o -> article.getLinkedObservanceSlug().equals(o.getSlug()))
+                    .findFirst().orElse(null);
+            }
+            PanchangDay day = null;
+            LocalDate date = observance != null ? observance.getDate() : article.getObservanceDate();
+            if (date != null) {
+                day = Arrays.stream(MAPPER.readValue(
+                        root.resolve("panchang/days-sample.json").toFile(), PanchangDay[].class))
+                    .filter(d -> date.equals(d.getDate()) && PanchangDay.DEFAULT_CITY.equals(d.getCity()))
+                    .findFirst().orElse(null);
+            }
+            return new Fixture(article, observance, day);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot load seed fixture " + slug, e);
+        }
+    }
+
+    private static Path seedRoot() {
+        for (Path candidate : new Path[]{Path.of("../seed"), Path.of("seed")}) {
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("seed/ directory not found from " + Path.of("").toAbsolutePath());
     }
 
     /** Mirrors the seeded sawan-somwar-vrat article: samagri + mantra + fasting → all 7 blocks. */

@@ -60,11 +60,25 @@ const DETAILS = [
     "Timings",
     "Calculated according to the Delhi-NCR panchang followed by The Tapa Co.",
   ],
+  [
+    "First reminder",
+    "11 October 2026. Join before then to receive the Circle from its beginning.",
+  ],
   ["Leaving the Circle", "Reply STOP whenever you wish. It ends with that message."],
   ["Your number", "Used for The Tapa Circle alone. Never sold or shared."],
 ] as const;
 
-export default function TapaCirclePage() {
+export default async function TapaCirclePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  // Entry-point capture (#22): nudges link here with ?from=<their page path>;
+  // only site-relative paths are accepted before being passed to the join POST.
+  const { from } = await searchParams;
+  const entryFrom =
+    from && from.startsWith("/") && !from.startsWith("//") ? from : undefined;
+
   return (
     <div>
       <Breadcrumb
@@ -119,7 +133,7 @@ export default function TapaCirclePage() {
               </span>
             </div>
           </div>
-          <CircleJoin />
+          <CircleJoin from={entryFrom} />
         </div>
       </section>
 

@@ -21,7 +21,12 @@ import java.time.Instant;
 @Document("circle_members")
 public class CircleMember {
 
-    public enum Status { ACTIVE, STOPPED, DELETE_REQUESTED }
+    /**
+     * BLOCKED is the provider-reported "recipient blocked this number" state
+     * (webhook status callback) — INACTIVE-equivalent: never sent to again,
+     * distinguishable from a member-typed STOP for compliance reporting.
+     */
+    public enum Status { ACTIVE, STOPPED, DELETE_REQUESTED, BLOCKED }
 
     @Id
     private String id;
@@ -50,6 +55,9 @@ public class CircleMember {
     /** Enforces the one-canned-service-reply-per-24h-window rule. */
     private Instant lastServiceReplyAt;
 
+    /** Short operational note, e.g. "provider reported blocked" — never message content. */
+    private String statusNote;
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getWaNumber() { return waNumber; }
@@ -68,4 +76,6 @@ public class CircleMember {
     public void setDeleteRequestedAt(Instant deleteRequestedAt) { this.deleteRequestedAt = deleteRequestedAt; }
     public Instant getLastServiceReplyAt() { return lastServiceReplyAt; }
     public void setLastServiceReplyAt(Instant lastServiceReplyAt) { this.lastServiceReplyAt = lastServiceReplyAt; }
+    public String getStatusNote() { return statusNote; }
+    public void setStatusNote(String statusNote) { this.statusNote = statusNote; }
 }

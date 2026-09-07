@@ -4,6 +4,8 @@ import co.thetapa.content.Article;
 import co.thetapa.content.Block;
 import co.thetapa.panchang.Observance;
 import co.thetapa.panchang.PanchangDay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -34,12 +36,16 @@ import java.util.Map;
  *   <li><b>Two-column samagri</b> — only when the SAMAGRI block's meta carries
  *       BOTH {@code groupA} and {@code groupB} (the column headings). The item
  *       list is split at {@code meta["splitAt"]} (1-based count of items in
- *       group A) when present, else at ceil(n/2). Otherwise a single column of
- *       at most 8 items (first 8 kept).</li>
+ *       group A) when present, else at ceil(n/2). Otherwise a single column.
+ *       All items render (the spec caps vidhi steps, not samagri); a hard
+ *       safety cap of 14 items applies with a warning log.</li>
  *   <li><b>Multi-day vidhi sub-headers</b> — a step whose {@code note} starts
- *       with {@code "day:"} (case-insensitive) gets the remainder rendered as
+ *       with {@code "day:"} (case-insensitive) gets the day label rendered as
  *       an italic sub-header above it; alternatively the VIDHI block meta key
- *       {@code "day.<stepNumber>"} supplies the text. Max 8 steps (first 8);
+ *       {@code "day.<stepNumber>"} supplies the text. Only the label itself is
+ *       rendered — any editorial tail after the first sentence boundary is
+ *       dropped — and a sub-header is emitted once per day group (a repeat of
+ *       the previously emitted label is suppressed). Max 8 steps (first 8);
  *       the last rendered step gets the rose circle.</li>
  *   <li><b>Mantra count line</b> — built from the block's defaultCount +
  *       presets ("Chant N times with a mala, or a / b / c times"); the spec's
@@ -48,11 +54,13 @@ import java.util.Map;
  */
 final class CardModelBuilder {
 
+    private static final Logger log = LoggerFactory.getLogger(CardModelBuilder.class);
+
     private static final DateTimeFormatter LONG_DATE = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH);
     private static final DateTimeFormatter SHORT_DATE = DateTimeFormatter.ofPattern("d MMM", Locale.ENGLISH);
     private static final String DEFAULT_COUNT_LINE = "Chant 108 times with a mala, or 11 / 21 / 51 times";
     private static final int MAX_STEPS = 8;
-    private static final int MAX_SINGLE_COL_ITEMS = 8;
+    private static final int MAX_SAMAGRI_ITEMS = 14;
     private static final int MAX_FASTING_LINES = 3;
 
     private CardModelBuilder() {
@@ -81,7 +89,7 @@ final class CardModelBuilder {
             festivalName,
             headerSubLine(date, tithiLabel),
             panchangFields(article, observance, day, date, tithiLabel, fastingBlock),
-            samagri(samagriBlock),
+            samagri(samagriBlock, article.getSlug()),
             steps(vidhiBlock),
             mantra(mantraBlock),
             fasting(fastingBlock),
@@ -187,9 +195,11 @@ final class CardModelBuilder {
             .filter(Block.FastingForm::recommended).findFirst()
             .orElse(fastingBlock.fasting().get(0));
         String duration = fastingBlock.meta() != null ? fastingBlock.meta().get("duration") : null;
+        // No highlight: per the card spec the strip renders labels gold and
+        // values white — the rose accent belongs only to the last vidhi circle.
         return duration != null
-            ? new CardModel.PanchangField("Fast", duration, main.name(), true)
-            : new CardModel.PanchangField("Fast", main.name(), null, true);
+            ? new CardModel.PanchangField("Fast", duration, main.name(), false)
+            : new CardModel.PanchangField("Fast", main.name(), null, false);
     }
 
     private static LocalDate nextDay(Observance observance, LocalDate date) {
@@ -201,11 +211,16 @@ final class CardModelBuilder {
 
     // ---- samagri ------------------------------------------------------------
 
-    private static CardModel.SamagriSection samagri(Block block) {
+    private static CardModel.SamagriSection samagri(Block block, String slug) {
         if (block == null || block.samagri() == null || block.samagri().isEmpty()) {
             return null;
         }
         List<String> names = block.samagri().stream().map(Block.SamagriItem::name).toList();
+        if (names.size() > MAX_SAMAGRI_ITEMS) {
+            log.warn("ritual card {}: samagri list has {} items — truncating to the hard cap of {}",
+                slug, names.size(), MAX_SAMAGRI_ITEMS);
+            names = names.subList(0, MAX_SAMAGRI_ITEMS);
+        }
         Map<String, String> meta = block.meta();
         String groupA = meta != null ? meta.get("groupA") : null;
         String groupB = meta != null ? meta.get("groupB") : null;
@@ -223,10 +238,8 @@ final class CardModelBuilder {
                 new CardModel.SamagriGroup(groupA, names.subList(0, splitAt)),
                 new CardModel.SamagriGroup(groupB, names.subList(splitAt, names.size()))));
         }
-        List<String> capped = names.size() > MAX_SINGLE_COL_ITEMS
-            ? names.subList(0, MAX_SINGLE_COL_ITEMS) : names;
         return new CardModel.SamagriSection(false,
-            List.of(new CardModel.SamagriGroup(null, capped)));
+            List.of(new CardModel.SamagriGroup(null, names)));
     }
 
     // ---- vidhi --------------------------------------------------------------
@@ -240,25 +253,47 @@ final class CardModelBuilder {
             .limit(MAX_STEPS)
             .toList();
         List<CardModel.StepRow> rows = new ArrayList<>(raw.size());
+        String lastEmitted = null;
         for (int i = 0; i < raw.size(); i++) {
             Block.VidhiStep s = raw.get(i);
-            rows.add(new CardModel.StepRow(i + 1, s.title(),
-                subHeaderFor(s, block.meta()), i == raw.size() - 1));
+            String label = subHeaderFor(s, block.meta());
+            // one sub-header per day group: suppress repeats of the label
+            // already emitted for the current group
+            if (label != null && label.equals(lastEmitted)) {
+                label = null;
+            } else if (label != null) {
+                lastEmitted = label;
+            }
+            rows.add(new CardModel.StepRow(i + 1, s.title(), label, i == raw.size() - 1));
         }
         return rows;
     }
 
     private static String subHeaderFor(Block.VidhiStep step, Map<String, String> meta) {
         if (step.note() != null && step.note().regionMatches(true, 0, "day:", 0, 4)) {
-            return step.note().substring(4).trim();
+            return dayLabel(step.note().substring(4));
         }
         if (meta != null) {
             String fromMeta = meta.get("day." + step.number());
             if (fromMeta != null && !fromMeta.isBlank()) {
-                return fromMeta.trim();
+                return dayLabel(fromMeta);
             }
         }
         return null;
+    }
+
+    /**
+     * The sub-header is only the day label — editorial notes after the first
+     * sentence boundary ("day: Ekadashi — 21 Aug. Offer tulsi …") are dropped,
+     * never appended to the card line.
+     */
+    private static String dayLabel(String raw) {
+        String label = raw.strip();
+        int dot = label.indexOf('.');
+        if (dot >= 0) {
+            label = label.substring(0, dot).strip();
+        }
+        return label.isEmpty() ? null : label;
     }
 
     // ---- mantra -------------------------------------------------------------

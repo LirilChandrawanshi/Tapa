@@ -19,6 +19,13 @@ import {
   type PincodeInfo,
   type Product,
 } from "@/lib/shop";
+import { getMe, type Me } from "@/lib/auth";
+import {
+  createAddress,
+  getAddresses,
+  type SavedAddress,
+} from "@/lib/orders";
+import { OtpBottomSheet } from "@/components/auth/OtpBottomSheet";
 
 interface AddressForm {
   name: string;
@@ -74,6 +81,19 @@ function etaIso(etaDays: number): string {
   return new Date(Date.now() + etaDays * 86_400_000).toISOString();
 }
 
+/** SavedAddress → the checkout's address shape (phone falls back to the account). */
+function fromSaved(a: SavedAddress, accountPhone: string): AddressForm {
+  return {
+    name: a.name,
+    phone: (a.phone || accountPhone).replace(/^\+91/, "").replace(/\D/g, ""),
+    line1: a.line1,
+    line2: a.line2 ?? "",
+    city: a.city,
+    state: a.state,
+    pincode: a.pincode,
+  };
+}
+
 /** One-page checkout: Contact & Delivery address · Payment method · Summary. */
 export function CheckoutView() {
   const router = useRouter();
@@ -86,6 +106,32 @@ export function CheckoutView() {
   >({ kind: "idle" });
   const [phase, setPhase] = useState<Phase>({ kind: "form" });
 
+  // ── guest-or-account fork (#163) + saved addresses (#158) ──
+  const [me, setMe] = useState<Me | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [guestMode, setGuestMode] = useState(false);
+  const [otpOpen, setOtpOpen] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedSavedId, setSelectedSavedId] = useState<string | null>(null);
+  const [saveToBook, setSaveToBook] = useState(false);
+
+  const loadAccount = async () => {
+    const meRes = await getMe();
+    setAuthChecked(true);
+    if (!meRes.ok) {
+      setMe(null);
+      return;
+    }
+    setMe(meRes.data);
+    const addrRes = await getAddresses();
+    if (addrRes.ok && addrRes.data.length > 0) {
+      setSavedAddresses(addrRes.data);
+      const usable = addrRes.data.find((a) => a.isDefault && a.serviceable)
+        ?? addrRes.data.find((a) => a.serviceable);
+      setSelectedSavedId(usable?.id ?? null);
+    }
+  };
+
   useEffect(() => {
     const cart = readCart();
     setLines(cart);
@@ -96,9 +142,10 @@ export function CheckoutView() {
     void fetchProducts().then((all) =>
       setProducts(new Map(all.map((p) => [p.slug, p]))),
     );
+    void loadAccount();
   }, []);
 
-  // Inline pincode validation — the same checker the PDP uses.
+  // Inline pincode validation — the same checker the PDP uses (manual entry only).
   useEffect(() => {
     if (!/^\d{6}$/.test(address.pincode)) {
       setPin({ kind: "idle" });
@@ -128,9 +175,9 @@ export function CheckoutView() {
   if (lines !== null && lines.length === 0 && phase.kind === "form") {
     return (
       <div className="mx-auto max-w-[420px] py-14 text-center">
-        <h2 className="mb-2 text-xl font-bold text-ink">Your bag is empty</h2>
+        <h2 className="mb-2 text-xl font-bold text-ink">Your cart is empty</h2>
         <p className="mb-5 text-[13.5px] text-sub">
-          Add a pujan to the bag before checking out.
+          Add a pujan to the cart before checking out.
         </p>
         <Link
           href="/ritual-pujans"
@@ -150,6 +197,19 @@ export function CheckoutView() {
   const delivery = deliveryPaiseFor(subtotal);
   const total = subtotal + delivery;
 
+  const selectedSaved =
+    selectedSavedId === null
+      ? null
+      : (savedAddresses.find((a) => a.id === selectedSavedId) ?? null);
+  const effectiveAddress =
+    selectedSaved && me ? fromSaved(selectedSaved, me.phone) : address;
+
+  // earliest pre-book cut-off in the cart — the failure banner promises the hold
+  const earliestOrderBy = resolved
+    .map((l) => l.product.orderByDate)
+    .filter((d): d is string => Boolean(d))
+    .sort()[0];
+
   const finishPayment = async (providerRef: string, orderNumber: string) => {
     // ── In production the Razorpay modal opens here with payment.providerRef;
     //    its success handler then calls the confirm endpoint. In the dev/mock
@@ -167,17 +227,22 @@ export function CheckoutView() {
     });
     clearCart();
     router.push(
-      `/orders/confirmed?on=${encodeURIComponent(confirmed.data.orderNumber)}&phone=${encodeURIComponent(address.phone.trim())}`,
+      `/orders/confirmed?on=${encodeURIComponent(confirmed.data.orderNumber)}&phone=${encodeURIComponent(effectiveAddress.phone.trim())}`,
     );
   };
 
   const onPay = async () => {
     setPhase({ kind: "paying" });
+    const payloadAddress = {
+      ...effectiveAddress,
+      name: effectiveAddress.name.trim(),
+      phone: effectiveAddress.phone.trim(),
+    };
     const r = await submitCheckout({
       items: resolved.map((l) => ({ productSlug: l.productSlug, qty: l.qty })),
-      address: { ...address, name: address.name.trim(), phone: address.phone.trim() },
+      address: payloadAddress,
       paymentMethod: method,
-      phone: address.phone.trim(),
+      phone: payloadAddress.phone,
     });
     if (!r.ok) {
       setPhase({
@@ -186,10 +251,24 @@ export function CheckoutView() {
       });
       return;
     }
+    // manual entry + "save this address" → into the book, best-effort
+    if (me && selectedSaved === null && saveToBook) {
+      void createAddress({
+        name: payloadAddress.name,
+        phone: payloadAddress.phone,
+        line1: payloadAddress.line1.trim(),
+        line2: payloadAddress.line2.trim(),
+        city: payloadAddress.city.trim(),
+        state: payloadAddress.state.trim(),
+        pincode: payloadAddress.pincode.trim(),
+      });
+    }
     await finishPayment(r.data.payment.providerRef, r.data.orderNumber);
   };
 
   const busy = phase.kind === "paying";
+  const showFork = authChecked && me === null && !guestMode;
+  const manualEntry = selectedSaved === null;
 
   const summaryRows = (
     <>
@@ -229,54 +308,157 @@ export function CheckoutView() {
   return (
     <div className="grid items-start gap-6 md:grid-cols-[1.6fr_1fr]">
       <div className="space-y-5">
+        {/* ── guest-or-account fork (#163) — never a wall, guest is primary ── */}
+        {showFork && (
+          <section className="rounded-[14px] border border-border bg-card p-[18px]">
+            <h2 className="mb-1 text-[15px] font-bold text-ink">
+              Check out your way
+            </h2>
+            <p className="mb-4 text-[12.5px] leading-relaxed text-sub">
+              No account needed — order number + phone always tracks your
+              order. Signing in just fills your saved addresses for you.
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setGuestMode(true)}
+                className="rounded-[10px] bg-cta px-5 py-[11px] text-[13.5px] font-bold text-white hover:opacity-90"
+              >
+                Continue as guest
+              </button>
+              <button
+                type="button"
+                onClick={() => setOtpOpen(true)}
+                className="rounded-[10px] border border-border bg-bg px-5 py-[11px] text-[13.5px] font-bold text-body hover:border-cta/60"
+              >
+                Sign in with OTP
+              </button>
+            </div>
+          </section>
+        )}
+
         {/* ── (a) Contact & Delivery address — never "Shipping address" ── */}
         <section className="rounded-[14px] border border-border bg-card p-[18px]">
           <h2 className="mb-4 text-[15px] font-bold text-ink">
             Contact &amp; Delivery address
           </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {FIELDS.map((f) => (
-              <label
-                key={f.key}
-                className={`block ${f.key === "line1" || f.key === "line2" ? "sm:col-span-2" : ""}`}
+
+          {/* saved addresses as radio cards, for signed-in buyers */}
+          {me && savedAddresses.length > 0 && (
+            <div className="mb-4 space-y-2">
+              {savedAddresses.map((a) => {
+                const on = selectedSavedId === a.id;
+                return (
+                  <label
+                    key={a.id}
+                    className={`flex cursor-pointer items-start gap-3 rounded-[11px] border px-4 py-[11px] ${
+                      on ? "border-cta bg-bhranti-bg" : "border-border bg-bg"
+                    } ${a.serviceable ? "" : "opacity-70"}`}
+                  >
+                    <input
+                      type="radio"
+                      name="saved-address"
+                      checked={on}
+                      disabled={!a.serviceable}
+                      onChange={() => setSelectedSavedId(a.id)}
+                      className="mt-1 accent-[var(--color-cta)]"
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-[13.5px] font-bold text-ink">
+                        {a.name}
+                        {a.isDefault && (
+                          <span className="ml-2 rounded-[5px] border border-border bg-card px-[6px] py-[1px] text-[9.5px] font-bold tracking-[0.4px] text-sub">
+                            DEFAULT
+                          </span>
+                        )}
+                      </span>
+                      <span className="block text-[12px] leading-relaxed text-sub">
+                        {a.line1}
+                        {a.line2 ? `, ${a.line2}` : ""}, {a.city} — {a.pincode}
+                      </span>
+                      <span
+                        className={`block text-[11.5px] font-semibold ${
+                          a.serviceable ? "text-dharma-fg" : "text-pratha-fg"
+                        }`}
+                      >
+                        {a.serviceable
+                          ? `✓ We deliver here · ~${a.etaDays ?? 3} days`
+                          : "Not on the delivery list yet — pick another address"}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedSavedId(selectedSavedId === null ? (savedAddresses.find((a) => a.serviceable)?.id ?? null) : null)
+                }
+                className="text-[12.5px] font-bold text-cta"
               >
-                <span className="mb-1 block text-[10.5px] font-bold tracking-[0.6px] text-sub uppercase">
-                  {f.label}
-                </span>
-                <input
-                  type="text"
-                  inputMode={f.inputMode}
-                  maxLength={f.maxLength}
-                  value={address[f.key]}
-                  onChange={(e) =>
-                    setAddress((a) => ({
-                      ...a,
-                      [f.key]:
-                        f.inputMode === "numeric"
-                          ? e.target.value.replace(/\D/g, "")
-                          : e.target.value,
-                    }))
-                  }
-                  className="w-full rounded-[9px] border border-border bg-bg px-[13px] py-[10px] text-[13.5px] text-ink outline-none focus:border-cta"
-                />
-              </label>
-            ))}
-          </div>
-          {pin.kind === "checking" && (
-            <p className="mt-2 text-[12.5px] text-sub">Checking your pincode…</p>
+                {manualEntry ? "‹ Back to saved addresses" : "Use a different address"}
+              </button>
+            </div>
           )}
-          {pin.kind === "result" && pin.info.serviceable && (
-            <p className="mt-2 text-[12.5px] font-semibold text-dharma-fg">
-              ✓ Delivers by {formatDateMedium(etaIso(pin.info.etaDays ?? 3))}
-              {pin.info.area ? ` · ${pin.info.area}` : ""}
-            </p>
-          )}
-          {pin.kind === "result" && !pin.info.serviceable && (
-            <p className="mt-2 text-[12.5px] font-semibold text-pratha-fg">
-              We do not deliver to this pincode yet. Nothing has been charged —
-              try a different address, or leave your number on the pujan page
-              and we&apos;ll message you when your area opens.
-            </p>
+
+          {manualEntry && (
+            <>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {FIELDS.map((f) => (
+                  <label
+                    key={f.key}
+                    className={`block ${f.key === "line1" || f.key === "line2" ? "sm:col-span-2" : ""}`}
+                  >
+                    <span className="mb-1 block text-[10.5px] font-bold tracking-[0.6px] text-sub uppercase">
+                      {f.label}
+                    </span>
+                    <input
+                      type="text"
+                      inputMode={f.inputMode}
+                      maxLength={f.maxLength}
+                      value={address[f.key]}
+                      onChange={(e) =>
+                        setAddress((a) => ({
+                          ...a,
+                          [f.key]:
+                            f.inputMode === "numeric"
+                              ? e.target.value.replace(/\D/g, "")
+                              : e.target.value,
+                        }))
+                      }
+                      className="w-full rounded-[9px] border border-border bg-bg px-[13px] py-[10px] text-[13.5px] text-ink outline-none focus:border-cta"
+                    />
+                  </label>
+                ))}
+              </div>
+              {pin.kind === "checking" && (
+                <p className="mt-2 text-[12.5px] text-sub">Checking your pincode…</p>
+              )}
+              {pin.kind === "result" && pin.info.serviceable && (
+                <p className="mt-2 text-[12.5px] font-semibold text-dharma-fg">
+                  ✓ Delivers by {formatDateMedium(etaIso(pin.info.etaDays ?? 3))}
+                  {pin.info.area ? ` · ${pin.info.area}` : ""}
+                </p>
+              )}
+              {pin.kind === "result" && !pin.info.serviceable && (
+                <p className="mt-2 text-[12.5px] font-semibold text-pratha-fg">
+                  We do not deliver to this pincode yet. Nothing has been charged —
+                  try a different address, or leave your number on the pujan page
+                  and we&apos;ll message you when your area opens.
+                </p>
+              )}
+              {me && (
+                <label className="mt-3 flex cursor-pointer items-center gap-2 text-[12.5px] text-body">
+                  <input
+                    type="checkbox"
+                    checked={saveToBook}
+                    onChange={(e) => setSaveToBook(e.target.checked)}
+                    className="accent-[var(--color-cta)]"
+                  />
+                  Save this address to my account for next time
+                </label>
+              )}
+            </>
           )}
         </section>
 
@@ -344,18 +526,33 @@ export function CheckoutView() {
               Your payment couldn&apos;t be completed. You haven&apos;t been
               charged.
             </p>
-            <p className="mb-2 text-[12.5px] text-sub">
-              Your bag is intact. Try the payment again whenever you are ready.
+            <p className="mb-1 text-[12.5px] text-sub">
+              Your cart is intact. Try the payment again whenever you are ready.
+              {earliestOrderBy &&
+                ` Your pre-booking is held until ${formatDateMedium(earliestOrderBy)} — the order-by cut-off.`}
             </p>
-            <button
-              type="button"
-              onClick={() =>
-                void finishPayment(phase.providerRef, phase.orderNumber)
-              }
-              className="rounded-[9px] bg-ink px-5 py-[9px] text-[12.5px] font-bold text-white"
-            >
-              Retry payment — {formatPaise(total)}
-            </button>
+            <p className="mb-2 text-[12.5px] text-sub">
+              If money left your account, it returns on its own within 5
+              working days — you will not be charged twice.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  void finishPayment(phase.providerRef, phase.orderNumber)
+                }
+                className="rounded-[9px] bg-ink px-5 py-[9px] text-[12.5px] font-bold text-white"
+              >
+                Retry payment — {formatPaise(total)}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhase({ kind: "form" })}
+                className="rounded-[9px] border border-border bg-card px-5 py-[9px] text-[12.5px] font-bold text-body"
+              >
+                Use a different method
+              </button>
+            </div>
           </div>
         )}
 
@@ -376,6 +573,17 @@ export function CheckoutView() {
         <h2 className="mb-3 text-[15px] font-bold text-ink">Order summary</h2>
         {summaryRows}
       </aside>
+
+      <OtpBottomSheet
+        open={otpOpen}
+        context="signin"
+        heading="Sign in to use your saved addresses"
+        onClose={() => setOtpOpen(false)}
+        onSuccess={() => {
+          setOtpOpen(false);
+          void loadAccount();
+        }}
+      />
     </div>
   );
 }

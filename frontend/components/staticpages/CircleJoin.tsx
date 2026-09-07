@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CIRCLE_JOINED_KEY,
@@ -9,18 +10,39 @@ import {
 
 type JoinState = "idle" | "waiting" | "active";
 
+interface FirstOccasion {
+  name: string;
+  date: string; // ISO yyyy-mm-dd
+}
+
+/** "2026-10-11" → "11 October 2026" (falls back to the raw string). */
+function fmtOccasionDate(iso: string): string {
+  const d = new Date(`${iso}T00:00:00`);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 /**
  * The single join control for /tapa-circle. Flow per the Circle v2 spec:
  * the typed number is registered as a pending join (held 24h), the visitor
  * is handed to wa.me to send JOIN — that inbound message is the consent —
  * and this page polls until the webhook confirms. The waiting state must
  * never claim success on its own.
+ *
+ * Entry-point capture (#22): callers pass `from` (the page path the join
+ * started on, e.g. via the nudge's ?from= link) and it rides along on the
+ * join POST as entryPointPage.
  */
-export function CircleJoin() {
+export function CircleJoin({ from }: { from?: string }) {
   const [number, setNumber] = useState("");
   const [touched, setTouched] = useState(false);
   const [state, setState] = useState<JoinState>("idle");
   const [deepLink, setDeepLink] = useState(CIRCLE_JOIN_URL);
+  const [firstOccasion, setFirstOccasion] = useState<FirstOccasion | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const valid = isValidIndianMobile(number);
@@ -46,10 +68,11 @@ export function CircleJoin() {
           );
           if (!res.ok) return;
           const body = (await res.json()) as {
-            data?: { status?: string };
+            data?: { status?: string; firstOccasion?: FirstOccasion };
           };
           if (body.data?.status === "ACTIVE") {
             stopPolling();
+            setFirstOccasion(body.data.firstOccasion ?? null);
             setState("active");
             try {
               localStorage.setItem(CIRCLE_JOINED_KEY, "true");
@@ -76,7 +99,7 @@ export function CircleJoin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           phone: `+91${number}`,
-          entryPointPage: "/tapa-circle",
+          entryPointPage: from ?? "/tapa-circle",
         }),
       });
       if (res.ok) {
@@ -93,19 +116,38 @@ export function CircleJoin() {
   };
 
   if (state === "active") {
+    // Confirmed state per spec (#20)
     return (
       <div className="rounded-2xl border border-wa/50 bg-wa/15 px-[22px] py-6 text-center">
         <p className="text-[22px]" aria-hidden>
           ✓
         </p>
         <p className="mt-1 text-[15px] font-bold text-hero-text">
-          You&rsquo;re in the Circle
+          You are in The Tapa Circle.
         </p>
         <p className="mt-2 text-[12.5px] leading-relaxed text-hero-text/70">
-          Your welcome message is on its way on WhatsApp. The next reminder
-          arrives the evening before the next vrat on the calendar — and
-          nothing on quiet days.
+          Your welcome message is on its way on WhatsApp.{" "}
+          {firstOccasion ? (
+            <>
+              Your first reminder arrives on{" "}
+              <b className="text-hero-text">
+                {fmtOccasionDate(firstOccasion.date)}
+              </b>{" "}
+              — {firstOccasion.name}, sent the evening before.
+            </>
+          ) : (
+            <>
+              Your first reminder arrives the evening before the next occasion
+              on the calendar — and nothing on quiet days.
+            </>
+          )}
         </p>
+        <Link
+          href="/ritual-guides"
+          className="mt-4 inline-block text-[12.5px] font-bold text-eyebrow-dark"
+        >
+          Return to the guides ›
+        </Link>
       </div>
     );
   }
@@ -148,9 +190,17 @@ export function CircleJoin() {
 
   return (
     <div className="rounded-2xl border border-white/[0.14] bg-white/[0.07] px-[22px] py-5">
-      <p className="mb-2 text-[10px] font-bold tracking-[0.8px] text-eyebrow-dark uppercase">
-        WhatsApp number
-      </p>
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <p className="text-[10px] font-bold tracking-[0.8px] text-eyebrow-dark uppercase">
+          WhatsApp number
+        </p>
+        <Link
+          href="/policies/privacy"
+          className="text-[10.5px] font-semibold text-hero-text/50 underline underline-offset-2 hover:text-hero-text/80"
+        >
+          How we treat your number
+        </Link>
+      </div>
       <div className="mb-2 flex items-stretch gap-2">
         <span
           aria-hidden
@@ -185,12 +235,13 @@ export function CircleJoin() {
         disabled={!valid}
         className="w-full rounded-[11px] bg-wa px-5 py-[12px] text-[13.5px] font-bold text-white disabled:opacity-50"
       >
-        Join on WhatsApp ›
+        Join The Tapa Circle
       </button>
       <p className="mt-3 text-[11.5px] leading-relaxed text-hero-text/60">
-        You&rsquo;ll send one message — <b className="text-hero-text">JOIN</b> —
-        from your WhatsApp. That message is your consent. Leave whenever you
-        wish by replying STOP.
+        Sending the one pre-filled message —{" "}
+        <b className="text-hero-text">JOIN</b> — from your WhatsApp is your
+        consent to receive Tapa Circle reminders. Reply STOP at any time to
+        leave.
       </p>
     </div>
   );

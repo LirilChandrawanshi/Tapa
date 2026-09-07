@@ -21,6 +21,8 @@ interface DdLink {
   accent?: boolean;
   dot?: string;
   when?: string;
+  /** ISO date for COMING UP rows — renders a computed "IN N DAYS" badge. */
+  date?: string;
   pill?: "live" | "soon";
 }
 
@@ -36,6 +38,7 @@ interface DdFeature {
   title: string;
   copy: string;
   cta: string;
+  href: string;
 }
 
 interface DdConfig {
@@ -95,18 +98,21 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
             label: "Hartalika Teej",
             href: "/ritual-guides/festive-pujans/hartalika-teej",
             description: "14 September",
+            date: "2026-09-14",
             dot: "#3E8B4A",
           },
           {
             label: "Ganesh Chaturthi",
             href: "/panchang/o/ganesh-chaturthi-2026",
             description: "15 September",
+            date: "2026-09-15",
             dot: "#B5651D",
           },
           {
             label: "Sharad Navratri",
             href: "/panchang/o/sharad-navratri-2026",
             description: "12 October",
+            date: "2026-10-12",
             dot: "#A83358",
           },
         ],
@@ -118,6 +124,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       title: "Every claim tagged and scored",
       copy: "Dharma, Pratha or Bhranti — with a confidence score you can check against a named text.",
       cta: "Our editorial method ›",
+      href: "/editorial-method",
     },
     footNote: "7 guides live · more landing weekly",
     footLink: { label: "Browse all ›", href: rg.href },
@@ -179,6 +186,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       title: "The full 2026 calendar",
       copy: "Every tithi, vrat and festival date, computed for your city. One PDF.",
       cta: "Download ›",
+      href: "/api/v1/panchang/calendar.pdf",
     },
     footNote: "Computed for New Delhi · Purnimanta · verified manually",
     footLink: { label: "All Panchang ›", href: pa.href },
@@ -235,6 +243,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       title: "The Glossary",
       copy: "Every term defined once, in plain language, with the Devanagari and how to say it.",
       cta: "Open the glossary ›",
+      href: "/glossary",
     },
     footNote: "Paragraph only. No tables. Every concept sourced to a named text.",
     footLink: { label: "Our editorial method ›", href: "/editorial-method" },
@@ -304,6 +313,7 @@ const CONFIG: Record<NavSectionKey, DdConfig> = {
       title: "You do not need a kit",
       copy: "Every samagri list is free and complete. A kit saves you a morning in the market. It does not make the puja more valid.",
       cta: "Read a guide instead ›",
+      href: "/ritual-guides",
     },
     footNote: "Dated kits are prepaid, no COD · free cancellation until dispatch",
     footLink: { label: "All kits ›", href: rk.href },
@@ -316,8 +326,29 @@ const FEATURE_TONES: Record<DdFeature["tone"], string> = {
   data: "border border-data-bd bg-data-bg",
 };
 
-function FeatureCard({ feature }: { feature: DdFeature }) {
+/** "2026-09-14" → "TODAY" / "TOMORROW" / "IN N DAYS"; null once past. */
+function whenBadge(iso: string): string | null {
+  const target = Date.parse(`${iso}T00:00:00+05:30`);
+  if (Number.isNaN(target)) return null;
+  const days = Math.ceil((target - Date.now()) / 86_400_000);
+  if (days < 0) return null;
+  if (days === 0) return "TODAY";
+  if (days === 1) return "TOMORROW";
+  return `IN ${days} DAYS`;
+}
+
+function FeatureCard({
+  feature,
+  onNavigate,
+}: {
+  feature: DdFeature;
+  onNavigate: () => void;
+}) {
   const dark = feature.tone === "dark";
+  const ctaClasses = `block w-full rounded-[10px] py-[11px] text-center text-[13px] font-bold text-white ${
+    feature.tone === "data" ? "bg-data-fg" : "bg-cta"
+  }`;
+  const isFile = feature.href.startsWith("/api/");
   return (
     <div
       className={`flex flex-col rounded-[13px] px-5 py-[18px] ${FEATURE_TONES[feature.tone]}`}
@@ -347,19 +378,22 @@ function FeatureCard({ feature }: { feature: DdFeature }) {
       >
         {feature.copy}
       </p>
-      <button
-        type="button"
-        className={`w-full rounded-[10px] py-[11px] text-[13px] font-bold text-white ${
-          feature.tone === "data" ? "bg-data-fg" : "bg-cta"
-        }`}
-      >
-        {feature.cta}
-      </button>
+      {isFile ? (
+        <a href={feature.href} onClick={onNavigate} className={ctaClasses}>
+          {feature.cta}
+        </a>
+      ) : (
+        <Link href={feature.href} onClick={onNavigate} className={ctaClasses}>
+          {feature.cta}
+        </Link>
+      )}
     </div>
   );
 }
 
 function DdLinkItem({ link, onNavigate }: { link: DdLink; onNavigate: () => void }) {
+  // Explicit `when` wins; a `date` computes "IN N DAYS" at render time.
+  const when = link.when ?? (link.date ? whenBadge(link.date) : null);
   const base = (
     <>
       <b
@@ -388,9 +422,9 @@ function DdLinkItem({ link, onNavigate }: { link: DdLink; onNavigate: () => void
       {link.description && (
         <small className="mt-[1px] block text-[11.5px] leading-normal text-sub">
           {link.description}
-          {link.when && (
+          {when && (
             <span className="ml-[6px] text-[11px] font-bold text-amber">
-              {link.when}
+              {when}
             </span>
           )}
         </small>
@@ -450,7 +484,7 @@ export function MegaDropdown({
             ))}
           </div>
         ))}
-        <FeatureCard feature={config.feature} />
+        <FeatureCard feature={config.feature} onNavigate={onNavigate} />
       </div>
       <div className="border-t border-border-light bg-[#FCFAF6]">
         <div className="mx-auto flex max-w-[1280px] flex-wrap justify-between gap-4 px-10 py-3 text-[12.5px] text-sub">

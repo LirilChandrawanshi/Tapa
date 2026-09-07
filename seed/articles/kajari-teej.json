@@ -50,12 +50,13 @@
             { "name": "Shiva–Parvati image or idol", "note": "", "optional": false },
             { "name": "Neem branch or Neemdi Mata image", "note": "Rajasthan custom", "optional": true },
             { "name": "Sattu", "note": "roasted gram flour, sweetened — the traditional offering", "optional": false },
+            { "name": "Diya and ghee", "note": "", "optional": false },
+            { "name": "Fruits or sweets", "note": "for bhog", "optional": true },
             { "name": "Kumkum and akshat", "note": "", "optional": false },
             { "name": "Mehndi and bangles", "note": "shringar for Parvati (Pratha)", "optional": true },
-            { "name": "Flowers", "note": "", "optional": false },
-            { "name": "Diya and ghee", "note": "", "optional": false },
-            { "name": "Fruits or sweets", "note": "for bhog", "optional": true }
-          ]
+            { "name": "Flowers", "note": "", "optional": false }
+          ],
+          "meta": { "groupA": "For puja", "groupB": "For shringar", "splitAt": "5" }
         },
         {
           "type": "VIDHI",
@@ -119,12 +120,13 @@
             { "name": "शिव-पार्वती की प्रतिमा या चित्र", "note": "", "optional": false },
             { "name": "नीम की डाली या नीमड़ी माता का चित्र", "note": "राजस्थान की प्रथा", "optional": true },
             { "name": "सत्तू", "note": "भुने चने का आटा, मीठा किया हुआ — पारंपरिक अर्पण", "optional": false },
+            { "name": "दीपक और घी", "note": "", "optional": false },
+            { "name": "फल या मिठाई", "note": "भोग के लिए", "optional": true },
             { "name": "कुमकुम और अक्षत", "note": "", "optional": false },
             { "name": "मेहंदी और चूड़ियाँ", "note": "पार्वती के शृंगार के लिए (प्रथा)", "optional": true },
-            { "name": "फूल", "note": "", "optional": false },
-            { "name": "दीपक और घी", "note": "", "optional": false },
-            { "name": "फल या मिठाई", "note": "भोग के लिए", "optional": true }
-          ]
+            { "name": "फूल", "note": "", "optional": false }
+          ],
+          "meta": { "groupA": "पूजा के लिए", "groupB": "शृंगार के लिए", "splitAt": "5" }
         },
         {
           "type": "VIDHI",

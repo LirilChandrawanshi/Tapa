@@ -1,29 +1,112 @@
 [
   {
-    "id": "sawan-somwar-vrat",
+    "id": "sawan-somwar-synthetic",
     "fixture": "sawanSomwar",
     "description": "seeded shape: samagri yes, mantra yes, fasting yes -> all 7 blocks",
     "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
     "absent": [],
     "mustContain": ["Sawan Somwar Vrat", "☐ ", "Chant 108 times with a mala, or 11 / 21 / 51 times", "ॐ नमः शिवाय", "thetapaco.com", "Source: Drik Panchang, Delhi-NCR · 2026", "data:image/png;base64,"],
-    "mustNotContain": []
+    "mustNotContain": [],
+    "containOnce": []
   },
   {
-    "id": "nag-panchami-like",
+    "id": "nag-panchami-synthetic",
     "fixture": "nagPanchami",
     "description": "no samagri, no mantra, fasting yes -> conditional blocks 3+5 absent; festival field set (Muhurat)",
     "present": ["header", "panchang", "vidhi", "fasting", "footer"],
     "absent": ["samagri", "mantra"],
     "mustContain": ["Muhurat"],
-    "mustNotContain": ["Parana", "Samagri checklist", "Chant"]
+    "mustNotContain": ["Parana", "Samagri checklist", "Chant"],
+    "containOnce": []
   },
   {
-    "id": "ekadashi-like",
+    "id": "ekadashi-synthetic",
     "fixture": "ekadashi",
     "description": "all blocks + ekadashi field set (Fast/Parana), two-group samagri, >8 steps capped at 8",
     "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
     "absent": [],
     "mustContain": ["Fast", "Parana", "At sunrise", "For the altar", "For the vrat", "Evening — parana prep"],
-    "mustNotContain": ["Muhurat", "NEVER-RENDERED-STEP-9"]
+    "mustNotContain": ["Muhurat", "NEVER-RENDERED-STEP-9"],
+    "containOnce": []
+  },
+  {
+    "id": "seed-nag-panchami",
+    "fixture": "seed:nag-panchami",
+    "description": "real fixture: 4 mandatory blocks + fasting, no samagri/mantra; no panchang day seeded -> two-cell strip",
+    "present": ["header", "panchang", "vidhi", "fasting", "footer"],
+    "absent": ["samagri", "mantra"],
+    "mustContain": ["Nag Panchami", "Shravana Shukla Panchami"],
+    "mustNotContain": [">Muhurat<", ">Parana<", "Chant"],
+    "containOnce": []
+  },
+  {
+    "id": "seed-sawan-somwar",
+    "fixture": "seed:sawan-somwar-vrat",
+    "description": "real fixture: all 7 blocks, festival field set, single-column samagri (7 items, uncapped)",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": ["Sawan Somwar", "ॐ नमः शिवाय", "☐ Fruit or mishri for bhog"],
+    "mustNotContain": [">Fast<", ">Parana<"],
+    "containOnce": []
+  },
+  {
+    "id": "seed-hariyali-teej",
+    "fixture": "seed:hariyali-teej",
+    "description": "real fixture: all 7 blocks + two-column samagri with group headings; teej field set (Fast/Break)",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": ["For puja", "For shringar", ">Fast<", ">Break<", "16 Aug"],
+    "mustNotContain": [">Muhurat<"],
+    "containOnce": []
+  },
+  {
+    "id": "seed-putrada-ekadashi",
+    "fixture": "seed:shravana-putrada-ekadashi",
+    "description": "real fixture: all 7 blocks; multi-day sub-headers deduped to one per day group, editorial tails stripped",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": [">Fast<", ">Parana<", "At sunrise", "22 Aug"],
+    "mustNotContain": ["Offer tulsi gathered the day before", ">Muhurat<"],
+    "containOnce": ["Dashami evening — 20 Aug", "Ekadashi — 21 Aug", "Ekadashi evening — 21 Aug", "Dwadashi morning — 22 Aug"]
+  },
+  {
+    "id": "seed-kajari-teej",
+    "fixture": "seed:kajari-teej",
+    "description": "real fixture: 6 blocks (no mantra) + two-column samagri; teej field set",
+    "present": ["header", "panchang", "samagri", "vidhi", "fasting", "footer"],
+    "absent": ["mantra"],
+    "mustContain": ["For puja", "For shringar", ">Break<", "24 Aug"],
+    "mustNotContain": ["Chant", ">Muhurat<"],
+    "containOnce": []
+  },
+  {
+    "id": "seed-kamika-ekadashi",
+    "fixture": "seed:kamika-ekadashi",
+    "description": "real fixture: all 7 blocks, multi-day vidhi across Dashami/Ekadashi/Dwadashi with deduped sub-headers",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": [">Fast<", ">Parana<", "22 Jul", "ॐ नमो भगवते वासुदेवाय"],
+    "mustNotContain": ["never plucked on Ekadashi itself", "Deepdaan is a loving regional addition", ">Muhurat<"],
+    "containOnce": ["Dashami evening — 20 Jul", "Ekadashi — 21 Jul", "Ekadashi evening — 21 Jul", "Dwadashi morning — 22 Jul"]
+  },
+  {
+    "id": "seed-hartalika-teej",
+    "fixture": "seed:hartalika-teej",
+    "description": "real fixture: all 7 blocks + two-column samagri + exactly three day-group sub-headers",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": ["For idol-making", "For puja + shringar", ">Fast<", ">Break<", "15 Sep"],
+    "mustNotContain": ["The colours are loving custom", "A bucket at home", ">Muhurat<"],
+    "containOnce": ["evening of 13 Sep (Dwitiya) — setup", "night of 14 Sep (Tritiya) — jagaran", "morning of 15 Sep (Chaturthi) — completion"]
+  },
+  {
+    "id": "seed-raksha-bandhan",
+    "fixture": "seed:raksha-bandhan",
+    "description": "real fixture: published with fasting block -> all 7 blocks; festival field set, no day seeded",
+    "present": ["header", "panchang", "samagri", "vidhi", "mantra", "fasting", "footer"],
+    "absent": [],
+    "mustContain": ["Raksha Bandhan", "येन बद्धो बली राजा", "Until the rakhi is tied"],
+    "mustNotContain": [">Fast<", ">Parana<", ">Muhurat<"],
+    "containOnce": []
   }
 ]

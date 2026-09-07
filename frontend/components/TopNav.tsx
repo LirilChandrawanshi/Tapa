@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { LangToggle } from "@/components/LangToggle";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { MegaDropdown } from "@/components/MegaDropdown";
+import { CartBadge } from "@/components/shop/CartBadge";
 import type { NavSectionKey } from "@/lib/taxonomy";
 import { TAXONOMY } from "@/lib/taxonomy";
 
@@ -148,6 +149,11 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
                 }`}
               >
                 {section.label}
+                {section.gatedBy === "kits_launched" && (
+                  <span className="rounded-[4px] bg-cta px-[5px] py-[2px] text-[8px] font-bold tracking-[0.5px] text-white">
+                    NEW
+                  </span>
+                )}
                 <span
                   aria-hidden
                   className={`text-[9px] opacity-60 transition-transform duration-150 ${
@@ -188,6 +194,7 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
               <SearchIcon />
             </Link>
             <LangToggle className="hidden lg:flex" />
+            {kitsLaunched && <CartBadge />}
             <UserMenu variant="desktop" />
           </div>
 
@@ -234,7 +241,14 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
                     }
                     className="flex w-full items-center justify-between border-b border-border-light px-4 py-[15px] text-base font-bold text-ink"
                   >
-                    {section.label}
+                    <span className="flex items-center gap-[7px]">
+                      {section.label}
+                      {section.gatedBy === "kits_launched" && (
+                        <span className="rounded-[4px] bg-cta px-[5px] py-[2px] text-[8px] font-bold tracking-[0.5px] text-white">
+                          NEW
+                        </span>
+                      )}
+                    </span>
                     <span aria-hidden className="text-xs text-sub">
                       {expanded ? "▴" : "▾"}
                     </span>

@@ -42,7 +42,7 @@ class CircleTemplateVarsTest {
     void buildsAllSevenVarsWithGuide() {
         Map<String, String> vars = CircleTemplateVars.reminderVars(observance(), publishedGuide(), SITE);
 
-        assertThat(vars.get("1")).isEqualTo("Sunday, 11 October");
+        assertThat(vars.get("1")).isEqualTo("11 October"); // spec (#28): no weekday in T2 {{1}}
         assertThat(vars.get("2")).isEqualTo("Karwa Chauth");
         assertThat(vars.get("3")).isEqualTo("6:12 PM, 10 October"); // previous-day start → date appended
         assertThat(vars.get("4")).isEqualTo("8:04 PM");             // same-day end → time only
@@ -117,6 +117,7 @@ class CircleTemplateVarsTest {
     void welcomeVarsNameFirstUpcomingOccasion() {
         Map<String, String> vars = CircleTemplateVars.welcomeVars(observance());
         assertThat(vars.get("1")).isEqualTo("Karwa Chauth");
+        // the weekday lives ONLY in the T1 welcome {{2}} (#28)
         assertThat(vars.get("2")).isEqualTo("Sunday, 11 October");
 
         assertThat(CircleTemplateVars.welcomeVars(null)).containsKeys("1", "2");

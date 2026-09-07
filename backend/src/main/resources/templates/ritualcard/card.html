@@ -55,10 +55,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
   }
-  .panchang .cell { text-align: center; flex: 1; padding: 0 4px; }
+  /* min-width 0 lets long values (e.g. full tithi labels) wrap inside their
+     cell instead of colliding with the neighbour on two-cell strips */
+  .panchang .cell { text-align: center; flex: 1 1 0; min-width: 0; padding: 0 4px; }
   .panchang .label { font-size: 11px; color: var(--gold); font-weight: 500; letter-spacing: 0.3px; }
-  .panchang .value { font-size: 14px; font-weight: 500; color: #fff; margin-top: 2px; }
+  .panchang .value { font-size: 14px; font-weight: 500; color: #fff; margin-top: 2px;
+                     overflow-wrap: break-word; line-height: 1.3; }
   .panchang .value.hot { color: var(--rose); }
   .panchang .cellsub { font-size: 11px; color: #666; }
   .panchang .divider { width: 1px; height: 32px; background: #333; flex: none; }

@@ -1,23 +1,31 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { PhaseClosed } from "@/components/PhaseClosed";
 import { getFlags } from "@/lib/flags";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { ContentCard } from "@/components/ContentCard";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { BuyBox } from "@/components/shop/BuyBox";
 import { KitManifest } from "@/components/shop/KitManifest";
 import { PincodeCheck } from "@/components/shop/PincodeCheck";
 import { ProductCard } from "@/components/shop/ProductCard";
-import { fetchArticle } from "@/lib/api";
-import { articleHref } from "@/lib/articleExtras";
+import {
+  articleHref,
+  fetchRelatedSafe,
+  hueFromClass,
+} from "@/lib/articleExtras";
 import {
   fetchProduct,
   fetchProducts,
   formatDateLong,
   formatPaise,
+  prebookClosed,
   type Product,
 } from "@/lib/shop";
+import { SITE_URL } from "@/lib/staticExtras";
 import { getSection } from "@/lib/taxonomy";
+import type { Article } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -41,16 +49,24 @@ function categoryLabel(category: string): string {
   );
 }
 
-/** Resolve the free-guide link — knowledge before commerce, never a 404. */
-async function guideHref(p: Product): Promise<string> {
-  const slug = p.linkedGuideSlugs?.[0];
-  if (!slug) return "/ritual-guides";
-  try {
-    const article = await fetchArticle(slug);
-    return articleHref(article);
-  } catch {
-    return "/ritual-guides";
+/** schema.org offer availability for the four (plus closed) states. */
+function schemaAvailability(p: Product): string {
+  if (p.availability === "LIVE") return "https://schema.org/InStock";
+  if (p.availability === "SOLD_OUT") return "https://schema.org/SoldOut";
+  if (p.availability === "PREBOOK" && prebookClosed(p)) {
+    return "https://schema.org/SoldOut";
   }
+  return "https://schema.org/PreOrder"; // PREBOOK open + COMING_SOON
+}
+
+/** First 6 vidhi step titles from the linked guide — the card preview. */
+function vidhiPreviewSteps(article: Article | null): string[] {
+  if (!article) return [];
+  const vidhi = article.lang.en.blocks.find((b) => b.type === "VIDHI");
+  return (vidhi?.steps ?? [])
+    .map((s) => s.title)
+    .filter(Boolean)
+    .slice(0, 6);
 }
 
 function SectionEyebrow({ children }: { children: string }) {
@@ -61,7 +77,7 @@ function SectionEyebrow({ children }: { children: string }) {
   );
 }
 
-function InfoTable({ rows }: { rows: [string, string][] }) {
+function InfoTable({ rows }: { rows: [string, ReactNode][] }) {
   return (
     <div className="overflow-hidden rounded-[14px] border border-border bg-card">
       {rows.map(([label, value]) => (
@@ -113,10 +129,57 @@ export default async function ProductPage({
   const p = product;
   const catLabel = categoryLabel(p.category);
   const related = all.filter((x) => x.slug !== p.slug).slice(0, 3);
-  const freeGuideHref = await guideHref(p);
-  const cardSlug = p.linkedGuideSlugs?.[0];
 
-  const deliveryRows: [string, string][] = [
+  // Linked guides — one best-effort fetch feeds the free-guide cross-link,
+  // the vidhi preview card and the related-guides rail. Never a 404.
+  const linkedGuides = (await fetchRelatedSafe(p.linkedGuideSlugs ?? []))
+    .map((r) => r.article)
+    .filter((a): a is Article => a !== null);
+  const primaryGuide = linkedGuides[0] ?? null;
+  const freeGuideHref = primaryGuide ? articleHref(primaryGuide) : "/ritual-guides";
+  const cardSlug = p.linkedGuideSlugs?.[0];
+  const vidhiSteps = vidhiPreviewSteps(primaryGuide);
+
+  const productUrl = `${SITE_URL}/ritual-pujans/p/${p.slug}`;
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: p.title,
+    description: p.description,
+    sku: p.slug,
+    url: productUrl,
+    brand: { "@type": "Brand", name: "The Tapa Company" },
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: "INR",
+      price: (p.pricePaise / 100).toFixed(2),
+      availability: schemaAvailability(p),
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Ritual Pujans",
+        item: `${SITE_URL}/ritual-pujans`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: catLabel,
+        item: `${SITE_URL}/ritual-pujans/${p.category}`,
+      },
+      { "@type": "ListItem", position: 4, name: p.title, item: productUrl },
+    ],
+  };
+
+  const deliveryRows: [string, ReactNode][] = [
     [
       "Dispatch",
       p.dispatchFrom
@@ -129,14 +192,46 @@ export default async function ProductPage({
     ["Courier", "Assigned at dispatch. Tracking is shared by SMS."],
   ];
 
-  const cancellationRows: [string, string][] = [
-    ["Cancellation", `Within ${p.cancellationHours} hours of placing the order.`],
-    ["Refund", "Full amount, to the account the payment came from."],
-    ["Damage in transit", "Report damage within 48 hours with photos"],
+  const policyLink = (label: string, href: string) => (
+    <Link href={href} className="ml-2 font-bold whitespace-nowrap text-cta">
+      {label}
+    </Link>
+  );
+
+  const cancellationRows: [string, ReactNode][] = [
+    [
+      "Cancellation",
+      <>
+        Within {p.cancellationHours} hours of placing the order.
+        {policyLink("Cancellation policy ›", "/policies/cancellation")}
+      </>,
+    ],
+    [
+      "Refund",
+      <>
+        Full amount, to the account the payment came from.
+        {policyLink("Returns & refunds ›", "/policies/refund")}
+      </>,
+    ],
+    [
+      "Damage in transit",
+      <>
+        Report damage within 48 hours with photos
+        {policyLink("Raise a claim ›", "/help/report-a-problem")}
+      </>,
+    ],
   ];
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
@@ -191,7 +286,7 @@ export default async function ProductPage({
             </div>
             <p className="mb-4 text-[11.5px] text-sub">Inclusive of all taxes</p>
 
-            <BuyBox product={p} />
+            <BuyBox product={p} guideHref={freeGuideHref} />
             <PincodeCheck />
           </div>
         </div>
@@ -220,6 +315,30 @@ export default async function ProductPage({
               <p className="mb-3 max-w-[680px] text-[14.5px] leading-[1.85] text-body">
                 {p.howToUseNote}
               </p>
+            )}
+            {vidhiSteps.length > 0 && primaryGuide && (
+              <div className="mb-4 max-w-[480px] overflow-hidden rounded-[14px] border border-border bg-card">
+                <p className="border-b border-border-light bg-bg px-[17px] py-[10px] text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
+                  The ritual card inside — a preview
+                </p>
+                <ol className="px-[17px] py-[6px]">
+                  {vidhiSteps.map((title, i) => (
+                    <li
+                      key={`${i}-${title}`}
+                      className="flex items-baseline gap-[10px] border-b border-border-light py-[8px] text-[13px] text-body last:border-b-0"
+                    >
+                      <span className="flex size-[20px] shrink-0 translate-y-[3px] items-center justify-center rounded-full bg-cta/10 text-[10.5px] font-bold text-cta">
+                        {i + 1}
+                      </span>
+                      {title}
+                    </li>
+                  ))}
+                </ol>
+                <p className="border-t border-border-light px-[17px] py-[9px] text-[11.5px] text-sub">
+                  The full vidhi, printed on the card in every kit — and free in
+                  the guide.
+                </p>
+              </div>
             )}
             {cardSlug && (
               <a
@@ -265,6 +384,32 @@ export default async function ProductPage({
           <SectionEyebrow>Cancellation, returns and damage</SectionEyebrow>
           <InfoTable rows={cancellationRows} />
         </section>
+
+        {/* ── The guides this kit serves ── */}
+        {linkedGuides.length > 0 && (
+          <section className="mb-11">
+            <SectionEyebrow>The ritual guides — free, always</SectionEyebrow>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {linkedGuides.map((a) => (
+                <ContentCard
+                  key={a.slug}
+                  hue={hueFromClass(a.hueClass ?? undefined)}
+                  href={articleHref(a)}
+                  topRight="FREE GUIDE"
+                  title={a.lang.en.title}
+                  summary={
+                    a.lang.en.deck ??
+                    a.lang.en.heroSubtitle ??
+                    "The full vidhi, sourced from a named text."
+                  }
+                  readTime={
+                    a.readMinutes != null ? `${a.readMinutes} min` : undefined
+                  }
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Related pujans ── */}
         {related.length > 0 && (

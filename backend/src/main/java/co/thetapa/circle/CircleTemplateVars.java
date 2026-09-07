@@ -19,9 +19,12 @@ import java.util.Map;
  */
 public final class CircleTemplateVars {
 
-    /** "Sunday, 11 October" */
+    /** "Sunday, 11 October" — T1 {{2}} only; the weekday belongs to the welcome. */
     static final DateTimeFormatter OCCASION_DATE =
         DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.ENGLISH);
+    /** "11 October" — T2 {{1}} per spec (#28): no weekday in the reminder date. */
+    static final DateTimeFormatter REMINDER_DATE =
+        DateTimeFormatter.ofPattern("d MMMM", Locale.ENGLISH);
     /** "6:04 PM" */
     static final DateTimeFormatter TITHI_TIME =
         DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
@@ -49,7 +52,8 @@ public final class CircleTemplateVars {
     /**
      * T2 tapa_circle_reminder vars.
      * <ul>
-     *   <li>{{1}} occasion date "Sunday, 11 October"</li>
+     *   <li>{{1}} occasion date "11 October" (no weekday — spec keeps the
+     *       weekday to the T1 welcome only)</li>
      *   <li>{{2}} occasion name</li>
      *   <li>{{3}} tithi start time, with ", d MMMM" appended when it starts on a
      *       day other than the occasion date (the spec's previous-day case)</li>
@@ -62,7 +66,7 @@ public final class CircleTemplateVars {
      */
     public static Map<String, String> reminderVars(Observance o, Article guide, String siteBaseUrl) {
         Map<String, String> vars = new LinkedHashMap<>();
-        vars.put("1", o.getDate().format(OCCASION_DATE));
+        vars.put("1", o.getDate().format(REMINDER_DATE));
         vars.put("2", o.getName());
         vars.put("3", formatTithiBoundary(o.getTithiStartsAt(), o.getDate()));
         vars.put("4", formatTithiBoundary(o.getTithiEndsAt(), o.getDate()));

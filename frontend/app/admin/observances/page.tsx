@@ -212,6 +212,20 @@ function ObservanceForm({
           placeholder="Shravana Krishna Chaturdashi"
         />
       </Field>
+      <Field label="Tithi starts at" hint="feeds Circle reminder vars">
+        <Input
+          type="datetime-local"
+          value={(o.tithiStartsAt ?? "").slice(0, 16)}
+          onChange={(v) => patch({ tithiStartsAt: v ? `${v}:00` : undefined })}
+        />
+      </Field>
+      <Field label="Tithi ends at">
+        <Input
+          type="datetime-local"
+          value={(o.tithiEndsAt ?? "").slice(0, 16)}
+          onChange={(v) => patch({ tithiEndsAt: v ? `${v}:00` : undefined })}
+        />
+      </Field>
       <Field label="Deity">
         <Input value={o.deity ?? ""} onChange={(v) => patch({ deity: v || undefined })} />
       </Field>

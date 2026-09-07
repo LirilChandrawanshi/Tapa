@@ -62,6 +62,17 @@ public class CircleSend {
     private String providerMessageId;
     private Instant sentAt;
 
+    /** Set only for FAILED_FLAGGED — the provider error that the admin sees as the flag reason. */
+    private String failureReason;
+
+    /**
+     * Provider delivery receipt ("DELIVERED"/"FAILED"), reported later via the
+     * webhook status callback and matched on {@code providerMessageId}.
+     * Distinct from {@link Status}, which records the submission outcome.
+     */
+    private String deliveryStatus;
+    private Instant deliveryUpdatedAt;
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getMemberId() { return memberId; }
@@ -80,4 +91,10 @@ public class CircleSend {
     public void setProviderMessageId(String providerMessageId) { this.providerMessageId = providerMessageId; }
     public Instant getSentAt() { return sentAt; }
     public void setSentAt(Instant sentAt) { this.sentAt = sentAt; }
+    public String getFailureReason() { return failureReason; }
+    public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
+    public String getDeliveryStatus() { return deliveryStatus; }
+    public void setDeliveryStatus(String deliveryStatus) { this.deliveryStatus = deliveryStatus; }
+    public Instant getDeliveryUpdatedAt() { return deliveryUpdatedAt; }
+    public void setDeliveryUpdatedAt(Instant deliveryUpdatedAt) { this.deliveryUpdatedAt = deliveryUpdatedAt; }
 }

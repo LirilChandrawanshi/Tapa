@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   cancelOrder,
   fetchOrder,
@@ -44,18 +45,17 @@ function isDated(order: OrderView): boolean {
 /** Guest order tracking — order number + phone, no account needed. */
 export function TrackView() {
   const params = useSearchParams();
+  const router = useRouter();
   const [orderNumber, setOrderNumber] = useState(params.get("on") ?? "");
   const [phone, setPhone] = useState(params.get("phone") ?? "");
   const [state, setState] = useState<State>({ kind: "idle" });
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const [justCancelled, setJustCancelled] = useState(false);
 
   const lookUp = async (on: string, ph: string) => {
     if (!on.trim() || !ph.trim()) return;
     setState({ kind: "loading" });
     setConfirmingCancel(false);
-    setJustCancelled(false);
     const r = await fetchOrder(on, ph);
     if (r.ok) setState({ kind: "ready", order: r.data });
     else if (r.status === 404) setState({ kind: "notfound" });
@@ -76,8 +76,10 @@ export function TrackView() {
     setCancelling(false);
     setConfirmingCancel(false);
     if (r.ok) {
-      setState({ kind: "ready", order: r.data });
-      setJustCancelled(true);
+      // the cancelled page carries the refund facts + the guide-stays-free pair
+      router.push(
+        `/orders/cancelled?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(phone)}`,
+      );
     } else {
       setState({ kind: "error", message: r.message });
     }
@@ -147,7 +149,7 @@ export function TrackView() {
       {state.kind === "ready" && (
         <OrderCard
           order={state.order}
-          justCancelled={justCancelled}
+          phone={phone}
           confirmingCancel={confirmingCancel}
           cancelling={cancelling}
           onAskCancel={() => setConfirmingCancel(true)}
@@ -161,7 +163,7 @@ export function TrackView() {
 
 function OrderCard({
   order,
-  justCancelled,
+  phone,
   confirmingCancel,
   cancelling,
   onAskCancel,
@@ -169,14 +171,16 @@ function OrderCard({
   onConfirmCancel,
 }: {
   order: OrderView;
-  justCancelled: boolean;
+  phone: string;
   confirmingCancel: boolean;
   cancelling: boolean;
   onAskCancel: () => void;
   onKeep: () => void;
   onConfirmCancel: () => void;
 }) {
-  const cancelled = order.status.toUpperCase() === "CANCELLED";
+  const cancelled = ["CANCELLED", "REFUND_INITIATED", "REFUNDED"].includes(
+    order.status.toUpperCase(),
+  );
   const current = stepIndex(order.status);
   const withinWindow =
     Boolean(order.cancellableUntil) &&
@@ -196,13 +200,19 @@ function OrderCard({
       {cancelled ? (
         <div className="mb-4 rounded-[12px] border border-bhranti-bd bg-bhranti-bg px-4 py-3">
           <p className="text-[13.5px] font-bold text-ink">
-            {justCancelled ? "Cancelled — refund initiated" : "This order was cancelled"}
+            This order was cancelled
           </p>
           <p className="mt-1 text-[12.5px] leading-relaxed text-sub">
             {formatPaise(order.totalPaise)} returns to the account the payment
-            came from, within 5–7 working days. The guide and the samagri list
+            came from, within 3–5 working days. The guide and the samagri list
             stay free — cancelling the pujan does not cancel the ritual.
           </p>
+          <Link
+            href={`/orders/refund?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(phone)}`}
+            className="mt-2 inline-block text-[12.5px] font-bold text-cta"
+          >
+            Track this refund ›
+          </Link>
         </div>
       ) : (
         <ol className="mb-4">
@@ -256,6 +266,18 @@ function OrderCard({
             );
           })}
         </ol>
+      )}
+
+      {/* courier + tracking id, whenever the courier has it (#174) */}
+      {!cancelled && order.trackingId && (
+        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 rounded-[11px] bg-bg px-4 py-3">
+          <p className="text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
+            {order.courier ? order.courier : "Courier"}
+          </p>
+          <p className="font-mono text-[13px] font-bold text-ink">
+            {order.trackingId}
+          </p>
+        </div>
       )}
 
       <div className="mb-4 rounded-[11px] bg-bg px-4 py-3">
@@ -352,6 +374,20 @@ function OrderCard({
           )}
         </div>
       )}
+
+      {/* something wrong with what arrived? */}
+      <div className="mt-4 border-t border-border pt-4">
+        <Link
+          href={`/help/report-a-problem?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(phone)}`}
+          className="text-[13px] font-bold text-cta"
+        >
+          Report a problem ›
+        </Link>
+        <p className="mt-1 text-[11.5px] text-sub">
+          Damaged box, broken or missing item — replacement or refund, your
+          choice, within one working day.
+        </p>
+      </div>
     </div>
   );
 }

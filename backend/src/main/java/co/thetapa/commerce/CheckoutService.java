@@ -68,7 +68,7 @@ public class CheckoutService {
         List<String> errors = new ArrayList<>();
 
         if (request.items() == null || request.items().isEmpty()) {
-            throw new ValidationFailedException(List.of("Your bag is empty."));
+            throw new ValidationFailedException(List.of("Your cart is empty."));
         }
         if (!List.of("upi", "card", "netbanking").contains(request.paymentMethod())) {
             errors.add("Choose a payment method."); // COD deliberately absent (PRD)
@@ -194,6 +194,11 @@ public class CheckoutService {
     }
 
     public Order cancel(String orderNumber, String requesterPhone) {
+        return cancel(orderNumber, requesterPhone, null);
+    }
+
+    /** Cancellation with an optional buyer-picked reason (#161) — never required. */
+    public Order cancel(String orderNumber, String requesterPhone, String reason) {
         Order order = orders.findByOrderNumber(orderNumber)
             .orElseThrow(() -> new NotFoundException("order", orderNumber));
         if (!order.getPhone().equals(requesterPhone)) {
@@ -215,6 +220,9 @@ public class CheckoutService {
         order.setCancelledAt(Instant.now());
         order.setRefundPaise(order.getTotalPaise());
         order.setStatusNote("Cancelled · full refund initiated");
+        if (reason != null && !reason.isBlank()) {
+            order.setCancelReason(reason.trim());
+        }
         Order saved = orders.save(order);
         if (stockWasReserved) {
             stock.restoreAll(saved.getItems());

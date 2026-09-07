@@ -61,6 +61,12 @@ export interface OrderView {
   courier?: string | null;
   /** ISO instant. */
   createdAt?: string | null;
+  /** ISO instant — set once the order is cancelled. */
+  cancelledAt?: string | null;
+  /** "upi" | "card" | "netbanking" — how the order was paid. */
+  paymentMethod?: string | null;
+  /** Refund amount in paise (full refund policy — equals totalPaise). */
+  refundPaise?: number | null;
 }
 
 export type OrdersResult<T> =
@@ -78,7 +84,7 @@ const GENERIC_COPY = "Something didn't go through. Please try again.";
 
 async function call<T>(
   path: string,
-  method: "GET" | "POST" = "GET",
+  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: unknown,
 ): Promise<OrdersResult<T>> {
   let res: Response;
@@ -119,11 +125,100 @@ export const getMyOrders = () => call<OrderView[]>("/me/orders");
 export const claimGuestOrders = () =>
   call<{ claimed: number }>("/me/orders/claim", "POST");
 
-/** Free cancellation (within the window); phone confirms ownership. */
-export const cancelOrder = (orderNumber: string, phone: string) =>
+/** Free cancellation (within the window); phone confirms ownership.
+ *  `reason` is the optional buyer-picked reason — never required. */
+export const cancelOrder = (orderNumber: string, phone: string, reason?: string) =>
   call<OrderView>(`/orders/${encodeURIComponent(orderNumber)}/cancel`, "POST", {
     phone,
+    ...(reason ? { reason } : {}),
   });
+
+/** Guest-friendly order lookup — order number + the phone it was placed with. */
+export const getOrder = (orderNumber: string, phone: string) =>
+  call<OrderView>(
+    `/orders/${encodeURIComponent(orderNumber.trim())}?phone=${encodeURIComponent(phone.trim())}`,
+  );
+
+/* ---------- report a problem (#147/#160) ---------- */
+
+export type IssueReason =
+  | "BOX_DAMAGED"
+  | "ITEM_BROKEN"
+  | "ITEM_MISSING"
+  | "WRONG_ITEM"
+  | "OTHER";
+
+/** Radio labels — plain words, no blame on the buyer. */
+export const ISSUE_REASONS: { value: IssueReason; label: string }[] = [
+  { value: "BOX_DAMAGED", label: "The box arrived damaged" },
+  { value: "ITEM_BROKEN", label: "Something inside is broken" },
+  { value: "ITEM_MISSING", label: "Something is missing from the kit" },
+  { value: "WRONG_ITEM", label: "I received the wrong item" },
+  { value: "OTHER", label: "Something else" },
+];
+
+export interface IssueView {
+  id: string;
+  orderNumber: string;
+  reason: IssueReason;
+  details: string;
+  photoNote: string;
+  status: "NEW" | "IN_REVIEW" | "RESOLVED";
+  createdAt?: string | null;
+}
+
+export const reportIssue = (
+  orderNumber: string,
+  body: { phone: string; reason: IssueReason; details: string },
+) =>
+  call<IssueView>(
+    `/orders/${encodeURIComponent(orderNumber.trim())}/issues`,
+    "POST",
+    body,
+  );
+
+/* ---------- address book (#158) ---------- */
+
+export interface SavedAddress {
+  id: string;
+  name: string;
+  phone: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  state: string;
+  pincode: string;
+  isDefault: boolean;
+  /** Live pincode serviceability, joined by the API on every read. */
+  serviceable: boolean;
+  etaDays?: number | null;
+}
+
+export interface AddressInput {
+  name: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  isDefault?: boolean;
+}
+
+/** 401 simply means signed out. Default address first. */
+export const getAddresses = () => call<SavedAddress[]>("/me/addresses");
+
+export const createAddress = (body: AddressInput) =>
+  call<SavedAddress>("/me/addresses", "POST", body);
+
+export const updateAddress = (id: string, body: AddressInput) =>
+  call<SavedAddress>(`/me/addresses/${encodeURIComponent(id)}`, "PUT", body);
+
+export const deleteAddress = (id: string) =>
+  call<{ deleted: boolean }>(`/me/addresses/${encodeURIComponent(id)}`, "DELETE");
+
+export const setDefaultAddress = (id: string) =>
+  call<SavedAddress>(`/me/addresses/${encodeURIComponent(id)}/default`, "POST");
 
 /* ---------- money ---------- */
 

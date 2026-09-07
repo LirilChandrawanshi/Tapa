@@ -316,7 +316,7 @@ export function Footer({
               </span>
             </a>
             <a
-              href="mailto:hello@thetapaco.com"
+              href="mailto:help@thetapaco.com"
               className="flex items-center gap-[11px] py-2"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] border border-white/10 bg-white/[0.06] text-[15px]">
@@ -327,7 +327,7 @@ export function Footer({
                   Email us
                 </span>
                 <span className="mt-[1px] block text-[11px] leading-normal text-[#7A6A55]">
-                  hello@thetapaco.com
+                  help@thetapaco.com
                 </span>
               </span>
             </a>

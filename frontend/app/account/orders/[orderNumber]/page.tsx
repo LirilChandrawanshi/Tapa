@@ -164,7 +164,10 @@ export default function OrderDetailPage() {
       )}
 
       {/* timeline */}
-      <section className="mt-5 rounded-2xl border border-border bg-card px-4 py-5">
+      <section
+        id="timeline"
+        className="mt-5 rounded-2xl border border-border bg-card px-4 py-5"
+      >
         <OrderTimeline order={order} />
         {!closed && order.statusNote && (
           <p className="mt-4 text-center text-[12.5px] text-sub">
@@ -205,6 +208,49 @@ export default function OrderDetailPage() {
             original payment method.
           </p>
         )}
+        {closed && (
+          <p className="mt-2 text-center">
+            <Link
+              href={`/orders/refund?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(me.phone)}`}
+              className="text-[13px] font-bold text-cta hover:underline"
+            >
+              Track this refund ›
+            </Link>
+          </p>
+        )}
+      </section>
+
+      {/* the four actions (#165) */}
+      <section className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <a
+          href="#timeline"
+          className="rounded-xl border border-border bg-card px-3 py-3 text-center text-[12.5px] font-bold text-body hover:border-cta/60"
+        >
+          Track
+        </a>
+        <a
+          href={`/api/v1/orders/${encodeURIComponent(order.orderNumber)}/invoice?phone=${encodeURIComponent(me.phone)}`}
+          className="rounded-xl border border-border bg-card px-3 py-3 text-center text-[12.5px] font-bold text-body hover:border-cta/60"
+        >
+          Download invoice
+        </a>
+        <button
+          type="button"
+          disabled={!cancellable}
+          onClick={() => setCancelOpen(true)}
+          title={
+            cancellable ? undefined : "The free-cancellation window has closed."
+          }
+          className="rounded-xl border border-border bg-card px-3 py-3 text-center text-[12.5px] font-bold text-body hover:border-cta/60 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Cancel
+        </button>
+        <Link
+          href={`/help/report-a-problem?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(me.phone)}`}
+          className="rounded-xl border border-border bg-card px-3 py-3 text-center text-[12.5px] font-bold text-body hover:border-cta/60"
+        >
+          Report a problem
+        </Link>
       </section>
 
       {/* items */}

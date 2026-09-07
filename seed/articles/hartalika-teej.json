@@ -55,7 +55,8 @@
             { "name": "Incense (agarbatti)", "note": "for puja", "optional": true },
             { "name": "Sindoor, kumkum and green bangles", "note": "for shringar — offered to Parvati", "optional": false },
             { "name": "Mehndi, chunri, fruits and sweets", "note": "for shringar and bhog", "optional": true }
-          ]
+          ],
+          "meta": { "groupA": "For idol-making", "groupB": "For puja + shringar", "splitAt": "2" }
         },
         {
           "type": "VIDHI",
@@ -136,7 +137,8 @@
             { "name": "अगरबत्ती", "note": "पूजा के लिए", "optional": true },
             { "name": "सिंदूर, कुमकुम और हरी चूड़ियाँ", "note": "शृंगार के लिए — पार्वती को अर्पित", "optional": false },
             { "name": "मेहंदी, चुनरी, फल और मिठाई", "note": "शृंगार और भोग के लिए", "optional": true }
-          ]
+          ],
+          "meta": { "groupA": "प्रतिमा बनाने के लिए", "groupB": "पूजा + शृंगार के लिए", "splitAt": "2" }
         },
         {
           "type": "VIDHI",

@@ -66,7 +66,7 @@ public class OrderController {
     public ApiResponse<OrderView> cancel(@PathVariable String orderNumber,
                                          @RequestBody Map<String, String> body) {
         String phone = OtpService.normalize(body.get("phone"));
-        return ApiResponse.ok(OrderView.of(checkout.cancel(orderNumber, phone)));
+        return ApiResponse.ok(OrderView.of(checkout.cancel(orderNumber, phone, body.get("reason"))));
     }
 
     /** Account order history (authed). */
@@ -102,7 +102,8 @@ public class OrderController {
                             List<Order.Line> items, long subtotalPaise, long deliveryPaise,
                             long totalPaise, Order.Address address, String expectedDelivery,
                             String festivalDate, String cancellableUntil, String trackingId,
-                            String courier, String createdAt) {
+                            String courier, String createdAt, String cancelledAt,
+                            String paymentMethod, Long refundPaise) {
 
         static OrderView of(Order o) {
             return new OrderView(o.getOrderNumber(), o.getStatus().name(), o.getStatusNote(),
@@ -112,7 +113,9 @@ public class OrderController {
                 o.getFestivalDate() == null ? null : o.getFestivalDate().toString(),
                 o.getCancellableUntil() == null ? null : o.getCancellableUntil().toString(),
                 o.getTrackingId(), o.getCourier(),
-                o.getCreatedAt() == null ? null : o.getCreatedAt().toString());
+                o.getCreatedAt() == null ? null : o.getCreatedAt().toString(),
+                o.getCancelledAt() == null ? null : o.getCancelledAt().toString(),
+                o.getPaymentMethod(), o.getRefundPaise());
         }
     }
 }

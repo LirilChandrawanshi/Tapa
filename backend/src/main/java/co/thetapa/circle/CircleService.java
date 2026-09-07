@@ -16,8 +16,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -63,13 +65,23 @@ public class CircleService {
     private final WhatsAppProvider provider;
     private final ObservanceRepository observances;
     private final ArticleRepository articles;
+    private final CircleApprovalRepository approvals;
 
     private final String businessWaNumber;
     private final String siteBaseUrl;
     private final String mediaBaseUrl;
+    /** T1 header image, or null → template header omitted (see javadoc on the field below). */
+    private final String welcomeImageUrl;
 
     /** Single retry +60s; package-private for tests. */
     long retryDelayMillis = 60_000;
+
+    /**
+     * T1 pacing: the welcome goes out ~5s AFTER the inbound JOIN webhook returns,
+     * not inline — an instant reply reads as a bot blast, a small beat reads as a
+     * message. Package-private for tests.
+     */
+    long welcomePaceMillis = 5_000;
 
     private final ScheduledExecutorService retryExecutor =
         Executors.newSingleThreadScheduledExecutor(r -> {
@@ -78,24 +90,36 @@ public class CircleService {
             return t;
         });
 
+    /**
+     * {@code tapa.circle.welcome-image-url}: absolute HTTPS URL of the T1 welcome
+     * header image (the 800x418 brand card registered with the BSP alongside the
+     * tapa_circle_welcome template — the template must be approved WITH an image
+     * header for this to apply). Default blank → null → the header is omitted and
+     * the text-only template variant is used.
+     */
     public CircleService(CircleMemberRepository members,
                          PendingJoinRepository pendingJoins,
                          CircleSendRepository sends,
                          WhatsAppProvider provider,
                          ObservanceRepository observances,
                          ArticleRepository articles,
+                         CircleApprovalRepository approvals,
                          @Value("${tapa.circle.wa-number:919999999999}") String businessWaNumber,
                          @Value("${tapa.circle.site-base-url:https://thetapaco.com}") String siteBaseUrl,
-                         @Value("${tapa.circle.media-base-url:https://thetapaco.com/media}") String mediaBaseUrl) {
+                         @Value("${tapa.circle.media-base-url:https://thetapaco.com/media}") String mediaBaseUrl,
+                         @Value("${tapa.circle.welcome-image-url:}") String welcomeImageUrl) {
         this.members = members;
         this.pendingJoins = pendingJoins;
         this.sends = sends;
         this.provider = provider;
         this.observances = observances;
         this.articles = articles;
+        this.approvals = approvals;
         this.businessWaNumber = businessWaNumber;
         this.siteBaseUrl = siteBaseUrl;
         this.mediaBaseUrl = mediaBaseUrl;
+        this.welcomeImageUrl = welcomeImageUrl == null || welcomeImageUrl.isBlank()
+            ? null : welcomeImageUrl.strip();
     }
 
     @PreDestroy
@@ -152,19 +176,48 @@ public class CircleService {
 
     enum Inbound { JOIN, STOP, DELETE, OTHER }
 
-    /** Case-insensitive keyword classification; the raw text is never persisted. */
+    /** Exact opt-out phrases accepted after trim/punctuation-strip/lowercase. */
+    private static final Set<String> STOP_PHRASES = Set.of(
+        "stop", "stop please", "unsubscribe", "स्टॉप", "रोको", "रोकें", "बंद", "बंद करो");
+
+    /**
+     * Case-insensitive keyword classification; the raw text is never persisted.
+     *
+     * <p>STOP matching is deliberately broad (#34): an opt-out must never be
+     * missed on account of punctuation, casing or trailing words. After
+     * trimming, stripping trailing punctuation and lowercasing, we accept the
+     * exact phrases in {@link #STOP_PHRASES} and ANY message whose first token
+     * is "stop", begins with "रोक" (रोको/रोकें/रोकिए…), or is "बंद" — so
+     * "STOP.", "Stop sending these", "रोक दो" and "बंद करो please" all opt out.
+     * ("stopping"/"stopped" as a first word do NOT match — token equality, not
+     * prefix, guards the Latin case.)</p>
+     */
     static Inbound classify(String text) {
         String t = text == null ? "" : text.strip();
-        if (t.equalsIgnoreCase("join")) {
+        // trailing punctuation only — "stop!!" and "रोकें।" are opt-outs, "s.t.o.p" is not
+        t = t.replaceAll("[\\p{Punct}।॥…”’\"']+$", "").strip();
+        String lower = t.toLowerCase(Locale.ROOT);
+        if (lower.equals("join")) {
             return Inbound.JOIN;
         }
-        if (t.equalsIgnoreCase("stop") || t.equals("रोकें") || t.equals("बंद")) {
-            return Inbound.STOP;
-        }
-        if (t.equalsIgnoreCase("delete")) {
+        if (lower.equals("delete")) {
             return Inbound.DELETE;
         }
+        if (isStop(lower)) {
+            return Inbound.STOP;
+        }
         return Inbound.OTHER;
+    }
+
+    private static boolean isStop(String lower) {
+        if (STOP_PHRASES.contains(lower)) {
+            return true;
+        }
+        if (lower.isEmpty()) {
+            return false;
+        }
+        String firstToken = lower.split("\\s+", 2)[0];
+        return firstToken.equals("stop") || firstToken.startsWith("रोक") || firstToken.equals("बंद");
     }
 
     /** @return a short outcome label for logging/webhook echo — never message content. */
@@ -200,6 +253,7 @@ public class CircleService {
         member.setJoinedAt(Instant.now());
         member.setConsentMessageId(messageId);
         member.setDeleteRequestedAt(null);
+        member.setStatusNote(null); // a rejoin (incl. after an unblock) starts clean
 
         // SENDING NUMBER WINS: the pending typed number only contributes entryPointPage
         // when it matches the sender; any mismatched PendingJoin is discarded via TTL.
@@ -215,12 +269,26 @@ public class CircleService {
         }
         pending.ifPresent(p -> pendingJoins.deleteByTypedNumber(from));
 
-        // T1 within 5s. First welcome dedupes on "welcome"; a rejoin re-welcome
-        // uses a dated pseudo-key so it isn't blocked by the original send.
+        // T1 paced ~5s after the webhook (#23) via the shared executor, with the
+        // configured welcome header image (#25). First welcome dedupes on
+        // "welcome"; a rejoin re-welcome uses a dated pseudo-key so it isn't
+        // blocked by the original send.
         String occasionKey = rejoin ? "welcome:rejoin:" + LocalDate.now(IST) : "welcome";
         Observance next = firstUpcomingVerified(LocalDate.now(IST));
-        sendTemplateWithRetry(member.getId(), from, CircleSend.TemplateId.T1, occasionKey,
-            CircleTemplateVars.welcomeVars(next), null);
+        String memberId = member.getId();
+        retryExecutor.schedule(() -> {
+            // Re-check at send time: a STOP/DELETE/blocked landing inside the
+            // pacing beat wins — "never send again" beats the queued welcome.
+            boolean stillActive = members.findByWaNumber(from)
+                .map(m -> m.getStatus() == CircleMember.Status.ACTIVE)
+                .orElse(false);
+            if (!stillActive) {
+                log.info("Circle T1 skipped — member no longer ACTIVE at send time");
+                return;
+            }
+            sendTemplateWithRetry(memberId, from, CircleSend.TemplateId.T1, occasionKey,
+                CircleTemplateVars.welcomeVars(next), welcomeImageUrl);
+        }, welcomePaceMillis, TimeUnit.MILLISECONDS);
         return rejoin ? "REJOINED" : "JOINED";
     }
 
@@ -239,8 +307,9 @@ public class CircleService {
             return "STOPPED_UNKNOWN";
         }
         CircleMember member = existing.get();
-        if (member.getStatus() == CircleMember.Status.STOPPED) {
-            return "ALREADY_STOPPED"; // silence
+        if (member.getStatus() == CircleMember.Status.STOPPED
+            || member.getStatus() == CircleMember.Status.BLOCKED) {
+            return "ALREADY_STOPPED"; // silence (a blocked number can't receive T3 anyway)
         }
         member.setStatus(CircleMember.Status.STOPPED);
         member.setStoppedAt(Instant.now());
@@ -322,6 +391,92 @@ public class CircleService {
             .findFirst().orElse(null);
     }
 
+    /**
+     * First upcoming observance that will actually reach members' phones —
+     * verified AND carrying a G58 approval row. Used by the public status
+     * endpoint to tell a fresh member when their first reminder arrives;
+     * null when nothing upcoming is approved yet.
+     */
+    public Observance firstUpcomingApproved(LocalDate from) {
+        return observances.findByDateGreaterThanEqualOrderByDateAsc(from).stream()
+            .filter(Observance::isVerified)
+            .filter(o -> approvals.existsByObservanceSlug(o.getSlug()))
+            .findFirst().orElse(null);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Provider status callbacks (#33)                                     */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Handles a provider status callback ({type:"status"} webhook shape).
+     *
+     * <ul>
+     *   <li>{@code blocked} — the recipient blocked the business number: the
+     *       member flips to {@link CircleMember.Status#BLOCKED} (never sent to
+     *       again). A DELETE_REQUESTED member keeps that status so the purge
+     *       job still fires; only the note is recorded. An unknown number gets
+     *       a BLOCKED tombstone so it is never contacted either.</li>
+     *   <li>{@code delivered} / {@code failed} — recorded on the matching
+     *       {@link CircleSend} row via providerMessageId (receipt only; the
+     *       one-retry rule applies to submission failures, not receipts).</li>
+     * </ul>
+     *
+     * @return a short outcome label for logging/webhook echo
+     */
+    public String handleStatusCallback(String messageId, String status, String recipient) {
+        String s = status == null ? "" : status.strip().toLowerCase(Locale.ROOT);
+        switch (s) {
+            case "blocked" -> {
+                if (recipient == null || recipient.isBlank()) {
+                    return "IGNORED";
+                }
+                String number;
+                try {
+                    number = OtpService.normalize(recipient);
+                } catch (IllegalArgumentException e) {
+                    return "IGNORED_NON_IN";
+                }
+                Optional<CircleMember> existing = members.findByWaNumber(number);
+                if (existing.isEmpty()) {
+                    CircleMember tombstone = new CircleMember();
+                    tombstone.setWaNumber(number);
+                    tombstone.setStatus(CircleMember.Status.BLOCKED);
+                    tombstone.setStoppedAt(Instant.now());
+                    tombstone.setStatusNote("provider reported blocked");
+                    try {
+                        members.save(tombstone);
+                    } catch (DuplicateKeyException ignored) {
+                        // concurrent write — the number is recorded either way
+                    }
+                    return "BLOCKED_UNKNOWN";
+                }
+                CircleMember member = existing.get();
+                member.setStatusNote("provider reported blocked");
+                if (member.getStatus() != CircleMember.Status.DELETE_REQUESTED) {
+                    member.setStatus(CircleMember.Status.BLOCKED);
+                    member.setStoppedAt(Instant.now());
+                }
+                members.save(member);
+                return "BLOCKED";
+            }
+            case "delivered", "failed" -> {
+                if (messageId == null || messageId.isBlank()) {
+                    return "IGNORED";
+                }
+                return sends.findTopByProviderMessageId(messageId).map(send -> {
+                    send.setDeliveryStatus(s.toUpperCase(Locale.ROOT));
+                    send.setDeliveryUpdatedAt(Instant.now());
+                    sends.save(send);
+                    return "DELIVERY_RECORDED";
+                }).orElse("UNKNOWN_MESSAGE");
+            }
+            default -> {
+                return "IGNORED";
+            }
+        }
+    }
+
     /* ------------------------------------------------------------------ */
     /* T2 reminder fan-out (called by CircleReminderScheduler)             */
     /* ------------------------------------------------------------------ */
@@ -370,17 +525,30 @@ public class CircleService {
                 } catch (RuntimeException second) {
                     log.error("Circle {} send to {} failed twice — flagged, no more retries: {}",
                         templateId, waNumber, second.getMessage());
-                    recordSend(memberId, waNumber, templateId, occasionKey,
-                        CircleSend.Status.FAILED_FLAGGED, null, false);
+                    recordFlagged(memberId, waNumber, templateId, occasionKey, second.getMessage());
                 }
             }, retryDelayMillis, TimeUnit.MILLISECONDS);
         }
     }
 
-    /** @return false when the unique (waNumber, occasionSlug, templateId) row already exists. */
+    /** FAILED_FLAGGED row carrying the provider error as the admin-visible flag reason. */
+    private void recordFlagged(String memberId, String waNumber, CircleSend.TemplateId templateId,
+                               String occasionSlug, String reason) {
+        recordSend(memberId, waNumber, templateId, occasionSlug,
+            CircleSend.Status.FAILED_FLAGGED, null, false, reason);
+    }
+
     private boolean recordSend(String memberId, String waNumber, CircleSend.TemplateId templateId,
                                String occasionSlug, CircleSend.Status status,
                                String providerMessageId, boolean quiet) {
+        return recordSend(memberId, waNumber, templateId, occasionSlug, status,
+            providerMessageId, quiet, null);
+    }
+
+    /** @return false when the unique (waNumber, occasionSlug, templateId) row already exists. */
+    private boolean recordSend(String memberId, String waNumber, CircleSend.TemplateId templateId,
+                               String occasionSlug, CircleSend.Status status,
+                               String providerMessageId, boolean quiet, String failureReason) {
         CircleSend send = new CircleSend();
         send.setMemberId(memberId);
         send.setWaNumber(waNumber);
@@ -389,6 +557,7 @@ public class CircleService {
         send.setLanguage(DEFAULT_LANGUAGE);
         send.setStatus(status);
         send.setProviderMessageId(providerMessageId);
+        send.setFailureReason(failureReason);
         send.setSentAt(Instant.now());
         try {
             sends.save(send);

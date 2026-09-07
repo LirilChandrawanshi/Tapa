@@ -9,16 +9,24 @@
  * the server remains the enforcer at publish (422 surfaces inline).
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type {
   Block,
   BlockType,
   FastingForm,
+  Mantra,
   Myth,
   SamagriItem,
   VidhiStep,
 } from "@/lib/types";
+import {
+  MEDIA_ACCEPT,
+  mediaUrl,
+  uploadMedia,
+  type MediaUploadResult,
+} from "@/lib/media";
+import SmartImage from "@/components/media/SmartImage";
 import {
   createAdminArticle,
   dpbWarnings,
@@ -170,6 +178,23 @@ export default function ArticleEditorPage() {
 
   const patchDpb = useCallback((p: Partial<AdminDpb>) => {
     setArticle((a) => (a ? { ...a, dpb: { ...(a.dpb ?? {}), ...p } } : a));
+  }, []);
+
+  /**
+   * HI content is otherwise edited only via raw JSON; the audio upload writes
+   * `lang.hi.audioGuideMediaId` into the document programmatically (creating a
+   * stub hi object if none exists yet) so the PUT payload carries it.
+   */
+  const setHiAudioGuide = useCallback((id: string | undefined) => {
+    setArticle((a) => {
+      if (!a) return a;
+      const hi: AdminArticleContent = {
+        ...(a.lang?.hi ?? { title: "", blocks: [] }),
+        audioGuideMediaId: id,
+      };
+      if (id === undefined) delete hi.audioGuideMediaId;
+      return { ...a, lang: { ...(a.lang ?? {}), hi } };
+    });
   }, []);
 
   const en = article?.lang?.en ?? {};
@@ -526,6 +551,124 @@ export default function ArticleEditorPage() {
             </div>
           </SectionCard>
 
+          {/* ---------- media ---------- */}
+          <SectionCard title="Media">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Field
+                label="Hero image"
+                hint={
+                  article.heroImageId
+                    ? `id ${article.heroImageId}`
+                    : "none — hue gradient fallback shown on site"
+                }
+              >
+                <div className="max-w-[360px]">
+                  <SmartImage
+                    id={article.heroImageId}
+                    alt="Hero preview"
+                    hueClass={article.hueClass}
+                    aspect="16 / 9"
+                  />
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <MediaUploadBtn
+                    accept={MEDIA_ACCEPT.image}
+                    label={article.heroImageId ? "Replace hero" : "Upload hero"}
+                    onUploaded={(r) =>
+                      patch({
+                        heroImageId: r.id,
+                        // the server derives the 800×418 WA/OG crop alongside
+                        ...(r.waAssetId ? { waImageId: r.waAssetId } : {}),
+                      })
+                    }
+                  />
+                  {article.heroImageId && (
+                    <Btn
+                      kind="danger"
+                      onClick={() => patch({ heroImageId: undefined })}
+                    >
+                      ✕ clear
+                    </Btn>
+                  )}
+                </div>
+                <p className="mt-1 text-[10px] text-sub">
+                  JPEG/PNG/WebP. Wider than 1600px is downscaled server-side;
+                  the 800×418 WhatsApp image is auto-derived (WebP: upload the
+                  WA override manually).
+                </p>
+              </Field>
+
+              <Field
+                label="WhatsApp / OG image (800×418)"
+                hint={
+                  article.waImageId
+                    ? `id ${article.waImageId}`
+                    : "auto-set when a hero uploads"
+                }
+              >
+                <div className="max-w-[280px]">
+                  <SmartImage
+                    id={article.waImageId}
+                    alt="WhatsApp card preview"
+                    hueClass={article.hueClass}
+                    aspect="800 / 418"
+                  />
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <MediaUploadBtn
+                    accept={MEDIA_ACCEPT.image}
+                    label="Upload WA override"
+                    onUploaded={(r) =>
+                      patch({ waImageId: r.waAssetId ?? r.id })
+                    }
+                  />
+                  {article.waImageId && (
+                    <Btn
+                      kind="danger"
+                      onClick={() => patch({ waImageId: undefined })}
+                    >
+                      ✕ clear
+                    </Btn>
+                  )}
+                </div>
+                <p className="mt-1 text-[10px] text-sub">
+                  Overrides use the uploaded image&apos;s auto-derived 800×418
+                  crop.
+                </p>
+              </Field>
+
+              <Field
+                label="Audio guide — EN"
+                hint={en.audioGuideMediaId ? `id ${en.audioGuideMediaId}` : "none"}
+              >
+                <AudioAdminRow
+                  id={en.audioGuideMediaId}
+                  onUploaded={(r) => patchEn({ audioGuideMediaId: r.id })}
+                  onClear={() => patchEn({ audioGuideMediaId: undefined })}
+                />
+              </Field>
+
+              <Field
+                label="Audio guide — HI"
+                hint={
+                  article.lang?.hi?.audioGuideMediaId
+                    ? `id ${article.lang.hi.audioGuideMediaId}`
+                    : "none (hi text is edited via raw JSON; this writes lang.hi directly)"
+                }
+              >
+                <AudioAdminRow
+                  id={article.lang?.hi?.audioGuideMediaId}
+                  onUploaded={(r) => setHiAudioGuide(r.id)}
+                  onClear={() => setHiAudioGuide(undefined)}
+                />
+              </Field>
+            </div>
+            <p className="mt-2 text-[10px] text-sub">
+              Per-mantra chant audio lives on each MANTRA block below. Ids are
+              saved with the article on Save.
+            </p>
+          </SectionCard>
+
           {/* ---------- blocks ---------- */}
           <SectionCard
             title={`Blocks (${blocks.length})`}
@@ -875,14 +1018,14 @@ function MantraEditor({
   block: Block;
   onChange: (p: Partial<Block>) => void;
 }) {
-  const mantra = block.mantra ?? {
+  const mantra: Mantra = block.mantra ?? {
     devanagari: "",
     transliteration: "",
     meaning: "",
     defaultCount: 11,
     presets: [11, 21, 108],
   };
-  const patch = (p: Partial<typeof mantra>) =>
+  const patch = (p: Partial<Mantra>) =>
     onChange({ mantra: { ...mantra, ...p } });
   return (
     <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
@@ -917,6 +1060,20 @@ function MantraEditor({
           />
         </Field>
       </div>
+      <Field label="Chant audio — EN" className="md:col-span-1">
+        <AudioAdminRow
+          id={mantra.audioEnMediaId}
+          onUploaded={(r) => patch({ audioEnMediaId: r.id })}
+          onClear={() => patch({ audioEnMediaId: undefined })}
+        />
+      </Field>
+      <Field label="Chant audio — HI" className="md:col-span-1">
+        <AudioAdminRow
+          id={mantra.audioHiMediaId}
+          onUploaded={(r) => patch({ audioHiMediaId: r.id })}
+          onClear={() => patch({ audioHiMediaId: undefined })}
+        />
+      </Field>
     </div>
   );
 }
@@ -993,6 +1150,88 @@ function FastingEditor({
           + Add form
         </Btn>
       </div>
+    </div>
+  );
+}
+
+/* ================= media upload helpers (W1-C) ================= */
+
+/** Hidden-input upload button with inline busy/error state. */
+function MediaUploadBtn({
+  accept,
+  label,
+  onUploaded,
+}: {
+  accept: string;
+  label: string;
+  onUploaded: (r: MediaUploadResult) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    setBusy(true);
+    setError("");
+    const res = await uploadMedia(file);
+    setBusy(false);
+    if (res.ok) onUploaded(res.data);
+    else setError(res.message);
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        className="hidden"
+        onChange={(e) => {
+          void handleFile(e.target.files?.[0]);
+          e.target.value = ""; // allow re-selecting the same file
+        }}
+      />
+      <Btn onClick={() => inputRef.current?.click()} disabled={busy}>
+        {busy ? "Uploading…" : label}
+      </Btn>
+      {error && (
+        <span className="text-[10px] font-bold text-cta">{error}</span>
+      )}
+    </span>
+  );
+}
+
+/** Audio id row: preview player + upload/replace + clear. */
+function AudioAdminRow({
+  id,
+  onUploaded,
+  onClear,
+}: {
+  id?: string;
+  onUploaded: (r: MediaUploadResult) => void;
+  onClear: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {id && (
+        <audio
+          controls
+          preload="none"
+          src={mediaUrl(id)}
+          className="h-8 max-w-[240px]"
+        />
+      )}
+      <MediaUploadBtn
+        accept={MEDIA_ACCEPT.audio}
+        label={id ? "Replace MP3" : "Upload MP3"}
+        onUploaded={onUploaded}
+      />
+      {id && (
+        <Btn kind="danger" onClick={onClear}>
+          ✕ clear
+        </Btn>
+      )}
     </div>
   );
 }

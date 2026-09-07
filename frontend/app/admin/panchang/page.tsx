@@ -194,6 +194,31 @@ function DayForm({
   isNew: boolean;
 }) {
   const patch = (p: Partial<AdminPanchangDay>) => onChange({ ...day, ...p });
+  const [muhuratsText, setMuhuratsText] = useState(() =>
+    day.muhurats && day.muhurats.length > 0 ? JSON.stringify(day.muhurats, null, 2) : "",
+  );
+  const [muhuratsError, setMuhuratsError] = useState(false);
+
+  function onMuhuratsChange(v: string) {
+    setMuhuratsText(v);
+    if (!v.trim()) {
+      setMuhuratsError(false);
+      patch({ muhurats: undefined });
+      return;
+    }
+    try {
+      const parsed: unknown = JSON.parse(v);
+      if (Array.isArray(parsed)) {
+        setMuhuratsError(false);
+        patch({ muhurats: parsed });
+      } else {
+        setMuhuratsError(true);
+      }
+    } catch {
+      setMuhuratsError(true);
+    }
+  }
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <Field label="Date">
@@ -280,6 +305,19 @@ function DayForm({
           value={day.abhijitMuhurat?.to ?? ""}
           onChange={(v) => patch({ abhijitMuhurat: { ...(day.abhijitMuhurat ?? {}), to: v } })}
         />
+      </Field>
+      <Field
+        label="Muhurats (JSON array)"
+        className="col-span-2"
+        hint={
+          muhuratsError ? (
+            <span className="font-bold text-cta">invalid JSON — not saved</span>
+          ) : (
+            'e.g. [{"label":"Parana (next day)","from":"06:22","to":"08:36","kind":"preferred"}]'
+          )
+        }
+      >
+        <TextArea value={muhuratsText} onChange={onMuhuratsChange} rows={3} mono />
       </Field>
       <div className="col-span-2 mt-1 border-t border-border-light pt-2">
         <Check

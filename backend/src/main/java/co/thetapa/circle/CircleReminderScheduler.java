@@ -18,8 +18,10 @@ import java.util.List;
  * <p>T2: every evening 6pm IST, remind about tomorrow's Delhi-NCR observances —
  * the evening BEFORE, auto-triggered from the panchang records. Nothing is ever
  * sent on non-observance days: no weekly broadcast, no countdowns, no product
- * pushes. Only verified observances go out; unverified ones are logged and
- * skipped (an unverified date must never reach a phone).</p>
+ * pushes. Two gates guard every fan-out: the observance must be VERIFIED (the
+ * date is right) AND carry a {@link CircleApproval} row (G58 — a human reviewed
+ * and approved the actual message via the admin queue). Missing either one →
+ * logged and skipped; an unreviewed message must never reach a phone.</p>
  *
  * <p>Purge: daily, hard-delete members whose DELETE request is older than 7 days,
  * together with their entire send log — full record removal.</p>
@@ -33,27 +35,42 @@ public class CircleReminderScheduler {
     private final CircleService circleService;
     private final CircleMemberRepository members;
     private final CircleSendRepository sends;
+    private final CircleApprovalRepository approvals;
 
     public CircleReminderScheduler(ObservanceRepository observances,
                                    CircleService circleService,
                                    CircleMemberRepository members,
-                                   CircleSendRepository sends) {
+                                   CircleSendRepository sends,
+                                   CircleApprovalRepository approvals) {
         this.observances = observances;
         this.circleService = circleService;
         this.members = members;
         this.sends = sends;
+        this.approvals = approvals;
     }
 
     @Scheduled(cron = "0 0 18 * * *", zone = "Asia/Kolkata")
     public void sendEveningBeforeReminders() {
         LocalDate tomorrow = LocalDate.now(CircleService.IST).plusDays(1);
-        List<Observance> tomorrows = observances.findByDateBetweenOrderByDateAsc(tomorrow, tomorrow);
+        // NOTE: Spring Data MongoDB derives "Between" as EXCLUSIVE $gt/$lt —
+        // Between(tomorrow, tomorrow) matches nothing, ever. Query >= and
+        // filter for the exact day instead.
+        List<Observance> tomorrows = observances
+            .findByDateGreaterThanEqualOrderByDateAsc(tomorrow).stream()
+            .filter(o -> tomorrow.equals(o.getDate()))
+            .toList();
         if (tomorrows.isEmpty()) {
             return; // non-observance day → total silence
         }
         for (Observance occasion : tomorrows) {
             if (!occasion.isVerified()) {
                 log.warn("Circle T2 skipped — observance '{}' on {} is not verified",
+                    occasion.getSlug(), occasion.getDate());
+                continue;
+            }
+            if (!approvals.existsByObservanceSlug(occasion.getSlug())) {
+                log.warn("Circle T2 skipped — observance '{}' on {} has no G58 approval "
+                        + "(approve it in /admin/circle before 6pm IST the evening before)",
                     occasion.getSlug(), occasion.getDate());
                 continue;
             }

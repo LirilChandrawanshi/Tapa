@@ -154,6 +154,27 @@ async function call<T>(
 
 /* ─────────────────────────── Fetchers ───────────────────────────── */
 
+/**
+ * Cached product list for server components on ISR pages (homepage rail,
+ * hero pre-book slide). 5-minute revalidate under the "home" tag — unlike
+ * fetchProducts() this never opts the page into dynamic rendering. `[]` on
+ * any failure; the storefront must render even while the backend is down.
+ */
+export async function fetchProductsCached(): Promise<Product[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/products`, {
+      next: { revalidate: 300, tags: ["home"] },
+    });
+    if (!res.ok) return [];
+    const body = (await res.json().catch(() => null)) as Envelope<
+      Product[]
+    > | null;
+    return Array.isArray(body?.data) ? body.data : [];
+  } catch {
+    return [];
+  }
+}
+
 /** All products, optionally filtered by category. `[]` on any failure. */
 export async function fetchProducts(category?: string): Promise<Product[]> {
   const q = category ? `?category=${encodeURIComponent(category)}` : "";
@@ -190,10 +211,17 @@ export const cancelOrder = (orderNumber: string, phone: string) =>
     body: { phone: phone.trim() },
   });
 
-export const submitNotifyMe = (phone: string) =>
+export const submitNotifyMe = (
+  phone: string,
+  opts?: { context?: "kits" | "purohit" | "restock"; articleSlug?: string },
+) =>
   call<unknown>("/notify-me", {
     method: "POST",
-    body: { context: "kits", phone: phone.trim() },
+    body: {
+      context: opts?.context ?? "kits",
+      phone: phone.trim(),
+      ...(opts?.articleSlug ? { articleSlug: opts.articleSlug } : {}),
+    },
   });
 
 /* ─────────────────────────── Formatting ─────────────────────────── */
@@ -372,10 +400,31 @@ export function shopTrack(
 
 /* ──────────────────────── Display helpers ───────────────────────── */
 
+/** Today's calendar date in IST, "YYYY-MM-DD" — cut-offs are Indian days. */
+export function todayIstIso(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
+}
+
+/**
+ * A PREBOOK kit whose order-by date has passed. The backend already rejects
+ * such orders at checkout; this drives the honest UI (closed buy box,
+ * "PRE-BOOKING CLOSED" chips) instead of letting the failure surface late.
+ */
+export function prebookClosed(p: Product): boolean {
+  return (
+    p.availability === "PREBOOK" &&
+    !!p.orderByDate &&
+    todayIstIso() > p.orderByDate.slice(0, 10)
+  );
+}
+
 /** Card chip: "PRE-BOOK · ORDER BY 1 OCT" / "IN STOCK" / "OPENS SOON" / "SOLD OUT". */
 export function availabilityChip(p: Product): string {
   switch (p.availability) {
     case "PREBOOK":
+      if (prebookClosed(p)) return "PRE-BOOKING CLOSED";
       return p.orderByDate
         ? `PRE-BOOK · ORDER BY ${formatDateShortCaps(p.orderByDate)}`
         : "PRE-BOOK";

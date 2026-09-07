@@ -1,7 +1,7 @@
 {
   "slug": "raksha-bandhan",
   "type": "RITUAL_GUIDE",
-  "status": "DRAFT",
+  "status": "PUBLISHED",
   "category": "ritual-guides",
   "subCategory": "festive-pujans",
   "hueClass": "h-thread",
@@ -76,6 +76,14 @@
             "defaultCount": 1,
             "presets": [1, 3, 11]
           }
+        },
+        {
+          "type": "FASTING",
+          "title": "Fasting on Raksha Bandhan",
+          "fasting": [
+            { "name": "Until the rakhi is tied", "description": "Many sisters keep a light morning fast and eat only after the rakhi is tied and sweets are shared. That is the whole observance — no day-long vrat is asked of anyone.", "recommended": true }
+          ],
+          "text": "No text prescribes a Raksha Bandhan fast; fasting until the tying is warm household custom, and eating normally breaks nothing."
         },
         {
           "type": "MYTHS",

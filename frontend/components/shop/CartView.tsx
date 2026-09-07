@@ -48,7 +48,7 @@ export function CartView() {
   }, [lines, products]);
 
   if (lines === null) {
-    return <p className="py-14 text-center text-[13.5px] text-sub">Loading your bag…</p>;
+    return <p className="py-14 text-center text-[13.5px] text-sub">Loading your cart…</p>;
   }
 
   if (lines.length === 0) {
@@ -57,30 +57,38 @@ export function CartView() {
         <p aria-hidden className="mb-3 text-4xl">
           🛍
         </p>
-        <h2 className="mb-2 text-xl font-bold text-ink">Your bag is empty</h2>
+        <h2 className="mb-2 text-xl font-bold text-ink">Nothing here yet</h2>
         <p className="mb-5 text-[13.5px] leading-relaxed text-sub">
-          Every guide stays free whether you buy or not. When you want the
-          sourcing done, the pujans are here.
+          Start with a ritual guide to find the right kit. Kits are optional
+          anyway — every guide works without one.
         </p>
         <Link
-          href="/ritual-pujans"
+          href="/ritual-guides"
           className="inline-block rounded-[10px] bg-cta px-6 py-[11px] text-[13.5px] font-bold text-white"
         >
-          Browse Ritual Pujans ›
+          Browse the ritual guides ›
         </Link>
+        <p className="mt-3">
+          <Link
+            href="/ritual-pujans"
+            className="text-[12.5px] font-bold text-cta"
+          >
+            Or go straight to the Ritual Pujans ›
+          </Link>
+        </p>
       </div>
     );
   }
 
   if (!products) {
-    return <p className="py-14 text-center text-[13.5px] text-sub">Loading your bag…</p>;
+    return <p className="py-14 text-center text-[13.5px] text-sub">Loading your cart…</p>;
   }
 
   if (!resolved || resolved.length === 0) {
     return (
       <div className="mx-auto max-w-[420px] py-14 text-center">
         <h2 className="mb-2 text-xl font-bold text-ink">
-          We couldn&apos;t load your bag just now
+          We couldn&apos;t load your cart just now
         </h2>
         <p className="text-[13.5px] leading-relaxed text-sub">
           Your items are safe on this device. Check your connection and

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CategoryHero } from "@/components/CategoryHero";
+import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { CountdownPill } from "@/components/CountdownPill";
 import { SectionHeader } from "@/components/SectionHeader";
 import {
@@ -345,6 +346,9 @@ export default async function PanchangPage() {
             <VerifyingPanel title="The 30-day view is being verified" />
           )}
         </section>
+
+        {/* Circle nudge (#16) — panchang context: the reader is already here for dates */}
+        <WhatsAppNudge context="panchang" />
 
         {/* Learn + download band */}
         <section className="mt-10 grid gap-4 md:grid-cols-2">

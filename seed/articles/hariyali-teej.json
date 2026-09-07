@@ -48,15 +48,16 @@
           "type": "SAMAGRI",
           "title": "What you'll need",
           "samagri": [
+            { "name": "Shiva–Parvati image or idol", "note": "size and material do not matter", "optional": false },
+            { "name": "Ganesh image or idol", "note": "optional", "optional": true },
             { "name": "Water or Panchamrit", "note": "for abhishek", "optional": false },
-            { "name": "Sindoor", "note": "for Maa Parvati", "optional": false },
-            { "name": "Bangles", "note": "green, optional (Pratha)", "optional": true },
-            { "name": "Flowers", "note": "", "optional": false },
             { "name": "Deepak and ghee", "note": "", "optional": false },
             { "name": "Incense", "note": "", "optional": true },
-            { "name": "Shiva–Parvati image or idol", "note": "size and material do not matter", "optional": false },
-            { "name": "Ganesh image or idol", "note": "optional", "optional": true }
-          ]
+            { "name": "Sindoor", "note": "for Maa Parvati", "optional": false },
+            { "name": "Bangles", "note": "green, optional (Pratha)", "optional": true },
+            { "name": "Flowers", "note": "", "optional": false }
+          ],
+          "meta": { "groupA": "For puja", "groupB": "For shringar", "splitAt": "5" }
         },
         {
           "type": "VIDHI",
@@ -135,15 +136,16 @@
           "type": "SAMAGRI",
           "title": "क्या-क्या चाहिए",
           "samagri": [
+            { "name": "शिव-पार्वती की प्रतिमा या चित्र", "note": "आकार और सामग्री का महत्व नहीं", "optional": false },
+            { "name": "गणेश जी की प्रतिमा या चित्र", "note": "वैकल्पिक", "optional": true },
             { "name": "जल या पंचामृत", "note": "अभिषेक के लिए", "optional": false },
-            { "name": "सिंदूर", "note": "माँ पार्वती के लिए", "optional": false },
-            { "name": "चूड़ियाँ", "note": "हरी, वैकल्पिक (प्रथा)", "optional": true },
-            { "name": "फूल", "note": "", "optional": false },
             { "name": "दीपक और घी", "note": "", "optional": false },
             { "name": "धूप", "note": "", "optional": true },
-            { "name": "शिव-पार्वती की प्रतिमा या चित्र", "note": "आकार और सामग्री का महत्व नहीं", "optional": false },
-            { "name": "गणेश जी की प्रतिमा या चित्र", "note": "वैकल्पिक", "optional": true }
-          ]
+            { "name": "सिंदूर", "note": "माँ पार्वती के लिए", "optional": false },
+            { "name": "चूड़ियाँ", "note": "हरी, वैकल्पिक (प्रथा)", "optional": true },
+            { "name": "फूल", "note": "", "optional": false }
+          ],
+          "meta": { "groupA": "पूजा के लिए", "groupB": "शृंगार के लिए", "splitAt": "5" }
         },
         {
           "type": "VIDHI",

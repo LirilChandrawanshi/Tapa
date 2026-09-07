@@ -346,6 +346,26 @@ export async function ArticleView({
       case "MYTHS":
         body = <MythCards block={block} />;
         break;
+      case "KATHA":
+        // the vrat katha card — a story panel, never plain prose (PRD §5.3)
+        body = block.text ? (
+          <div className="overflow-hidden rounded-[15px] border border-border bg-card">
+            <div className="border-b border-border-light bg-pratha-bg px-5 py-3">
+              <p className="text-[10px] font-bold tracking-[0.8px] text-pratha-fg uppercase">
+                Vrat Katha — the sacred story
+              </p>
+            </div>
+            <div className="px-5 py-4">
+              <Prose text={block.text} />
+              {block.meta?.source && (
+                <p className="mt-3 text-[11.5px] font-semibold text-sub">
+                  Source: {block.meta.source}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : null;
+        break;
       default:
         body = block.text ? <Prose text={block.text} /> : null;
     }
@@ -444,7 +464,7 @@ export async function ArticleView({
       </header>
 
       {/* trust chips + audio bar */}
-      <div className="border-b border-border bg-card">
+      <div id="audio" className="scroll-mt-24 border-b border-border bg-card">
         <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-[10px] px-4 py-[11px] md:h-[56px] md:flex-row md:items-center md:gap-5 md:px-10 md:py-0">
           <div className="flex flex-wrap items-center gap-4">
             {(
