@@ -90,12 +90,30 @@ async function call<T>(
 export const requestOtp = (phone: string) =>
   call<OtpRequested>("/auth/otp/request", "POST", { phone });
 
-/** Verifies the OTP; on success the API sets the httpOnly session cookies. */
-export const verifyOtp = (phone: string, code: string) =>
-  call<{ user: AuthUser }>("/auth/otp/verify", "POST", { phone, code });
+/** Fired on sign-in/sign-out so chrome like the TopNav can refresh itself. */
+export const AUTH_EVENT = "tapa:auth-change";
 
-export const logout = () =>
-  call<{ loggedOut: boolean }>("/auth/logout", "POST");
+function announceAuthChange() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(AUTH_EVENT));
+  }
+}
+
+/** Verifies the OTP; on success the API sets the httpOnly session cookies. */
+export const verifyOtp = async (phone: string, code: string) => {
+  const result = await call<{ user: AuthUser }>("/auth/otp/verify", "POST", {
+    phone,
+    code,
+  });
+  if (result.ok) announceAuthChange();
+  return result;
+};
+
+export const logout = async () => {
+  const result = await call<{ loggedOut: boolean }>("/auth/logout", "POST");
+  if (result.ok) announceAuthChange();
+  return result;
+};
 
 /** 401/403 (result.ok === false) simply means signed out — not an error state. */
 export const getMe = () => call<Me>("/me");

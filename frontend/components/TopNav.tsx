@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LangToggle } from "@/components/LangToggle";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { MegaDropdown } from "@/components/MegaDropdown";
 import type { NavSectionKey } from "@/lib/taxonomy";
 import { TAXONOMY } from "@/lib/taxonomy";
@@ -187,12 +188,7 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
               <SearchIcon />
             </Link>
             <LangToggle className="hidden lg:flex" />
-            <Link
-              href="/sign-in"
-              className="hidden rounded-[10px] bg-cta px-5 py-[11px] text-[13.5px] font-bold whitespace-nowrap text-white lg:block"
-            >
-              Sign in
-            </Link>
+            <UserMenu variant="desktop" />
           </div>
 
           {openKey && (
@@ -303,13 +299,7 @@ export function TopNav({ kitsLaunched }: { kitsLaunched: boolean }) {
           </div>
 
           <div className="p-4">
-            <Link
-              href="/sign-in"
-              onClick={() => setDrawerOpen(false)}
-              className="mb-[9px] block w-full rounded-xl bg-cta py-[14px] text-center text-[14.5px] font-bold text-white"
-            >
-              Sign in
-            </Link>
+            <UserMenu variant="drawer" />
           </div>
           <div className="flex justify-center px-4 pb-[18px]">
             <LangToggle />

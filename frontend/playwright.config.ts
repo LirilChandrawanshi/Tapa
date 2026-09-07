@@ -40,7 +40,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npx next start -p 3100",
+    // fetch-cache is purged so a flag flipped outside the suite (its
+    // revalidation webhook only reaches :3000) can't leak stale pages in
+    command: "rm -rf .next/cache/fetch-cache && npx next start -p 3100",
     url: "http://localhost:3100",
     reuseExistingServer: false,
     timeout: 120_000,
