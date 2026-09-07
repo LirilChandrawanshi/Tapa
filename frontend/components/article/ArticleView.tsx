@@ -11,6 +11,7 @@ import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { getFlags } from "@/lib/flags";
 import { ActionBar } from "./ActionBar";
 import { ArticleAnalytics } from "./ArticleAnalytics";
+import { LangSection } from "./LangSection";
 import { LangSwap } from "./LangSwap";
 import { MantraChip } from "./MantraChip";
 import { ModeSelector } from "./ModeSelector";
@@ -827,17 +828,22 @@ export async function ArticleView({
               </div>
             )}
 
-            {/* ordered blocks */}
-            {en.blocks.map((block, i) => renderBlock(block, i))}
+            {/* ordered blocks — both languages server-rendered, toggled client-side */}
+            {hiHasBlocks ? (
+              <>
+                <LangSection lang="en">
+                  {en.blocks.map((block, i) => renderBlock(block, i))}
+                </LangSection>
+                <LangSection lang="hi">
+                  {hi!.blocks.map((block, i) => renderBlock(block, i))}
+                </LangSection>
+              </>
+            ) : (
+              en.blocks.map((block, i) => renderBlock(block, i))
+            )}
 
             {/* Circle nudge — after the last block, whatever it is (#18) */}
             <WhatsAppNudge context={nudgeContext} />
-
-            {hiHasBlocks && (
-              <p className="mt-4 text-xs text-sub italic">
-                हिंदी संस्करण उपलब्ध है — भाषा बदलने के लिए ऊपर हिं चुनें।
-              </p>
-            )}
 
             {/* Tapa intelligence layer — suppressed on beginner guides */}
             {!isBeginner && (
