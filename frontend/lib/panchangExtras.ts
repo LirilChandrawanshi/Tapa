@@ -6,7 +6,30 @@
  * page shows a "being verified" state instead of crashing the build.
  */
 
-import type { Observance, UpcomingObservance } from "./types";
+import type { Observance, PanchangDay, UpcomingObservance } from "./types";
+
+/**
+ * Fields the API now returns on observances but that predate lib/types.ts.
+ * Kept here (additive) so panchang surfaces can read them without touching
+ * the shared DTO file.
+ */
+export interface ObservanceExtras {
+  /** ISO instant the observed tithi begins, e.g. "2026-09-06T22:03:00". */
+  tithiStartsAt?: string;
+  /** ISO instant the observed tithi ends. */
+  tithiEndsAt?: string;
+  /** Amanta-convention civil date, present only for month-boundary dates. */
+  dateAmanta?: string;
+  /** One-line WhatsApp Circle teaser. */
+  circleTeaser?: string;
+}
+
+export type ObservanceX = Observance & ObservanceExtras;
+
+/** Read the additive fields off any observance without widening lib/types. */
+export function obsX(o: Observance): ObservanceX {
+  return o as ObservanceX;
+}
 
 /** Resolve a promise to null on any failure — dead backend, bad JSON, 5xx. */
 export async function safeFetch<T>(promise: Promise<T>): Promise<T | null> {
@@ -83,6 +106,83 @@ export function fmtLong(iso: string): string {
   return `${weekday(iso)}, ${fmtDate(iso)}`;
 }
 
+/** "7 Sep · 11:22 pm" from an ISO instant; date-only inputs → "7 Sep". */
+export function fmtAt(iso?: string | null): string | null {
+  if (!iso) return null;
+  const [datePart, timePart] = iso.split("T");
+  if (!timePart) return fmtShort(iso);
+  const [h, m] = timePart.split(":").map(Number);
+  if (Number.isNaN(h) || Number.isNaN(m)) return fmtShort(datePart);
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const suffix = h < 12 ? "am" : "pm";
+  return `${fmtShort(datePart)} · ${hour12}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+/** `iso` shifted by `n` calendar days, as "YYYY-MM-DD". */
+export function addDays(iso: string, n: number): string {
+  const d = asUtc(iso);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+const MONTHS_FULL = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+] as const;
+
+/** "September 2026" for a "2026-09" month key. */
+export function monthLabel(key: string): string {
+  const [y, m] = key.split("-").map(Number);
+  if (!y || !m || m < 1 || m > 12) return key;
+  return `${MONTHS_FULL[m - 1]} ${y}`;
+}
+
+/** "Sep" for a "2026-09" month key. */
+export function monthShort(key: string): string {
+  const m = Number(key.split("-")[1]);
+  return m >= 1 && m <= 12 ? MONTHS_SHORT[m - 1] : key;
+}
+
+/** "waning" / "waxing" gloss for a paksha name; null when unknown. */
+export function pakshaNote(paksha?: string | null): string | null {
+  if (!paksha) return null;
+  if (/krishna/i.test(paksha)) return "waning";
+  if (/shukla/i.test(paksha)) return "waxing";
+  return null;
+}
+
+/* ── Parana (fast-breaking) window ───────────────────────────────────── */
+
+export interface ParanaWindow {
+  /** Civil date the window falls on (the morning after the vrat). */
+  date: string;
+  from: string;
+  to: string;
+}
+
+/**
+ * Locate the parana window for a vrat on `date`.
+ * The contract puts it in the NEXT day's muhurats; seeded data carries it on
+ * the vrat day itself labelled "Parana (next day)" — accept either.
+ */
+export function findParana(
+  vratDay: PanchangDay | null | undefined,
+  nextDay: PanchangDay | null | undefined,
+  date: string,
+): ParanaWindow | null {
+  const onNext = nextDay?.muhurats?.find((m) => /parana/i.test(m.label));
+  if (onNext) return { date: addDays(date, 1), from: onNext.from, to: onNext.to };
+  const onDay = vratDay?.muhurats?.find((m) => /parana/i.test(m.label));
+  if (onDay) {
+    return {
+      date: /next\s*day/i.test(onDay.label) ? addDays(date, 1) : date,
+      from: onDay.from,
+      to: onDay.to,
+    };
+  }
+  return null;
+}
+
 /** "14–23 September 2026" or across months "26 Sep – 11 Oct 2026". */
 export function fmtRange(startIso: string, endIso?: string): string {
   if (!endIso || endIso === startIso) return fmtDate(startIso);
@@ -137,6 +237,8 @@ export const VRAT_FILTERS = [
   { key: "sawan-somwar", label: "Sawan Somwar" },
   { key: "purnima", label: "Purnima" },
   { key: "amavasya", label: "Amavasya" },
+  { key: "pradosh", label: "Pradosh" },
+  { key: "eclipse", label: "Eclipse" },
 ] as const;
 
 export type VratFilterKey = (typeof VRAT_FILTERS)[number]["key"];
@@ -156,6 +258,14 @@ export function matchesVratFilter(o: Observance, f: VratFilterKey): boolean {
       return hay.includes("purnima") || hay.includes("poornima");
     case "amavasya":
       return hay.includes("amavasya");
+    case "pradosh":
+      return hay.includes("pradosh");
+    case "eclipse":
+      return (
+        o.type === "ECLIPSE" ||
+        hay.includes("grahan") ||
+        hay.includes("eclipse")
+      );
   }
 }
 

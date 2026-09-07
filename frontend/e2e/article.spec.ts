@@ -21,7 +21,7 @@ test.describe("Sawan Somwar article", () => {
       .filter({ hasText: "SOURCE OF TRUTH" })
       .filter({ hasText: "CORE PRACTICE" })
       .last();
-    await expect(sourceCard.getByText("CORE PRACTICE")).toBeVisible();
+    await expect(sourceCard.getByText("CORE PRACTICE").first()).toBeVisible();
     await expect(
       sourceCard.getByText(/Shiva Purana/).first(),
     ).toBeVisible();

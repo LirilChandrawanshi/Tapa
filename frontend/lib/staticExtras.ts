@@ -48,9 +48,12 @@ export interface SearchPayload {
   totalCount: number;
   glossary: SearchHit[];
   guides: SearchHit[];
+  pujas: SearchHit[];
   dates: SearchHit[];
+  downloads: SearchHit[];
   kits: SearchHit[];
   didYouMean: string[];
+  relatedSearches: string[];
   popular: PopularSearch[];
 }
 
@@ -72,9 +75,12 @@ export async function searchSite(query: string): Promise<SearchPayload> {
     totalCount: d.totalCount ?? 0,
     glossary: d.glossary ?? [],
     guides: d.guides ?? [],
+    pujas: d.pujas ?? [],
     dates: d.dates ?? [],
+    downloads: d.downloads ?? [],
     kits: d.kits ?? [],
     didYouMean: d.didYouMean ?? [],
+    relatedSearches: d.relatedSearches ?? [],
     popular: d.popular ?? [],
   };
 }
@@ -157,6 +163,38 @@ export async function submitApplication(
 }
 
 /* ────────────────────────────── glossary ───────────────────────────── */
+
+/** A published article a glossary term appears in (#117). */
+export interface GlossaryAppearance {
+  slug: string;
+  title: string;
+  category: string;
+  subCategory: string;
+}
+
+/**
+ * Fetched per-entry on expand so the list payload stays light. Empty array
+ * on any failure — the chip row simply does not render.
+ */
+export async function fetchGlossaryAppearsIn(
+  slug: string,
+): Promise<GlossaryAppearance[]> {
+  try {
+    const res = await fetch(`/api/v1/glossary/${encodeURIComponent(slug)}`);
+    const body = (await res.json().catch(() => null)) as Envelope<{
+      appearsIn?: GlossaryAppearance[];
+    }> | null;
+    if (!res.ok || !body?.data) return [];
+    return body.data.appearsIn ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Route for an article a term appears in. */
+export function appearanceHref(a: GlossaryAppearance): string {
+  return `/${a.category || "ritual-guides"}/${a.subCategory || "all"}/${a.slug}`;
+}
 
 export type GlossaryCategoryFilter =
   | "all"

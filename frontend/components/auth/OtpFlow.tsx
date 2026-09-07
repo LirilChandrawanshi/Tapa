@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { track } from "@/lib/analytics";
 import {
   requestOtp,
   updateMe,
@@ -91,6 +92,7 @@ export function OtpFlow({
 
   async function sendOtp(isResend = false) {
     if (busy || !phoneValid) return;
+    if (!isResend) track("login_started", { context });
     setBusy(true);
     setError(null);
     const res = await requestOtp(`+91${phone}`);
@@ -126,6 +128,7 @@ export function OtpFlow({
         return;
       }
       const verified = res.data.user;
+      track("login_completed", { context, isNew: verified.isNew });
       setUser(verified);
       if (verified.isNew) {
         setName(verified.name);
@@ -134,7 +137,7 @@ export function OtpFlow({
         onSuccess(verified);
       }
     },
-    [busy, phone, onSuccess],
+    [busy, phone, context, onSuccess],
   );
 
   function setDigit(index: number, raw: string) {
@@ -188,7 +191,10 @@ export function OtpFlow({
     onDismiss !== undefined ? (
       <button
         type="button"
-        onClick={onDismiss}
+        onClick={() => {
+          track("login_skipped", { context, step });
+          onDismiss();
+        }}
         className="mt-3 w-full py-2 text-center text-[13px] font-semibold text-sub hover:text-body"
       >
         {dismissLabel ?? DISMISS_LABELS[context]}
@@ -245,6 +251,10 @@ export function OtpFlow({
             />
           </div>
 
+          <p className="mt-2 text-[11.5px] text-sub">
+            We&rsquo;ll send a 6-digit code to verify.
+          </p>
+
           {errorLine}
 
           <button
@@ -274,7 +284,8 @@ export function OtpFlow({
           Enter the 6-digit code
         </h2>
         <p className="mt-1 text-[13px] text-sub">
-          Sent to <b className="text-body">+91 {phone}</b> ·{" "}
+          Code sent to{" "}
+          <b className="text-body">+91 XXXXX X{phone.slice(6)}</b> ·{" "}
           <button
             type="button"
             onClick={() => {
@@ -316,7 +327,7 @@ export function OtpFlow({
           onClick={() => void verify(digits.join(""))}
           className={`mt-4 ${primaryBtn}`}
         >
-          {busy ? "Checking…" : "Verify"}
+          {busy ? "Checking…" : context === "save" ? "Verify & save" : "Verify"}
         </button>
 
         <p className="mt-3 text-center text-[12.5px] text-sub">

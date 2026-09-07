@@ -18,18 +18,24 @@ public final class SearchModels {
                       String hueClass, String badge) {
         public static final String TYPE_GLOSSARY = "glossary";
         public static final String TYPE_GUIDE = "guide";
+        public static final String TYPE_PUJA = "puja";
         public static final String TYPE_DATE = "date";
+        public static final String TYPE_DOWNLOAD = "download";
         public static final String TYPE_KIT = "kit";
     }
 
     /**
      * Grouped response. Hard ranking rule (PRD): glossary definition first,
-     * then guides, then dates, then kits — knowledge before commerce.
+     * then guides, then bookable pujas, then dates, then downloads, then
+     * kits — knowledge first, commerce last. The two commerce groups
+     * (pujas, kits) are flag-gated and empty until their surface is live.
      */
     public record SearchResponse(String query, int totalCount,
                                  List<Hit> glossary, List<Hit> guides,
-                                 List<Hit> dates, List<Hit> kits,
-                                 List<String> didYouMean, List<PopularSearch> popular) {
+                                 List<Hit> pujas, List<Hit> dates,
+                                 List<Hit> downloads, List<Hit> kits,
+                                 List<String> didYouMean, List<String> relatedSearches,
+                                 List<PopularSearch> popular) {
     }
 
     /** Every query is logged; zero-result queries are an editorial backlog signal. */

@@ -9,7 +9,9 @@ export function generateStaticParams(): { category: string }[] {
   return [];
 }
 
-type Params = { params: Promise<{ category: string }> };
+type Params = {
+  params: Promise<{ category: string }>;
+};
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { category } = await params;
@@ -18,9 +20,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-export default async function DharmicConceptsCategoryPage({ params }: Params) {
+export default async function DharmicConceptsCategoryPage({
+  params,
+}: Params) {
   const { category } = await params;
   return (
-    <SubCategoryListing sectionKey="dharmic-concepts" subCategory={category} />
+    <SubCategoryListing
+      sectionKey="dharmic-concepts"
+      subCategory={category}
+    />
   );
 }

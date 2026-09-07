@@ -6,14 +6,14 @@ import {
   TimingDataTag,
   VerifyingPanel,
 } from "@/components/panchang/DataMeta";
+import {
+  PdfDownloadLink,
+  StickyDownloadBar,
+} from "@/components/panchang/PanchangControls";
+import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
 import { VratList } from "@/components/panchang/VratList";
 import { fetchUpcoming } from "@/lib/api";
-import {
-  CALENDAR_PDF_HREF,
-  CITY_LABEL,
-  safeFetch,
-  todayIst,
-} from "@/lib/panchangExtras";
+import { CITY_LABEL, safeFetch, todayIst } from "@/lib/panchangExtras";
 
 export const revalidate = 900; // ISR — purged via the `panchang` tag
 
@@ -64,6 +64,8 @@ export default async function VratCalendarPage() {
         }
       />
 
+      <PanchangSubnav active="vrat" />
+
       <div className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 md:px-10">
           <TimingDataTag />
@@ -95,14 +97,17 @@ export default async function VratCalendarPage() {
               forward.
             </p>
           </div>
-          <a
-            href={CALENDAR_PDF_HREF}
+          <PdfDownloadLink
+            surface="vrat-calendar-band"
             className="shrink-0 rounded-[9px] bg-cta px-4 py-2 text-[12.5px] font-bold text-white"
           >
             Download full 2026 calendar
-          </a>
+          </PdfDownloadLink>
         </div>
       </div>
+
+      {/* Sticky mini download bar (#84) */}
+      <StickyDownloadBar />
     </main>
   );
 }

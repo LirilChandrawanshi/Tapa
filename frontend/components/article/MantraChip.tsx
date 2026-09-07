@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { track } from "@/lib/analytics";
+import { mediaUrl } from "@/lib/media";
 import type { Mantra } from "@/lib/types";
 
 interface JapaState {
@@ -20,6 +22,15 @@ export function MantraChip({ slug, mantra }: { slug: string; mantra: Mantra }) {
     count: 0,
     target: mantra.defaultCount || presets[presets.length - 1],
   });
+  const [listening, setListening] = useState(false);
+  const chantStarted = useRef(false);
+  const mantraAudioId = mantra.audioEnMediaId ?? mantra.audioHiMediaId;
+
+  function markChantStarted(via: string) {
+    if (chantStarted.current) return;
+    chantStarted.current = true;
+    track("mantra_chant_started", { slug, via });
+  }
 
   useEffect(() => {
     try {
@@ -48,9 +59,17 @@ export function MantraChip({ slug, mantra }: { slug: string; mantra: Mantra }) {
     }
   }
 
-  const dec = () => update({ ...state, count: Math.max(0, state.count - 1) });
-  const inc = () =>
-    update({ ...state, count: Math.min(state.target, state.count + 1) });
+  const dec = () => {
+    const next = { ...state, count: Math.max(0, state.count - 1) };
+    update(next);
+    track("mantra_count_updated", { slug, count: next.count, target: next.target });
+  };
+  const inc = () => {
+    markChantStarted("counter");
+    const next = { ...state, count: Math.min(state.target, state.count + 1) };
+    update(next);
+    track("mantra_count_updated", { slug, count: next.count, target: next.target });
+  };
   const pick = (target: number) =>
     update({ target, count: Math.min(state.count, target) });
 
@@ -69,6 +88,33 @@ export function MantraChip({ slug, mantra }: { slug: string; mantra: Mantra }) {
         {mantra.transliteration}
         {mantra.meaning ? ` — "${mantra.meaning}"` : ""}
       </p>
+
+      {mantraAudioId && (
+        <div className="mt-3">
+          {listening ? (
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <audio
+              src={mediaUrl(mantraAudioId)}
+              controls
+              autoPlay
+              preload="metadata"
+              className="h-9 w-full"
+              onPlay={() => markChantStarted("audio")}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                markChantStarted("audio");
+                setListening(true);
+              }}
+              className="rounded-[9px] border-[1.5px] border-white/20 bg-white/5 px-[13px] py-[7px] text-[12.5px] font-semibold text-amber hover:border-amber"
+            >
+              ▶ Listen &amp; chant
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="mt-[14px] flex flex-wrap items-center gap-3 border-t border-white/10 pt-[14px]">
         <div>

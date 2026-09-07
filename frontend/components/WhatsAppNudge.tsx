@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { track } from "@/lib/analytics";
 
 const IMPRESSIONS_KEY = "tapa-nudge-impressions";
 const JOINED_KEY = "tapa-circle-joined";
@@ -63,16 +64,19 @@ export function WhatsAppNudge({
       }
       const seen = Number(localStorage.getItem(IMPRESSIONS_KEY) ?? "0");
       if (!Number.isFinite(seen) || seen >= MAX_IMPRESSIONS) {
+        track("wa_nudge_suppressed", { context, impressions: seen });
         setVisible(false);
         return;
       }
       localStorage.setItem(IMPRESSIONS_KEY, String(seen + 1));
+      track("wa_nudge_impressed", { context, impression: seen + 1 });
       setVisible(true);
     } catch {
       // storage unavailable — show it, nothing to count against
+      track("wa_nudge_impressed", { context });
       setVisible(true);
     }
-  }, []);
+  }, [context]);
 
   if (!visible) return null;
 
@@ -94,6 +98,7 @@ export function WhatsAppNudge({
       </div>
       <Link
         href={joinHref}
+        onClick={() => track("wa_nudge_clicked", { context, from: pathname })}
         className="shrink-0 rounded-[10px] bg-wa px-4 py-[10px] text-[12.5px] font-bold whitespace-nowrap text-white"
       >
         Join the Tapa Circle ›

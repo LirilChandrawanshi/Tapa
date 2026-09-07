@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CategoryHero } from "@/components/CategoryHero";
 import { TimingDataTag } from "@/components/panchang/DataMeta";
+import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
 
 export const metadata: Metadata = {
   title: "Tithi & Paksha — How the Lunar Day Works | Tapa Panchang",
@@ -44,6 +45,8 @@ export default function TithiPakshaPage() {
           </div>
         }
       />
+
+      <PanchangSubnav />
 
       <div className="mx-auto max-w-[760px] px-4 pt-8 md:px-10">
         <TimingDataTag className="mb-6" />

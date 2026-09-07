@@ -5,6 +5,8 @@ import Link from "next/link";
 const ASSURANCES = [
   "Saved rituals are safe",
   "Reminders still scheduled",
+  "Your cart is intact",
+  "No payment was taken — if you were placing an order, check Order history before retrying",
   "Nothing you were doing has been lost",
 ] as const;
 

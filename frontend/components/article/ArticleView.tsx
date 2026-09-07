@@ -3,24 +3,40 @@ import type { ReactNode } from "react";
 import { ContentCard } from "@/components/ContentCard";
 import { DpbBadge } from "@/components/DpbBadge";
 import { LangToggle } from "@/components/LangToggle";
+import { AudioPlayer } from "@/components/media/AudioPlayer";
+import { SmartImage } from "@/components/media/SmartImage";
 import { Pill } from "@/components/Pill";
 import { SectionHeader } from "@/components/SectionHeader";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
+import { getFlags } from "@/lib/flags";
+import { ActionBar } from "./ActionBar";
+import { ArticleAnalytics } from "./ArticleAnalytics";
 import { LangSwap } from "./LangSwap";
 import { MantraChip } from "./MantraChip";
+import { ModeSelector } from "./ModeSelector";
 import { SamagriChecklist } from "./SamagriChecklist";
 import { SaveShareButtons } from "./SaveShareButtons";
+import { TrackedDetails } from "./TrackedDetails";
 import {
   anchorId,
   articleHref,
   collectTaggedSteps,
+  compositionCounts,
   dpbTagOf,
+  fetchCorrectionsSafe,
   fetchObservanceSafe,
+  fetchPanchangDaySafe,
   fetchRelatedSafe,
   formatObservanceDate,
+  formatTithiInstant,
   hueFromClass,
+  isEkadashiGuide,
+  isFutureObservance,
+  kitLinkedSlugOf,
+  observanceTithiOf,
   subCategoryLabel,
   titleizeSlug,
+  weekdayOf,
 } from "@/lib/articleExtras";
 import type { Article, Block, Dpb } from "@/lib/types";
 import type { NavSectionKey } from "@/lib/taxonomy";
@@ -91,8 +107,14 @@ function SankalpaCard({ block }: { block: Block }) {
   if (!s) return null;
   return (
     <div className="my-2 overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="border-b border-pratha-bd bg-pratha-bg px-5 py-[13px] text-[11px] font-bold tracking-[0.4px] text-pratha-fg uppercase">
-        Spoken with water in the right hand, then poured out
+      {/* G29 — permission-first label; the water instruction is the sub-note */}
+      <div className="border-b border-pratha-bd bg-pratha-bg px-5 py-[13px]">
+        <p className="text-[11px] font-bold tracking-[0.4px] text-pratha-fg uppercase">
+          Say this — or your own words
+        </p>
+        <p className="mt-[2px] text-[11.5px] text-pratha-fg/80">
+          Spoken with water in the right hand, then poured out
+        </p>
       </div>
       <div className="px-5 py-5">
         <p className="font-devanagari mb-[11px] text-[19px] leading-[1.85] text-pratha-fg">
@@ -114,7 +136,13 @@ function SankalpaCard({ block }: { block: Block }) {
   );
 }
 
-function VidhiSteps({ block }: { block: Block }) {
+function VidhiSteps({
+  block,
+  showPills,
+}: {
+  block: Block;
+  showPills: boolean;
+}) {
   const steps = block.steps ?? [];
   return (
     <div>
@@ -158,7 +186,7 @@ function VidhiSteps({ block }: { block: Block }) {
                   </span>
                 </span>
               )}
-              {step.dpb && (
+              {showPills && step.dpb && (
                 <div className="mt-2 flex flex-wrap gap-[7px]">
                   <DpbPill dpb={step.dpb} />
                   {step.dpb.sourceName && (
@@ -230,6 +258,42 @@ function MythCards({ block }: { block: Block }) {
   );
 }
 
+/** #64 — QA block: an accordion of question/answer pairs. */
+function QaAccordion({ block }: { block: Block }) {
+  const pairs = block.myths ?? [];
+  return (
+    <div className="flex flex-col gap-[10px]">
+      {pairs.map((qa, i) => (
+        <details
+          key={i}
+          className="group overflow-hidden rounded-[13px] border border-border bg-card"
+        >
+          <summary className="flex cursor-pointer list-none items-center gap-[11px] px-[17px] py-[13px] hover:bg-[#FCFAF6] [&::-webkit-details-marker]:hidden">
+            <span
+              aria-hidden
+              className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-pratha-bg text-[12px] font-bold text-pratha-fg"
+            >
+              ?
+            </span>
+            <span className="flex-1 text-sm leading-[1.6] font-semibold text-ink">
+              {qa.question}
+            </span>
+            <span
+              aria-hidden
+              className="shrink-0 text-sub transition-transform group-open:rotate-180"
+            >
+              ⌄
+            </span>
+          </summary>
+          <p className="border-t border-border-light px-[17px] py-[13px] text-sm leading-[1.82]">
+            {qa.answer}
+          </p>
+        </details>
+      ))}
+    </div>
+  );
+}
+
 /* ── the article template ─────────────────────────────────────── */
 
 export async function ArticleView({
@@ -252,13 +316,34 @@ export async function ArticleView({
     : sectionHref;
   const coreLabel =
     article.type === "DHARMIC_CONCEPT" ? "CORE CLAIM" : "CORE PRACTICE";
+  const isBeginner = article.type === "BEGINNER_GUIDE";
+  const nudgeContext =
+    article.type === "DHARMIC_CONCEPT" ? "article-concept" : "article-vrat";
 
-  const observance = article.linkedObservanceSlug
-    ? await fetchObservanceSafe(article.linkedObservanceSlug)
-    : null;
-  const related = article.relatedSlugs?.length
-    ? await fetchRelatedSafe(article.relatedSlugs)
-    : [];
+  const [observance, related, corrections, flags, panchangDay] =
+    await Promise.all([
+      article.linkedObservanceSlug
+        ? fetchObservanceSafe(article.linkedObservanceSlug)
+        : Promise.resolve(null),
+      article.relatedSlugs?.length
+        ? fetchRelatedSafe(article.relatedSlugs)
+        : Promise.resolve([]),
+      fetchCorrectionsSafe(article.slug),
+      getFlags(),
+      article.observanceDate
+        ? fetchPanchangDaySafe(article.observanceDate)
+        : Promise.resolve(null),
+    ]);
+
+  const kitSlug = kitLinkedSlugOf(article);
+  const ekadashi = isEkadashiGuide(article, observance);
+  const tithi = observance ? observanceTithiOf(observance) : {};
+  const paranaMuhurat = ekadashi
+    ? panchangDay?.muhurats?.find((m) =>
+        m.label.toLowerCase().includes("parana"),
+      )
+    : undefined;
+  const counts = compositionCounts(article);
 
   const datelineParts = [
     formatObservanceDate(article.observanceDate),
@@ -272,7 +357,21 @@ export async function ArticleView({
   const taggedSteps = collectTaggedSteps(article);
   const mythsBlock = en.blocks.find((b) => b.type === "MYTHS");
   const vidhiBlock = en.blocks.find((b) => b.type === "VIDHI");
+  const samagriIndex = en.blocks.findIndex((b) => b.type === "SAMAGRI");
+  const samagriBlock = samagriIndex >= 0 ? en.blocks[samagriIndex] : undefined;
+  const samagriAnchor = samagriBlock
+    ? samagriBlock.title
+      ? anchorId(samagriBlock.title)
+      : `section-${samagriIndex}`
+    : null;
   const pdfHref = `/api/v1/cards/${article.slug}.pdf`;
+
+  const relGuides = related.filter(
+    (r) => !r.article || r.article.type !== "DHARMIC_CONCEPT",
+  );
+  const relConcepts = related.filter(
+    (r) => r.article?.type === "DHARMIC_CONCEPT",
+  );
 
   /* JSON-LD: Article + FAQPage (myths) + HowTo (vidhi) */
   const jsonLd: Record<string, unknown>[] = [
@@ -333,7 +432,7 @@ export async function ArticleView({
         );
         break;
       case "VIDHI":
-        body = <VidhiSteps block={block} />;
+        body = <VidhiSteps block={block} showPills={!isBeginner} />;
         break;
       case "MANTRA":
         body = block.mantra ? (
@@ -346,6 +445,9 @@ export async function ArticleView({
       case "MYTHS":
         body = <MythCards block={block} />;
         break;
+      case "QA":
+        body = <QaAccordion block={block} />;
+        break;
       case "KATHA":
         // the vrat katha card — a story panel, never plain prose (PRD §5.3)
         body = block.text ? (
@@ -357,6 +459,13 @@ export async function ArticleView({
             </div>
             <div className="px-5 py-4">
               <Prose text={block.text} />
+              {block.meta?.audioId && (
+                <AudioPlayer
+                  enId={block.meta.audioId}
+                  label="🎧 Listen — the katha, read aloud"
+                  className="mt-3"
+                />
+              )}
               {block.meta?.source && (
                 <p className="mt-3 text-[11.5px] font-semibold text-sub">
                   Source: {block.meta.source}
@@ -373,11 +482,77 @@ export async function ArticleView({
       <section key={`${block.type}-${index}`}>
         {block.title && <SectionTitle id={id} title={block.title} />}
         {body}
-        {block.type === "MYTHS" && (
-          <WhatsAppNudge copy="Never miss this vrat again." />
-        )}
       </section>
     );
+  }
+
+  function relatedCard({
+    slug,
+    article: rel,
+  }: {
+    slug: string;
+    article: Article | null;
+  }): ReactNode {
+    return rel ? (
+      <ContentCard
+        key={slug}
+        hue={hueFromClass(rel.hueClass)}
+        href={articleHref(rel)}
+        title={rel.lang.en.title}
+        meta={formatObservanceDate(rel.observanceDate)}
+        summary={rel.lang.en.deck ?? rel.lang.en.heroSubtitle ?? ""}
+        pills={
+          rel.dpb ? (
+            <DpbBadge
+              tag={dpbTagOf(rel.dpb)}
+              score={rel.dpb.confidenceScore}
+              source={rel.dpb.sourceClass}
+            />
+          ) : undefined
+        }
+        readTime={rel.readMinutes ? `${rel.readMinutes} min` : undefined}
+      />
+    ) : (
+      <ContentCard
+        key={slug}
+        hue="gold"
+        href={`${subHref}/${slug}`}
+        title={titleizeSlug(slug)}
+        summary="Guide — opens in this collection."
+      />
+    );
+  }
+
+  /* Dates & parana strip tiles (#59) — omit any tile whose data is missing */
+  const dateTiles: { label: string; value: string; sub?: string }[] = [];
+  if (article.observanceDate) {
+    dateTiles.push({
+      label: "DATE",
+      value: formatObservanceDate(article.observanceDate),
+      sub: weekdayOf(article.observanceDate),
+    });
+    if (observance?.tithiLabel) {
+      dateTiles.push({
+        label: "TITHI",
+        value: observance.tithiLabel,
+        sub: tithi.startsAt
+          ? `starts ${formatTithiInstant(tithi.startsAt)}`
+          : undefined,
+      });
+    }
+    if (tithi.endsAt) {
+      dateTiles.push({
+        label: "TITHI ENDS",
+        value: formatTithiInstant(tithi.endsAt),
+      });
+    }
+    if (paranaMuhurat) {
+      dateTiles.push({
+        label: "PARANA",
+        value: `${paranaMuhurat.from}–${paranaMuhurat.to}`,
+        sub: paranaMuhurat.label,
+      });
+    }
   }
 
   return (
@@ -386,8 +561,9 @@ export async function ArticleView({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <ArticleAnalytics slug={article.slug} type={article.type} />
 
-      {/* breadcrumb + lang + save/share */}
+      {/* breadcrumb + lang + save/share (all breakpoints) */}
       <div className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-4 py-[7px] md:px-10">
           <nav
@@ -414,12 +590,24 @@ export async function ArticleView({
           </nav>
           <div className="flex shrink-0 items-center gap-2">
             <LangToggle />
-            <span className="hidden gap-2 sm:flex">
-              <SaveShareButtons slug={article.slug} title={en.title} />
-            </span>
+            <SaveShareButtons slug={article.slug} title={en.title} />
           </div>
         </div>
       </div>
+
+      {/* hero image band (G6) — only when an asset exists; the hue-gradient
+          hero below stays as the fallback either way */}
+      {article.heroImageId && (
+        <div className="w-full">
+          <SmartImage
+            id={article.heroImageId}
+            alt={en.title}
+            hueClass={article.hueClass}
+            aspect="1280 / 380"
+            className="max-h-[380px] rounded-none!"
+          />
+        </div>
+      )}
 
       {/* hero */}
       <header
@@ -435,7 +623,7 @@ export async function ArticleView({
               {sectionLabel}
               {subLabel ? ` · ${subLabel}` : ""}
             </p>
-            {article.dpb && (
+            {!isBeginner && article.dpb && (
               <DpbBadge
                 tag={dpbTagOf(article.dpb)}
                 score={article.dpb.confidenceScore}
@@ -463,9 +651,19 @@ export async function ArticleView({
         </div>
       </header>
 
-      {/* trust chips + audio bar */}
+      {/* utility action bar (G17) — between hero and content, all viewports */}
+      <ActionBar
+        slug={article.slug}
+        title={en.title}
+        pdfHref={pdfHref}
+        kitSlug={kitSlug}
+        purohitVisible={flags.purohit_tab_visible}
+        remindEligible={isFutureObservance(article.observanceDate)}
+      />
+
+      {/* trust chips + audio guide (G20) */}
       <div id="audio" className="scroll-mt-24 border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-[10px] px-4 py-[11px] md:h-[56px] md:flex-row md:items-center md:gap-5 md:px-10 md:py-0">
+        <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-[10px] px-4 py-[11px] md:flex-row md:items-center md:gap-5 md:px-10">
           <div className="flex flex-wrap items-center gap-4">
             {(
               [
@@ -487,28 +685,12 @@ export async function ArticleView({
               </span>
             ))}
           </div>
-          <div className="flex shrink-0 items-center gap-[11px] rounded-[10px] bg-ink-deep px-[14px] py-[9px]">
-            <button
-              type="button"
-              disabled={!en.audioGuideMediaId}
-              aria-label="Play audio guide"
-              className={`flex size-6 items-center justify-center rounded-full text-[11px] text-white ${
-                en.audioGuideMediaId
-                  ? "bg-cta"
-                  : "cursor-not-allowed bg-white/15"
-              }`}
-            >
-              ▶
-            </button>
-            <div>
-              <p className="text-[11.5px] leading-tight font-semibold text-white">
-                Listen to this guide
-              </p>
-              <p className="text-[11px] leading-tight text-[#7A6A55]">
-                {en.audioGuideMediaId ? "EN/हिं" : "Audio coming soon · EN/हिं"}
-              </p>
-            </div>
-          </div>
+          <AudioPlayer
+            enId={en.audioGuideMediaId}
+            hiId={hi?.audioGuideMediaId}
+            label="Listen to this guide"
+            className="shrink-0 md:w-[360px]"
+          />
         </div>
       </div>
 
@@ -539,8 +721,57 @@ export async function ArticleView({
       <div className="mx-auto max-w-[1280px] px-4 pt-7 md:px-10">
         <div className="grid items-start gap-11 lg:grid-cols-[minmax(0,1fr)_330px]">
           <main className="max-w-[740px] min-w-0">
-            {/* source-of-truth card */}
-            {article.dpb && (
+            {/* mode selector (G18) — intent signal only, never filters */}
+            <ModeSelector slug={article.slug} />
+
+            {/* dates & parana strip (#59) */}
+            {dateTiles.length > 0 && (
+              <div className="mb-6">
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                  {dateTiles.map((tile) => (
+                    <div
+                      key={tile.label}
+                      className={`rounded-[13px] border px-[14px] py-[12px] ${
+                        tile.label === "PARANA"
+                          ? "border-dharma-bd bg-dharma-bg"
+                          : "border-border bg-card"
+                      }`}
+                    >
+                      <p className="mb-[3px] text-[10px] font-bold tracking-[0.6px] text-gold">
+                        {tile.label}
+                      </p>
+                      <p className="text-[13.5px] leading-[1.4] font-bold text-ink">
+                        {tile.value}
+                      </p>
+                      {tile.sub && (
+                        <p className="mt-[2px] text-[11.5px] text-sub">
+                          {tile.sub}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {ekadashi && (
+                  <p className="mt-2 text-[12.5px] leading-[1.7] text-sub italic">
+                    The parana window is the only timing that matters here.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* beginner meta strip (#73) */}
+            {isBeginner && (
+              <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[13px] border border-dharma-bd bg-dharma-bg px-[17px] py-[13px] text-[13px] font-semibold text-dharma-fg">
+                <span>📖 No prior reading needed</span>
+                <span>🕉 No Sanskrit required</span>
+                {article.readMinutes && (
+                  <span>⏱ {article.readMinutes} min read</span>
+                )}
+              </div>
+            )}
+
+            {/* source-of-truth card — suppressed on beginner guides (#73) */}
+            {!isBeginner && article.dpb && (
               <div className="mb-6 overflow-hidden rounded-2xl border border-border bg-card">
                 <div className="flex items-center justify-between border-b border-border-light px-5 py-3">
                   <span className="text-[11px] font-bold tracking-[0.6px] text-sub">
@@ -577,6 +808,15 @@ export async function ArticleView({
                     {article.dpb.confidenceNote}
                   </p>
                 )}
+                {/* composition counter (#58) */}
+                <p className="border-t border-border-light px-5 py-3 text-[12.5px] leading-[1.7] text-sub">
+                  This guide: <b className="text-ink">1 core practice</b> ·{" "}
+                  {counts.scriptural} scriptural element
+                  {counts.scriptural === 1 ? "" : "s"} · {counts.regional}{" "}
+                  regional custom{counts.regional === 1 ? "" : "s"} ·{" "}
+                  {counts.corrections} correction
+                  {counts.corrections === 1 ? "" : "s"}
+                </p>
               </div>
             )}
 
@@ -589,132 +829,275 @@ export async function ArticleView({
 
             {/* ordered blocks */}
             {en.blocks.map((block, i) => renderBlock(block, i))}
+
+            {/* Circle nudge — after the last block, whatever it is (#18) */}
+            <WhatsAppNudge context={nudgeContext} />
+
             {hiHasBlocks && (
               <p className="mt-4 text-xs text-sub italic">
                 हिंदी संस्करण उपलब्ध है — भाषा बदलने के लिए ऊपर हिं चुनें।
               </p>
             )}
 
-            {/* Tapa intelligence layer */}
-            <details className="group mt-8 overflow-hidden rounded-r-[14px] border border-border border-l-[3px] border-l-amber bg-card">
-              <summary className="cursor-pointer list-none px-5 py-4 [&::-webkit-details-marker]:hidden">
-                <span className="mb-1 block text-[11px] font-bold tracking-[0.6px] text-gold">
-                  ◗ TAPA INTELLIGENCE LAYER
-                </span>
-                <span className="block text-[15.5px] font-bold text-ink">
-                  Every claim on this page, classified and scored
-                </span>
-                <span className="mt-1 block text-[12.5px] text-sub group-open:hidden">
-                  Expand the full Dharma / Pratha / Bhranti table ›
-                </span>
-              </summary>
-              <div className="overflow-x-auto border-t border-border-light">
-                <table className="w-full min-w-[560px] text-left text-[12.5px]">
-                  <thead>
-                    <tr className="bg-bg text-[11px] tracking-[0.5px] text-sub">
-                      <th className="px-5 py-[9px] font-bold">ELEMENT</th>
-                      <th className="px-3 py-[9px] font-bold">TAG</th>
-                      <th className="px-3 py-[9px] font-bold">SOURCE</th>
-                      <th className="px-5 py-[9px] text-right font-bold">
-                        SCORE
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {article.dpb && (
-                      <tr className="border-t border-border-light">
-                        <td className="px-5 py-[10px] font-semibold text-ink">
-                          {coreLabel === "CORE CLAIM"
-                            ? "Core claim"
-                            : "Core practice"}{" "}
-                          (this guide)
-                        </td>
-                        <td className="px-3 py-[10px]">
-                          <DpbPill dpb={article.dpb} />
-                        </td>
-                        <td className="px-3 py-[10px] text-sub">
-                          {[article.dpb.sourceName, article.dpb.sourceRef]
-                            .filter(Boolean)
-                            .join(" · ") || "—"}
-                        </td>
-                        <td className="px-5 py-[10px] text-right text-sub">
-                          {typeof article.dpb.confidenceScore === "number"
-                            ? `${article.dpb.confidenceScore}/5`
-                            : "—"}
-                        </td>
+            {/* Tapa intelligence layer — suppressed on beginner guides */}
+            {!isBeginner && (
+              <TrackedDetails
+                slug={article.slug}
+                className="group mt-8 overflow-hidden rounded-r-[14px] border border-border border-l-[3px] border-l-amber bg-card"
+              >
+                <summary className="cursor-pointer list-none px-5 py-4 [&::-webkit-details-marker]:hidden">
+                  <span className="mb-1 block text-[11px] font-bold tracking-[0.6px] text-gold">
+                    ◗ TAPA INTELLIGENCE LAYER
+                  </span>
+                  <span className="block text-[15.5px] font-bold text-ink">
+                    Every claim on this page, classified and scored
+                  </span>
+                  <span className="mt-1 block text-[12.5px] text-sub group-open:hidden">
+                    Expand the full Dharma / Pratha / Bhranti table ›
+                  </span>
+                </summary>
+                <div className="overflow-x-auto border-t border-border-light">
+                  <table className="w-full min-w-[560px] text-left text-[12.5px]">
+                    <thead>
+                      <tr className="bg-bg text-[11px] tracking-[0.5px] text-sub">
+                        <th className="px-5 py-[9px] font-bold">ELEMENT</th>
+                        <th className="px-3 py-[9px] font-bold">TAG</th>
+                        <th className="px-3 py-[9px] font-bold">SOURCE</th>
+                        <th className="px-5 py-[9px] text-right font-bold">
+                          SCORE
+                        </th>
                       </tr>
-                    )}
-                    {taggedSteps.map(({ step, dpb }) => (
-                      <tr
-                        key={step.number}
-                        className="border-t border-border-light"
-                      >
-                        <td className="px-5 py-[10px] text-ink">
-                          Step {step.number} — {step.title}
-                        </td>
-                        <td className="px-3 py-[10px]">
-                          <DpbPill dpb={dpb} />
-                        </td>
-                        <td className="px-3 py-[10px] text-sub">
-                          {dpb.sourceName ?? dpb.prathaScope ?? "—"}
-                        </td>
-                        <td className="px-5 py-[10px] text-right text-sub">
-                          {typeof dpb.confidenceScore === "number"
-                            ? `${dpb.confidenceScore}/5`
-                            : "—"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </details>
-
-            {/* related guides */}
-            {related.length > 0 && (
-              <div className="mt-10 mb-12">
-                <SectionHeader
-                  eyebrow="Keep reading"
-                  title="Related guides"
-                />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {related.map(({ slug, article: rel }) =>
-                    rel ? (
-                      <ContentCard
-                        key={slug}
-                        hue={hueFromClass(rel.hueClass)}
-                        href={articleHref(rel)}
-                        title={rel.lang.en.title}
-                        meta={formatObservanceDate(rel.observanceDate)}
-                        summary={
-                          rel.lang.en.deck ?? rel.lang.en.heroSubtitle ?? ""
-                        }
-                        pills={
-                          rel.dpb ? (
-                            <DpbBadge
-                              tag={dpbTagOf(rel.dpb)}
-                              score={rel.dpb.confidenceScore}
-                              source={rel.dpb.sourceClass}
-                            />
-                          ) : undefined
-                        }
-                        readTime={
-                          rel.readMinutes ? `${rel.readMinutes} min` : undefined
-                        }
-                      />
-                    ) : (
-                      <ContentCard
-                        key={slug}
-                        hue="gold"
-                        href={`${subHref}/${slug}`}
-                        title={titleizeSlug(slug)}
-                        summary="Guide — opens in this collection."
-                      />
-                    ),
-                  )}
+                    </thead>
+                    <tbody>
+                      {article.dpb && (
+                        <tr className="border-t border-border-light">
+                          <td className="px-5 py-[10px] font-semibold text-ink">
+                            {coreLabel === "CORE CLAIM"
+                              ? "Core claim"
+                              : "Core practice"}{" "}
+                            (this guide)
+                          </td>
+                          <td className="px-3 py-[10px]">
+                            <DpbPill dpb={article.dpb} />
+                          </td>
+                          <td className="px-3 py-[10px] text-sub">
+                            {[article.dpb.sourceName, article.dpb.sourceRef]
+                              .filter(Boolean)
+                              .join(" · ") || "—"}
+                          </td>
+                          <td className="px-5 py-[10px] text-right text-sub">
+                            {typeof article.dpb.confidenceScore === "number"
+                              ? `${article.dpb.confidenceScore}/5`
+                              : "—"}
+                          </td>
+                        </tr>
+                      )}
+                      {taggedSteps.map(({ step, dpb }) => (
+                        <tr
+                          key={step.number}
+                          className="border-t border-border-light"
+                        >
+                          <td className="px-5 py-[10px] text-ink">
+                            Step {step.number} — {step.title}
+                          </td>
+                          <td className="px-3 py-[10px]">
+                            <DpbPill dpb={dpb} />
+                          </td>
+                          <td className="px-3 py-[10px] text-sub">
+                            {dpb.sourceName ?? dpb.prathaScope ?? "—"}
+                          </td>
+                          <td className="px-5 py-[10px] text-right text-sub">
+                            {typeof dpb.confidenceScore === "number"
+                              ? `${dpb.confidenceScore}/5`
+                              : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+              </TrackedDetails>
+            )}
+
+            {/* corrections log (#71/#134) — only when something was fixed */}
+            {corrections.length > 0 && (
+              <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card">
+                <div className="border-b border-border-light px-5 py-3 text-[11px] font-bold tracking-[0.6px] text-sub">
+                  CORRECTIONS — DATED
+                </div>
+                <ul>
+                  {corrections.map((c, i) => (
+                    <li
+                      key={i}
+                      className="border-b border-border-light px-5 py-3 text-[13px] leading-[1.75] last:border-b-0"
+                    >
+                      {c.date && (
+                        <b className="mr-2 text-ink">
+                          {formatObservanceDate(c.date)}
+                        </b>
+                      )}
+                      <span className="text-body">{c.note}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="border-t border-border-light bg-[#FCFAF6] px-5 py-3 text-[12px] text-sub">
+                  Spotted something off?{" "}
+                  <Link
+                    href="/report-correction"
+                    className="font-bold text-cta"
+                  >
+                    Report a correction ›
+                  </Link>
+                </p>
               </div>
             )}
+
+            {/* related — grouped by what they are (#66) */}
+            {(related.length > 0 || article.linkedObservanceSlug) && (
+              <div className="mt-10 mb-4">
+                <SectionHeader eyebrow="Keep reading" title="Related" />
+                {relGuides.length > 0 && (
+                  <div className="mb-6">
+                    <p className="mb-3 text-[11px] font-bold tracking-[0.7px] text-gold">
+                      RELATED RITUAL GUIDES
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {relGuides.map(relatedCard)}
+                    </div>
+                  </div>
+                )}
+                {relConcepts.length > 0 && (
+                  <div className="mb-6">
+                    <p className="mb-3 text-[11px] font-bold tracking-[0.7px] text-gold">
+                      RELATED CONCEPTS
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {relConcepts.map(relatedCard)}
+                    </div>
+                  </div>
+                )}
+                {article.linkedObservanceSlug && (
+                  <div>
+                    <p className="mb-3 text-[11px] font-bold tracking-[0.7px] text-gold">
+                      RELATED DATES
+                    </p>
+                    <Link
+                      href={`/panchang/o/${article.linkedObservanceSlug}`}
+                      className="flex items-center gap-[13px] rounded-[14px] border border-border bg-card px-[18px] py-[15px] hover:border-cta"
+                    >
+                      <span
+                        aria-hidden
+                        className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-pratha-bg text-lg"
+                      >
+                        📅
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[13.5px] font-bold text-ink">
+                          {observance?.name ?? "This date on the panchang"}
+                        </span>
+                        <span className="block text-xs text-sub">
+                          {[
+                            formatObservanceDate(
+                              observance?.date ?? article.observanceDate,
+                            ),
+                            observance?.tithiLabel,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ") || "Timings, tithi and the full day"}
+                        </span>
+                      </span>
+                      <span aria-hidden className="text-cta">
+                        ›
+                      </span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* cross-sell band (#67) — knowledge before commerce, stated */}
+            <div className="mt-8 mb-12">
+              <div className="grid gap-3 sm:grid-cols-3">
+                {kitSlug ? (
+                  <Link
+                    href={`/ritual-pujans/p/${kitSlug}`}
+                    className="rounded-[14px] border border-border bg-card px-[17px] py-[15px] hover:border-cta"
+                  >
+                    <p className="mb-1 text-lg" aria-hidden>
+                      🛒
+                    </p>
+                    <p className="text-[13.5px] font-bold text-ink">
+                      Ritual Kit
+                    </p>
+                    <p className="mt-[3px] text-xs leading-[1.6] text-sub">
+                      Everything on the samagri list, in one box.
+                    </p>
+                    <p className="mt-2 text-xs font-bold text-cta">
+                      Order the kit ›
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="rounded-[14px] border border-border bg-bg px-[17px] py-[15px]">
+                    <p className="mb-1 text-lg grayscale" aria-hidden>
+                      🛒
+                    </p>
+                    <p className="text-[13.5px] font-bold text-ink">
+                      Ritual Kit
+                    </p>
+                    <p className="mt-[3px] text-xs leading-[1.6] text-sub">
+                      No kit for this guide — the samagri list above is free.
+                    </p>
+                  </div>
+                )}
+                {flags.purohit_tab_visible ? (
+                  <Link
+                    href="/pujan-with-purohit"
+                    className="rounded-[14px] border border-border bg-card px-[17px] py-[15px] hover:border-cta"
+                  >
+                    <p className="mb-1 text-lg" aria-hidden>
+                      🙏
+                    </p>
+                    <p className="text-[13.5px] font-bold text-ink">Purohit</p>
+                    <p className="mt-[3px] text-xs leading-[1.6] text-sub">
+                      A verified purohit for the home pujan.
+                    </p>
+                    <p className="mt-2 text-xs font-bold text-cta">
+                      Book a purohit ›
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="rounded-[14px] border border-border bg-bg px-[17px] py-[15px]">
+                    <p className="mb-1 text-lg grayscale" aria-hidden>
+                      🙏
+                    </p>
+                    <p className="text-[13.5px] font-bold text-ink">Purohit</p>
+                    <p className="mt-[3px] text-xs leading-[1.6] text-sub">
+                      Opens soon. This vrat needs no purohit to be valid.
+                    </p>
+                  </div>
+                )}
+                <Link
+                  href="/tapa-circle"
+                  className="rounded-[14px] border border-border bg-card px-[17px] py-[15px] hover:border-cta"
+                >
+                  <p className="mb-1 text-lg" aria-hidden>
+                    💬
+                  </p>
+                  <p className="text-[13.5px] font-bold text-ink">
+                    Tapa Circle
+                  </p>
+                  <p className="mt-[3px] text-xs leading-[1.6] text-sub">
+                    Reminders on WhatsApp, the evening before.
+                  </p>
+                  <p className="mt-2 text-xs font-bold text-cta">
+                    Join the Circle ›
+                  </p>
+                </Link>
+              </div>
+              <p className="mt-3 text-[12.5px] leading-[1.7] text-sub italic">
+                You do not need any of these. The guide is complete on its own.
+              </p>
+            </div>
           </main>
 
           {/* sticky sidebar (desktop) */}
@@ -724,7 +1107,7 @@ export async function ArticleView({
                 WHY YOU CAN TRUST THIS
               </div>
               <div className="px-4 py-[14px]">
-                {article.dpb ? (
+                {!isBeginner && article.dpb ? (
                   <>
                     <DpbBadge
                       tag={dpbTagOf(article.dpb)}
@@ -745,28 +1128,69 @@ export async function ArticleView({
                   </>
                 ) : (
                   <p className="text-xs leading-[1.75] text-sub">
-                    Timing and calendar content carries no DPB tag by design.
+                    {isBeginner
+                      ? "Written for first-timers — every term explained as it appears."
+                      : "Timing and calendar content carries no DPB tag by design."}
                   </p>
                 )}
               </div>
-              <div className="flex flex-col gap-[6px] border-t border-border-light bg-[#FCFAF6] px-4 py-3">
-                {(
-                  [
-                    ["dharma", "DHARMA", "Named in a text you could open."],
-                    ["pratha", "PRATHA", "Custom. Real — not scripture."],
-                    ["bhranti", "BHRANTI", "A misconception, corrected."],
-                  ] as const
-                ).map(([variant, label, copy]) => (
-                  <p
-                    key={label}
-                    className="flex items-center gap-2 text-[11px] text-sub"
-                  >
-                    <Pill variant={variant}>{label}</Pill>
-                    {copy}
-                  </p>
-                ))}
-              </div>
+              {!isBeginner && (
+                <div className="flex flex-col gap-[6px] border-t border-border-light bg-[#FCFAF6] px-4 py-3">
+                  {(
+                    [
+                      ["dharma", "DHARMA", "Named in a text you could open."],
+                      ["pratha", "PRATHA", "Custom. Real — not scripture."],
+                      ["bhranti", "BHRANTI", "A misconception, corrected."],
+                    ] as const
+                  ).map(([variant, label, copy]) => (
+                    <p
+                      key={label}
+                      className="flex items-center gap-2 text-[11px] text-sub"
+                    >
+                      <Pill variant={variant}>{label}</Pill>
+                      {copy}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* samagri quick checklist mirror (G28) — titles only */}
+            {samagriBlock?.samagri?.length ? (
+              <div className="overflow-hidden rounded-[14px] border border-border bg-card">
+                <div className="border-b border-border-light px-4 py-3 text-[11px] font-bold tracking-[0.6px] text-sub">
+                  SAMAGRI AT A GLANCE
+                </div>
+                <ul className="px-4 py-[10px]">
+                  {samagriBlock.samagri.map((item, i) => (
+                    <li
+                      key={`${item.name}-${i}`}
+                      className={`flex items-baseline gap-2 py-[4px] text-[12.5px] text-body ${
+                        item.optional ? "opacity-70" : ""
+                      }`}
+                    >
+                      <span aria-hidden className="text-[10px] text-gold">
+                        ◆
+                      </span>
+                      {item.name}
+                      {item.optional && (
+                        <span className="text-[9.5px] font-bold tracking-[0.4px] text-sub">
+                          OPTIONAL
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                {samagriAnchor && (
+                  <a
+                    href={`#${samagriAnchor}`}
+                    className="block border-t border-border-light bg-[#FCFAF6] px-4 py-[9px] text-xs font-bold text-cta"
+                  >
+                    Open the full checklist ›
+                  </a>
+                )}
+              </div>
+            ) : null}
 
             <a
               href={pdfHref}
@@ -782,17 +1206,6 @@ export async function ArticleView({
                 One page — samagri, steps, mantra
               </span>
             </a>
-
-            <div className="rounded-[13px] border border-pratha-bd bg-pratha-bg px-4 py-[14px]">
-              <p className="mb-2 text-[11px] font-bold tracking-[0.6px] text-gold">
-                NEED A PUROHIT?
-              </p>
-              <p className="text-xs leading-[1.75] text-body">
-                <b className="text-pratha-fg">Coming soon.</b> Verified
-                purohits for home pujans — booking opens after the knowledge
-                layer is complete. This vrat needs no purohit to be valid.
-              </p>
-            </div>
           </aside>
         </div>
       </div>

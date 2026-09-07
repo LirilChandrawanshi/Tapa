@@ -5,8 +5,8 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { CartView } from "@/components/shop/CartView";
 
 export const metadata: Metadata = {
-  title: "Your bag",
-  description: "Review your pujan bag before checkout.",
+  title: "Your cart",
+  description: "Review your cart before checkout.",
 };
 
 export const dynamic = "force-dynamic";
@@ -22,13 +22,16 @@ export default async function CartPage() {
         items={[
           { label: "Home", href: "/" },
           { label: "Ritual Pujans", href: "/ritual-pujans" },
-          { label: "Your bag" },
+          { label: "Your cart" },
         ]}
       />
       <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-10">
-        <h1 className="mb-5 text-2xl font-bold tracking-[-0.4px] text-ink">
-          Your bag
+        <h1 className="mb-1 text-2xl font-bold tracking-[-0.4px] text-ink">
+          Your cart
         </h1>
+        <p className="mb-5 text-[13px] text-sub">
+          Review your cart before checkout.
+        </p>
         <CartView />
       </div>
     </div>

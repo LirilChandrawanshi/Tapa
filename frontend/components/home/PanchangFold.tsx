@@ -65,6 +65,8 @@ export function PanchangFold({
       ];
 
   const next = nextObservance?.observance ?? null;
+  // G9 — the observance is today: an invitation to begin, not a countdown.
+  const isToday = nextObservance?.countdownDays === 0;
 
   return (
     <section className="mx-auto max-w-[1280px] px-4 pt-8 md:px-10">
@@ -102,7 +104,21 @@ export function PanchangFold({
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/10 px-5 py-[13px] md:px-7">
-          {next ? (
+          {next && isToday ? (
+            <p className="min-w-0 flex-1 text-[13px] text-hero-text/85">
+              Today is{" "}
+              <span className="font-bold text-hero-text">{next.name}</span>
+              {" — "}
+              <Link
+                href={
+                  next.articleSlug ? guideHref(next.articleSlug) : "/panchang"
+                }
+                className="font-bold whitespace-nowrap text-cta"
+              >
+                start your vrat →
+              </Link>
+            </p>
+          ) : next ? (
             <>
               <CountdownPill date={next.date} now={now} />
               <p className="min-w-0 flex-1 text-[12.5px] text-hero-text/85">

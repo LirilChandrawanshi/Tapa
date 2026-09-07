@@ -32,7 +32,7 @@ test.describe("phone-OTP auth", () => {
   }) => {
     await page.goto(ARTICLE_PATH);
 
-    const saveButton = page.getByRole("button", { name: "Save", exact: true });
+    const saveButton = page.getByRole("button", { name: "Save", exact: true }).first();
     await expect(saveButton).toBeVisible();
     await saveButton.click();
 

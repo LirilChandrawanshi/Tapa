@@ -4,7 +4,6 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { CategoryHero } from "@/components/CategoryHero";
 import { GlossaryBrowser } from "@/components/staticpages/GlossaryBrowser";
 import { SuggestWord } from "@/components/staticpages/SuggestWord";
-import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { fetchGlossary } from "@/lib/api";
 import type { GlossaryTerm } from "@/lib/types";
 
@@ -85,6 +84,27 @@ export default async function GlossaryPage() {
       <div className="mx-auto max-w-[1280px] px-4 py-8 md:px-10">
         <GlossaryBrowser terms={items} />
 
+        {/* one-sheet PDF of the whole glossary (#118) */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-[15px] border border-gold/40 bg-pratha-bg px-5 py-4">
+          <div>
+            <p className="text-[13.5px] font-bold text-ink">
+              Take the whole glossary with you
+            </p>
+            <p className="text-[12.5px] leading-relaxed text-sub">
+              Every term, Devanagari and definition on one printable sheet —
+              for the puja shelf, or for whoever asks what the words mean.
+            </p>
+          </div>
+          <a
+            href="/api/v1/glossary.pdf"
+            target="_blank"
+            rel="noopener"
+            className="shrink-0 rounded-[11px] bg-cta px-[20px] py-[10px] text-[12.5px] font-bold text-white"
+          >
+            Download the PDF ›
+          </a>
+        </div>
+
         <div className="mt-9 grid gap-4 md:grid-cols-2">
           <div className="rounded-[18px] bg-ink-deep px-5 py-6 md:px-[28px]">
             <p className="mb-[10px] text-[10px] font-bold tracking-[0.8px] text-eyebrow-dark uppercase">
@@ -129,8 +149,6 @@ export default async function GlossaryPage() {
         <div className="mt-4">
           <SuggestWord />
         </div>
-
-        <WhatsAppNudge copy="A considered reminder before every vrat and festival — on WhatsApp." />
       </div>
     </div>
   );

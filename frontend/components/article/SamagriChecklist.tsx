@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { track } from "@/lib/analytics";
 import type { SamagriItem } from "@/lib/types";
 
 /**
@@ -37,6 +38,9 @@ export function SamagriChecklist({
   function toggle(index: number) {
     setChecked((prev) => {
       const next = prev.map((v, i) => (i === index ? !v : v));
+      if (next[index]) {
+        track("samagri_item_checked", { slug, item: items[index]?.name });
+      }
       try {
         sessionStorage.setItem(storageKey, JSON.stringify(next));
       } catch {
@@ -98,6 +102,7 @@ export function SamagriChecklist({
       <div className="flex gap-2 border-t border-border px-[14px] py-[9px]">
         <a
           href={`/api/v1/cards/${slug}.pdf`}
+          onClick={() => track("samagri_downloaded", { slug })}
           className="flex-1 rounded-lg border-[1.5px] border-border bg-card py-[9px] text-center text-[11.5px] font-semibold text-ink hover:border-cta"
         >
           ↓ Download PDF
@@ -106,6 +111,7 @@ export function SamagriChecklist({
           href={waShareHref()}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track("samagri_whatsapp_shared", { slug })}
           className="flex-1 rounded-lg bg-wa py-[9px] text-center text-[11.5px] font-semibold text-white"
         >
           Send to WhatsApp

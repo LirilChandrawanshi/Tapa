@@ -11,21 +11,26 @@ import {
   TimingDataTag,
   VerifyingPanel,
 } from "@/components/panchang/DataMeta";
+import { ConventionToggle } from "@/components/panchang/ConventionToggle";
 import {
   ObservanceRow,
   ObservanceTable,
 } from "@/components/panchang/ObservanceRow";
 import {
+  CitySelect,
+  PdfDownloadLink,
+} from "@/components/panchang/PanchangControls";
+import {
   MuhuratStrip,
   PanchangDashboard,
 } from "@/components/panchang/PanchangDashboard";
+import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
 import {
   fetchCalendarMonth,
   fetchPanchangToday,
   fetchUpcoming,
 } from "@/lib/api";
 import {
-  CALENDAR_PDF_HREF,
   CITY_LABEL,
   daysBetween,
   fmtEnds,
@@ -181,28 +186,20 @@ export default async function PanchangPage() {
         side={<TodaySnapshot payload={today} now={now} />}
       />
 
-      {/* Control strip: marker, city, PDF */}
+      <PanchangSubnav active="today" />
+
+      {/* Control strip: marker, city, convention, PDF */}
       <div className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 md:px-10">
           <TimingDataTag />
-          <button
-            type="button"
-            disabled
-            title="More cities soon"
-            className="flex items-center gap-2 rounded-[9px] border border-border bg-bg px-3 py-[6px] text-[12px] font-bold text-mid"
-          >
-            <span className="text-[9.5px] font-bold tracking-[0.7px] text-sub uppercase">
-              Calculated for
-            </span>
-            {CITY_LABEL} ▾
-            <span className="font-medium text-sub">— more cities soon</span>
-          </button>
-          <a
-            href={CALENDAR_PDF_HREF}
+          <CitySelect />
+          <ConventionToggle />
+          <PdfDownloadLink
+            surface="landing-strip"
             className="ml-auto rounded-[9px] border border-data-fg bg-data-fg px-[14px] py-[7px] text-[12px] font-bold text-white hover:opacity-90"
           >
             ↓ Download 2026 calendar (PDF)
-          </a>
+          </PdfDownloadLink>
         </div>
       </div>
 
@@ -223,6 +220,49 @@ export default async function PanchangPage() {
           ) : (
             <VerifyingPanel />
           )}
+        </section>
+
+        {/* Five limbs primer (#82) */}
+        <section className="mt-8 rounded-[15px] border border-border bg-card p-5 md:p-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
+              Panch · ang — five limbs, tracked daily
+            </p>
+            <Link
+              href="/panchang/tithi-paksha"
+              className="text-[12px] font-bold text-cta"
+            >
+              How tithi &amp; paksha work ›
+            </Link>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {(
+              [
+                ["1", "Tithi", "the lunar day — what almost every festival date is fixed by"],
+                ["2", "Paksha", "the waxing or waning half of the lunar month"],
+                ["3", "Nakshatra", "the star the Moon sits in today"],
+                ["4", "Vara", "the weekday — the one limb you already know"],
+                ["5", "Yoga & Karana", "the rest of the five — used for muhurat picking"],
+              ] as const
+            ).map(([n, name, note]) => (
+              <div key={name} className="flex gap-[10px]">
+                <span
+                  aria-hidden
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-data-bd bg-data-bg text-[11px] font-bold text-data-fg"
+                >
+                  {n}
+                </span>
+                <div>
+                  <p className="text-[13px] leading-tight font-bold text-ink">
+                    {name}
+                  </p>
+                  <p className="mt-[2px] text-[11.5px] leading-relaxed text-sub">
+                    {note}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Next vrats */}
@@ -382,12 +422,12 @@ export default async function PanchangPage() {
               Every tithi, vrat and festival date for the year — print it, or
               keep it on your phone.
             </p>
-            <a
-              href={CALENDAR_PDF_HREF}
+            <PdfDownloadLink
+              surface="landing-band"
               className="mt-4 inline-block w-fit rounded-[9px] bg-cta px-4 py-2 text-[12.5px] font-bold text-white"
             >
               Download 2026 calendar (PDF)
-            </a>
+            </PdfDownloadLink>
           </div>
         </section>
       </div>

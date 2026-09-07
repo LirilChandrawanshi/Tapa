@@ -6,8 +6,11 @@ import type { GlossaryTerm } from "@/lib/types";
 import {
   GLOSSARY_CATEGORY_LABELS,
   GLOSSARY_FILTERS,
+  appearanceHref,
   conceptHref,
+  fetchGlossaryAppearsIn,
   groupTermsByLetter,
+  type GlossaryAppearance,
   type GlossaryCategoryFilter,
 } from "@/lib/staticExtras";
 
@@ -164,6 +167,20 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryTerm[] }) {
 }
 
 function GlossaryEntry({ term }: { term: GlossaryTerm }) {
+  // "Appears in" is fetched per-entry on expand so the list payload stays light (#117)
+  const [open, setOpen] = useState(false);
+  const [appearances, setAppearances] = useState<GlossaryAppearance[] | null>(
+    null,
+  );
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    if (next && appearances === null) {
+      fetchGlossaryAppearsIn(term.slug).then(setAppearances);
+    }
+  };
+
   return (
     <article
       id={term.slug}
@@ -194,13 +211,48 @@ function GlossaryEntry({ term }: { term: GlossaryTerm }) {
       <p className="mt-2 max-w-[640px] text-[13px] leading-[1.75] text-body">
         {term.definition}
       </p>
-      {term.conceptArticleSlug && (
-        <Link
-          href={conceptHref(term.conceptArticleSlug)}
-          className="mt-2 inline-block text-[12.5px] font-bold text-cta"
+      <div className="mt-2 flex flex-wrap items-center gap-4">
+        {term.conceptArticleSlug && (
+          <Link
+            href={conceptHref(term.conceptArticleSlug)}
+            className="text-[12.5px] font-bold text-cta"
+          >
+            Read the concept →
+          </Link>
+        )}
+        <button
+          onClick={toggle}
+          aria-expanded={open}
+          className="text-[12.5px] font-bold text-gold hover:text-cta"
         >
-          Read the concept →
-        </Link>
+          {open ? "Hide where it appears ▴" : "Where this appears ▾"}
+        </button>
+      </div>
+      {open && (
+        <div className="mt-3 border-t border-border-light pt-3">
+          <p className="mb-2 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
+            Appears in
+          </p>
+          {appearances === null ? (
+            <p className="text-[12px] text-sub">Looking through the guides…</p>
+          ) : appearances.length === 0 ? (
+            <p className="text-[12px] text-sub">
+              No published guide mentions this term yet.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-[7px]">
+              {appearances.map((a) => (
+                <Link
+                  key={a.slug}
+                  href={appearanceHref(a)}
+                  className="rounded-full border border-border bg-bg px-3 py-[5px] text-xs font-semibold text-body hover:border-cta hover:text-cta"
+                >
+                  {a.title}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </article>
   );

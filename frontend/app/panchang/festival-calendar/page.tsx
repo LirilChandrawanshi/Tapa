@@ -8,6 +8,7 @@ import {
   TimingDataTag,
   VerifyingPanel,
 } from "@/components/panchang/DataMeta";
+import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
 import { TypeBadge, TypeLegend } from "@/components/panchang/TypeBadge";
 import { fetchFestivals } from "@/lib/api";
 import {
@@ -136,6 +137,8 @@ export default async function FestivalCalendarPage() {
           </div>
         }
       />
+
+      <PanchangSubnav active="festival" />
 
       <div className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 md:px-10">

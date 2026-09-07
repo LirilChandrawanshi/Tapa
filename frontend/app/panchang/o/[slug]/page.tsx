@@ -9,19 +9,46 @@ import {
   VerifyingPanel,
 } from "@/components/panchang/DataMeta";
 import {
+  DayByDayTable,
+  type FestivalDay,
+  MuhuratWindows,
+  UnusualBand,
+  detectAnomalies,
+} from "@/components/panchang/FestivalDetail";
+import {
   ObservanceRow,
   ObservanceTable,
 } from "@/components/panchang/ObservanceRow";
+import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
+import { RemindButton } from "@/components/panchang/RemindButton";
 import { TypeBadge } from "@/components/panchang/TypeBadge";
-import { ApiError, fetchEkadashi, fetchFestival, fetchUpcoming } from "@/lib/api";
 import {
+  ComputedTable,
+  FastTimeline,
+  ParanaHero,
+  type TimelineStop,
+  VratTimingTiles,
+} from "@/components/panchang/VratDetail";
+import {
+  ApiError,
+  fetchEkadashi,
+  fetchFestival,
+  fetchPanchangDate,
+  fetchUpcoming,
+} from "@/lib/api";
+import {
+  addDays,
+  findParana,
+  fmtAt,
   fmtLong,
   fmtRange,
+  fmtShort,
   guideHref,
+  obsX,
   safeFetch,
   todayIst,
 } from "@/lib/panchangExtras";
-import type { UpcomingObservance } from "@/lib/types";
+import type { DayPayload, Observance, UpcomingObservance } from "@/lib/types";
 
 export const revalidate = 900; // ISR — purged via the `panchang` tag
 
@@ -62,6 +89,18 @@ async function fetchSeriesMates(
         !(u.observance.slug === selfSlug && u.observance.date === selfDate),
     )
     .sort((a, b) => a.observance.date.localeCompare(b.observance.date));
+}
+
+/** date → endDate inclusive, capped at 10 civil days. */
+function festivalDates(o: Observance): string[] {
+  const out: string[] = [];
+  let d = o.date;
+  const end = o.endDate && o.endDate > o.date ? o.endDate : o.date;
+  while (d <= end && out.length < 10) {
+    out.push(d);
+    d = addDays(d, 1);
+  }
+  return out;
 }
 
 export default async function ObservancePage({ params }: Props) {
@@ -106,9 +145,84 @@ export default async function ObservancePage({ params }: Props) {
   }
 
   const o = data.observance;
+  const x = obsX(o);
+
+  const isMultiDay = Boolean(o.endDate && o.endDate !== o.date);
+  const isFestivalTemplate =
+    isMultiDay && (o.type === "FESTIVAL" || o.type === "SPECIAL_SEASONAL");
+  const isVratTemplate =
+    !isFestivalTemplate &&
+    (o.type === "VRAT" || o.type === "PURNIMA_AMAVASYA");
+  const isEkadashi = /ekadashi/i.test(`${o.series ?? ""} ${o.name}`);
+  const isNavratri = /navratri/i.test(`${o.slug} ${o.name}`);
+
+  // ── Vrat template data: this day + the parana day ──
+  let vratDay: DayPayload | null = null;
+  let paranaDay: DayPayload | null = null;
+  if (isVratTemplate) {
+    [vratDay, paranaDay] = await Promise.all([
+      safeFetch(fetchPanchangDate(o.date)),
+      safeFetch(fetchPanchangDate(addDays(o.date, 1))),
+    ]);
+  }
+  const parana = isVratTemplate
+    ? findParana(vratDay?.day, paranaDay?.day, o.date)
+    : null;
+
+  // ── Festival template data: one payload per civil day (cap 10) ──
+  let festDays: FestivalDay[] = [];
+  if (isFestivalTemplate) {
+    const dates = festivalDates(o);
+    const payloads = await Promise.all(
+      dates.map((d) => safeFetch(fetchPanchangDate(d))),
+    );
+    festDays = dates.map((date, i) => ({
+      date,
+      day: payloads[i]?.day ?? null,
+    }));
+  }
+  const anomalies = detectAnomalies(festDays);
+
   const mates = o.series ? await fetchSeriesMates(o.series, o.slug, o.date) : [];
 
-  const tiles: { key: string; value: string; sub?: string }[] = [
+  // ── Fast timeline (vrat template) ──
+  const paranaDate = parana?.date ?? addDays(o.date, 1);
+  const sunrise = vratDay?.day?.sunrise ?? null;
+  const timelineStops: TimelineStop[] = [
+    {
+      label: "Sankalp & sunrise",
+      time: `${fmtShort(o.date)}${sunrise ? ` · ${sunrise}` : ""}`,
+      note: "A simple resolve. The fast begins here.",
+    },
+    {
+      label: "The fast",
+      time: "Through the day and night",
+      note: isEkadashi
+        ? "No grains · fruit, milk and water permitted"
+        : "Kept in the form your family follows",
+    },
+    {
+      label: "Tithi ends",
+      time: fmtAt(x.tithiEndsAt) ?? "—",
+      note: "The fast continues past this point — it ends at parana, not at the tithi.",
+    },
+    {
+      label: "Parana opens",
+      time: parana
+        ? `${fmtShort(parana.date)} · ${parana.from}`
+        : `${fmtShort(paranaDate)} · sunrise`,
+    },
+    {
+      label: "Window closes",
+      time: parana ? `${parana.to}` : isEkadashi ? "Dwadashi ends" : "—",
+      note: "Break the fast before this.",
+    },
+  ];
+  let activeStop: number | null = null;
+  if (now === o.date) activeStop = 1;
+  else if (now > o.date && now <= paranaDate) activeStop = 3;
+
+  const genericTiles: { key: string; value: string; sub?: string }[] = [
     {
       key: "Date",
       value: fmtRange(o.date, o.endDate),
@@ -172,29 +286,163 @@ export default async function ObservancePage({ params }: Props) {
         </div>
       </section>
 
+      <PanchangSubnav active="vrat" />
+
       <div className="mx-auto max-w-[1280px] px-4 md:px-10">
-        {/* Timing tiles */}
-        <section className="mt-7">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {tiles.map((t) => (
-              <div
-                key={t.key}
-                className="rounded-[13px] border border-data-bd bg-data-bg px-4 py-[14px]"
-              >
-                <p className="mb-1 text-[9.5px] font-bold tracking-[0.9px] text-data-fg/60 uppercase">
-                  {t.key}
-                </p>
-                <p className="text-[14.5px] leading-snug font-bold text-data-fg">
-                  {t.value}
-                </p>
-                {t.sub && (
-                  <p className="mt-[2px] text-[11px] text-data-fg/70">{t.sub}</p>
-                )}
-              </div>
-            ))}
-          </div>
-          <SourceStrip className="mt-2" />
+        {/* Save / Remind CTA row */}
+        <section className="mt-6 flex flex-wrap items-center gap-3">
+          <RemindButton observanceSlug={o.slug} name={o.name} />
+          {o.articleSlug && (
+            <Link
+              href={guideHref(o.articleSlug)}
+              className="flex items-center gap-[6px] rounded-[9px] border-[1.5px] border-border bg-card px-[14px] py-[7px] text-[12.5px] font-bold text-body hover:border-cta"
+            >
+              <span aria-hidden>📖</span> How to observe this{" "}
+              {o.type === "FESTIVAL" ? "festival" : "vrat"}
+            </Link>
+          )}
         </section>
+
+        {/* ── VRAT template ─────────────────────────────────────────── */}
+        {isVratTemplate && (
+          <>
+            {parana && (
+              <section className="mt-6">
+                <ParanaHero parana={parana} />
+              </section>
+            )}
+
+            <section className="mt-6">
+              <VratTimingTiles observance={o} day={vratDay?.day ?? null} parana={parana} />
+              <SourceStrip className="mt-2" />
+            </section>
+
+            <section className="mt-8">
+              <div className="mb-3">
+                <p className="text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
+                  The fast, end to end
+                </p>
+                <h2 className="text-[17px] font-bold text-ink">
+                  From sankalp to parana
+                </h2>
+                <p className="mt-1 text-[12.5px] text-sub">
+                  The part most people get wrong is the end, not the beginning.
+                </p>
+              </div>
+              <FastTimeline stops={timelineStops} activeIndex={activeStop} />
+            </section>
+
+            <section className="mt-8">
+              <h2 className="mb-3 text-[17px] font-bold text-ink">
+                The full panchang for {fmtLong(o.date)}
+              </h2>
+              <ComputedTable observance={o} day={vratDay?.day ?? null} parana={parana} />
+              <SourceStrip className="mt-2" />
+            </section>
+          </>
+        )}
+
+        {/* ── FESTIVAL (multi-day) template ─────────────────────────── */}
+        {isFestivalTemplate && (
+          <>
+            <section className="mt-6">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {genericTiles.map((t) => (
+                  <div
+                    key={t.key}
+                    className="rounded-[13px] border border-data-bd bg-data-bg px-4 py-[14px]"
+                  >
+                    <p className="mb-1 text-[9.5px] font-bold tracking-[0.9px] text-data-fg/60 uppercase">
+                      {t.key}
+                    </p>
+                    <p className="text-[14.5px] leading-snug font-bold text-data-fg">
+                      {t.value}
+                    </p>
+                    {t.sub && (
+                      <p className="mt-[2px] text-[11px] text-data-fg/70">
+                        {t.sub}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <SourceStrip className="mt-2" />
+            </section>
+
+            {festDays.length > 0 && (
+              <section className="mt-8">
+                <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 className="text-[17px] font-bold text-ink">
+                    Day by day — {fmtRange(o.date, o.endDate)}
+                  </h2>
+                  <span className="text-[11.5px] text-sub">
+                    {festDays.length} day{festDays.length === 1 ? "" : "s"}
+                    {o.endDate &&
+                    festDays.length === 10 &&
+                    addDays(o.date, 9) < o.endDate
+                      ? " shown"
+                      : ""}
+                  </span>
+                </div>
+                {isNavratri && (
+                  <p className="mb-3 text-[11.5px] text-sub italic">
+                    Colours and offerings are practitioner custom, not
+                    scripture. They vary by year and by source.
+                  </p>
+                )}
+                <DayByDayTable days={festDays} isNavratri={isNavratri} />
+                <SourceStrip className="mt-2" />
+              </section>
+            )}
+
+            <section className="mt-8">
+              <h2 className="mb-3 text-[17px] font-bold text-ink">
+                Muhurat windows — day one
+              </h2>
+              <MuhuratWindows day1={festDays[0]?.day ?? null} />
+              {!festDays[0]?.day?.muhurats?.length &&
+                !festDays[0]?.day?.abhijitMuhurat && (
+                  <p className="text-[12.5px] text-sub">
+                    Day-one muhurat windows are being verified and will appear
+                    here.
+                  </p>
+                )}
+            </section>
+
+            {anomalies.length > 0 && (
+              <section className="mt-8">
+                <UnusualBand anomalies={anomalies} />
+              </section>
+            )}
+          </>
+        )}
+
+        {/* ── Generic tiles for everything else ─────────────────────── */}
+        {!isVratTemplate && !isFestivalTemplate && (
+          <section className="mt-6">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {genericTiles.map((t) => (
+                <div
+                  key={t.key}
+                  className="rounded-[13px] border border-data-bd bg-data-bg px-4 py-[14px]"
+                >
+                  <p className="mb-1 text-[9.5px] font-bold tracking-[0.9px] text-data-fg/60 uppercase">
+                    {t.key}
+                  </p>
+                  <p className="text-[14.5px] leading-snug font-bold text-data-fg">
+                    {t.value}
+                  </p>
+                  {t.sub && (
+                    <p className="mt-[2px] text-[11px] text-data-fg/70">
+                      {t.sub}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <SourceStrip className="mt-2" />
+          </section>
+        )}
 
         {/* Blurb */}
         {o.blurb && (
@@ -224,7 +472,7 @@ export default async function ObservancePage({ params }: Props) {
                 href={guideHref(o.articleSlug)}
                 className="shrink-0 rounded-[9px] bg-cta px-4 py-2 text-[12.5px] font-bold text-white"
               >
-                Read the {o.name} guide →
+                Read the guide ›
               </Link>
             </div>
           ) : (

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Devanagari, Tiro_Devanagari_Hindi } from "next/font/google";
+import { AnalyticsLoader } from "@/components/AnalyticsLoader";
 import { AnnounceBar } from "@/components/AnnounceBar";
 import { Footer } from "@/components/Footer";
 import { TopNav } from "@/components/TopNav";
@@ -53,6 +54,7 @@ export default async function RootLayout({
       className={`${tiroDevanagari.variable} ${notoSansDevanagari.variable}`}
     >
       <body>
+        <AnalyticsLoader />
         <AnnounceBar />
         <TopNav kitsLaunched={flags.kits_launched} />
         {children}

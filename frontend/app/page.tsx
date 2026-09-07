@@ -1,5 +1,8 @@
+import { MethodBand } from "@/components/MethodBand";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
+import { BeginnersRail } from "@/components/home/BeginnersRail";
 import { CategoryTiles } from "@/components/home/CategoryTiles";
+import { CorrectionsBand } from "@/components/home/CorrectionsBand";
 import { GuidesRail } from "@/components/home/GuidesRail";
 import { HomeHero, HomeHeroFallback } from "@/components/home/HomeHero";
 import { JourneyStepper } from "@/components/home/JourneyStepper";
@@ -18,6 +21,9 @@ import { todayIst } from "@/lib/panchangExtras";
  *   3. Hero            4. Trust badge strip   5. Panchang first fold
  *   6. Ritual kits     7. Journey stepper     8. From ritual guides
  *   9. Purohit strip  10. WhatsApp nudge     11. Explore by category
+ *
+ * Between 8 and 9 sit the P1 prototype's editorial bands (#25–#27):
+ * Corrections, Beginner's rail, and the Dharma/Pratha/Bhranti MethodBand.
  *
  * One composed fetch (GET /api/v1/home); the backend may be down, so every
  * section carries its own fallback — nothing renders blank.
@@ -60,6 +66,17 @@ export default async function Home() {
 
       {/* 8 — FROM RITUAL GUIDES */}
       <GuidesRail cards={home?.guidesRail ?? []} now={now} />
+
+      {/* 8a — CORRECTIONS, NOT WARNINGS */}
+      <CorrectionsBand />
+
+      {/* 8b — BEGINNER'S RAIL */}
+      <BeginnersRail />
+
+      {/* 8c — HOW WE DECIDE WHAT IS TRUE */}
+      <div className="mx-auto max-w-[1280px] px-4 pt-10 md:px-10">
+        <MethodBand />
+      </div>
 
       {/* 9 — PUJAN WITH PUROHIT STRIP */}
       <PurohitStrip />

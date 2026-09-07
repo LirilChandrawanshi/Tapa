@@ -1,4 +1,9 @@
 import Link from "next/link";
+import {
+  FooterAccordion,
+  type FooterAccordionSection,
+} from "@/components/FooterAccordion";
+import { CIRCLE_WHATSAPP_NUMBER } from "@/lib/staticExtras";
 import { TAXONOMY, getSection } from "@/lib/taxonomy";
 
 /*
@@ -7,30 +12,43 @@ import { TAXONOMY, getSection } from "@/lib/taxonomy";
  *   4. Columns (About · Help · For You · Connect)
  *   5. Corrections strip   6. Legal
  * Phase-gate rule: unopened categories show a date, never a dead link.
+ * Bands 3–4 collapse into one-open accordions on mobile (FooterAccordion).
  */
 
 const COLUMN_HEADING =
   "mb-[14px] text-[10px] font-bold tracking-[0.7px] text-eyebrow-dark uppercase";
 const COLUMN_LINK =
   "block py-[5.5px] text-[13px] text-sub hover:text-eyebrow-dark";
-const LOCKED_LINK = "block py-[5.5px] text-[13px] text-[#5C4E36]";
+const SITEMAP_HEADING =
+  "mb-[10px] border-b border-white/10 pb-[9px] text-[14.5px] font-bold text-hero-text";
 
-function SitemapColumn({
-  title,
+/**
+ * TODO(business): placeholder social handles — confirm before Gate 2.
+ * No more href="#": every icon points at a real (claimable) profile URL.
+ */
+const SOCIALS = [
+  { name: "Instagram", href: "https://instagram.com/thetapaco" },
+  { name: "Facebook", href: "https://facebook.com/thetapaco" },
+  { name: "YouTube", href: "https://youtube.com/@thetapaco" },
+] as const;
+
+const TRUST_BADGES = [
+  { icon: "📜", label: "Scripturally sourced" },
+  { icon: "🕊️", label: "Fear-free" },
+  { icon: "🙏", label: "Shraddha-first" },
+] as const;
+
+function SitemapLinks({
   links,
   allLabel,
   allHref,
 }: {
-  title: string;
   links: readonly { label: string; href: string; lead?: boolean }[];
   allLabel: string;
   allHref: string;
 }) {
   return (
-    <div>
-      <p className="mb-[10px] border-b border-white/10 pb-[9px] text-[14.5px] font-bold text-hero-text">
-        {title}
-      </p>
+    <>
       {links.map((link) => (
         <Link
           key={link.href}
@@ -48,7 +66,7 @@ function SitemapColumn({
       >
         {allLabel} ›
       </Link>
-    </div>
+    </>
   );
 }
 
@@ -92,6 +110,191 @@ export function Footer({
     (s) => s.gatedBy !== "kits_launched" || kitsLaunched,
   );
 
+  const sitemapAccordion: FooterAccordionSection[] = sitemapSections.map(
+    (section) => ({
+      id: section.key,
+      title: section.label,
+      titleClass: SITEMAP_HEADING,
+      content: (
+        <SitemapLinks
+          links={section.children}
+          allLabel={
+            section.key === "ritual-pujans"
+              ? "Shop all kits"
+              : `All ${section.label}`
+          }
+          allHref={section.href}
+        />
+      ),
+    }),
+  );
+
+  const columnsAccordion: FooterAccordionSection[] = [
+    {
+      id: "about",
+      title: "About",
+      titleClass: COLUMN_HEADING,
+      content: (
+        <>
+          <Link href="/about" className={COLUMN_LINK}>
+            Why <span className="font-devanagari">तप्</span>
+          </Link>
+          <Link href="/editorial-method" className={COLUMN_LINK}>
+            Our Editorial Method
+          </Link>
+          <Link href="/scripture-references" className={COLUMN_LINK}>
+            Scripture References
+          </Link>
+          <Link href="/glossary" className={COLUMN_LINK}>
+            Glossary
+          </Link>
+          <Link href="/tapa-circle" className={COLUMN_LINK}>
+            The Tapa Circle
+          </Link>
+          <Link href="/work-with-us" className={COLUMN_LINK}>
+            Join the Purohit Network
+          </Link>
+          <Link href="/work-with-us" className={COLUMN_LINK}>
+            For Retailers
+          </Link>
+          <Link href="/work-with-us" className={COLUMN_LINK}>
+            Bulk &amp; Corporate Orders
+          </Link>
+        </>
+      ),
+    },
+    {
+      id: "help",
+      title: "Help",
+      titleClass: COLUMN_HEADING,
+      content: (
+        <>
+          <Link href="/orders/track" className={COLUMN_LINK}>
+            Track Your Order
+          </Link>
+          <Link href="/policies/shipping" className={COLUMN_LINK}>
+            Shipping &amp; Delivery
+          </Link>
+          <Link href="/policies/refund" className={COLUMN_LINK}>
+            Returns &amp; Refunds
+          </Link>
+          <Link href="/policies/cancellation" className={COLUMN_LINK}>
+            Cancellations
+          </Link>
+          <Link href="/policies/shipping#payment" className={COLUMN_LINK}>
+            Payment &amp; COD
+          </Link>
+          <Link href="/editorial-method" className={COLUMN_LINK}>
+            FAQs
+          </Link>
+          <Link href="/about" className={COLUMN_LINK}>
+            Contact Support
+          </Link>
+        </>
+      ),
+    },
+    {
+      id: "for-you",
+      title: "For You",
+      titleClass: COLUMN_HEADING,
+      content: (
+        <>
+          <Link href="/account" className={COLUMN_LINK}>
+            My Account
+          </Link>
+          <Link href="/account" className={COLUMN_LINK}>
+            Saved Rituals
+          </Link>
+          <Link href="/account" className={COLUMN_LINK}>
+            My Reminders
+          </Link>
+          <Link href="/account" className={COLUMN_LINK}>
+            Notification Preferences
+          </Link>
+          <span className={`${COLUMN_LINK} cursor-default`}>
+            English / <span className="font-devanagari">हिंदी</span>
+          </span>
+        </>
+      ),
+    },
+    {
+      id: "connect",
+      title: "Connect",
+      titleClass: COLUMN_HEADING,
+      content: (
+        <>
+          <p className="mt-[2px] mb-[10px] text-[9.5px] font-bold tracking-[0.5px] text-[#7A6A55]">
+            GET IN TOUCH
+          </p>
+          <a
+            href={`https://wa.me/${CIRCLE_WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-[11px] py-2"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] border border-white/10 bg-wa/20 text-[15px]">
+              💬
+            </span>
+            <span>
+              <span className="block text-[13px] leading-[1.35] font-medium text-hero-text">
+                Chat on WhatsApp
+              </span>
+              <span className="mt-[1px] block text-[11px] leading-normal text-[#7A6A55]">
+                Support · Mon–Sat, 10am–7pm IST
+              </span>
+            </span>
+          </a>
+          <a
+            href="mailto:help@thetapaco.com"
+            className="flex items-center gap-[11px] py-2"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] border border-white/10 bg-white/[0.06] text-[15px]">
+              ✉
+            </span>
+            <span>
+              <span className="block text-[13px] leading-[1.35] font-medium text-hero-text">
+                Email us
+              </span>
+              <span className="mt-[1px] block text-[11px] leading-normal text-[#7A6A55]">
+                help@thetapaco.com
+              </span>
+            </span>
+          </a>
+          <Link href="/work-with-us" className="flex items-center gap-[11px] py-2">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] border border-white/10 bg-white/[0.06] text-[15px]">
+              ✍
+            </span>
+            <span>
+              <span className="block text-[13px] leading-[1.35] font-medium text-hero-text">
+                Contact form
+              </span>
+              <span className="mt-[1px] block text-[11px] leading-normal text-[#7A6A55]">
+                Partnerships, press
+              </span>
+            </span>
+          </Link>
+          <p className="mt-[22px] mb-[10px] text-[9.5px] font-bold tracking-[0.5px] text-[#7A6A55]">
+            FOLLOW
+          </p>
+          <div className="flex gap-[9px]">
+            {SOCIALS.map((social) => (
+              <a
+                key={social.name}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.name}
+                className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-white/10 bg-white/[0.06] text-[11px] font-bold text-[#C4A882]"
+              >
+                {social.name[0]}
+              </a>
+            ))}
+          </div>
+        </>
+      ),
+    },
+  ];
+
   return (
     <footer className="bg-ink">
       {/* ── Band 1: Brand ── */}
@@ -117,11 +320,19 @@ export function Footer({
             rumour.
           </p>
           <Link
-            href="/editorial-method"
+            href="/"
             className="inline-block rounded-[22px] bg-cta px-[27px] py-3 text-[13.5px] font-bold text-white"
           >
-            Read our editorial method ›
+            ▶ Start today&rsquo;s vrat
           </Link>
+          <p className="mt-3">
+            <Link
+              href="/editorial-method"
+              className="text-[12px] font-semibold text-sub underline underline-offset-[3px] hover:text-eyebrow-dark"
+            >
+              Read our editorial method ›
+            </Link>
+          </p>
           <p className="font-devanagari mt-4 text-[13px] tracking-[0.4px] text-[#C4A882]">
             हर अनुष्ठान, सही विधि से
           </p>
@@ -144,7 +355,9 @@ export function Footer({
           </Link>
           <div className="flex items-center gap-[10px] md:ml-auto">
             <span className="mr-1 hidden text-xs text-[#7A6A55] lg:block">
-              Save rituals and manage reminders
+              {kitsLaunched
+                ? "Save rituals, track orders and manage reminders"
+                : "Save rituals and manage reminders"}
             </span>
             <Link
               href="/sign-in"
@@ -165,25 +378,13 @@ export function Footer({
       {/* ── Band 3: Sitemap ── */}
       <div className="mx-auto max-w-[1280px] px-5 md:px-10">
         <div className="border-b border-white/[0.07] pt-[30px] pb-8">
-          <p className="mb-5 text-[10px] font-bold tracking-[0.7px] text-eyebrow-dark">
+          <p className="mb-2 text-[10px] font-bold tracking-[0.7px] text-eyebrow-dark md:mb-5">
             BROWSE BY CATEGORY
           </p>
-          <div className="grid gap-[22px] md:grid-cols-4 md:gap-[30px]">
-            {sitemapSections.map((section) => (
-              <SitemapColumn
-                key={section.key}
-                title={section.label}
-                links={section.children}
-                allLabel={
-                  section.key === "ritual-pujans"
-                    ? "Shop all kits"
-                    : `All ${section.label}`
-                }
-                allHref={section.href}
-              />
-            ))}
-            {!kitsLaunched && <div className="hidden md:block" />}
-          </div>
+          <FooterAccordion
+            sections={sitemapAccordion}
+            gridClass="md:grid md:grid-cols-4 md:gap-[30px]"
+          />
           {/* Phase-locked cells: a date, not a SOON pill, never a dead link */}
           <div className="mt-[26px] grid gap-[22px] border-t border-dashed border-white/[0.09] pt-6 md:grid-cols-4 md:gap-[30px]">
             {!kitsLaunched && (
@@ -243,110 +444,11 @@ export function Footer({
 
       {/* ── Band 4: Columns ── */}
       <div className="mx-auto max-w-[1280px] px-5 md:px-10">
-        <div className="grid gap-[22px] border-b border-white/[0.07] pt-[34px] pb-9 md:grid-cols-[1.05fr_1fr_1fr_1.15fr] md:gap-9">
-          <div>
-            <p className={COLUMN_HEADING}>About</p>
-            <Link href="/about" className={COLUMN_LINK}>
-              Why <span className="font-devanagari">तप्</span>
-            </Link>
-            <Link href="/editorial-method" className={COLUMN_LINK}>
-              Our Editorial Method
-            </Link>
-            <Link href="/editorial-method" className={COLUMN_LINK}>
-              Scripture References
-            </Link>
-            <Link href="/glossary" className={COLUMN_LINK}>
-              Glossary
-            </Link>
-            <Link href="/tapa-circle" className={COLUMN_LINK}>
-              The Tapa Circle
-            </Link>
-            <Link href="/work-with-us" className={COLUMN_LINK}>
-              Join the Purohit Network
-            </Link>
-          </div>
-          <div>
-            <p className={COLUMN_HEADING}>Help</p>
-            {/* Commerce-dependent links stay dimmed until Gate 2 */}
-            <span className={LOCKED_LINK}>Track Your Order</span>
-            <span className={LOCKED_LINK}>Shipping &amp; Delivery</span>
-            <span className={LOCKED_LINK}>Returns &amp; Refunds</span>
-            <span className={LOCKED_LINK}>Cancellations</span>
-            <Link href="/editorial-method" className={COLUMN_LINK}>
-              FAQs
-            </Link>
-            <Link href="/about" className={COLUMN_LINK}>
-              Contact Support
-            </Link>
-          </div>
-          <div>
-            <p className={COLUMN_HEADING}>For You</p>
-            <Link href="/account" className={COLUMN_LINK}>
-              My Account
-            </Link>
-            <Link href="/account" className={COLUMN_LINK}>
-              Saved Rituals
-            </Link>
-            <Link href="/account" className={COLUMN_LINK}>
-              My Reminders
-            </Link>
-            <Link href="/account" className={COLUMN_LINK}>
-              Notification Preferences
-            </Link>
-            <span className={`${COLUMN_LINK} cursor-default`}>
-              English / <span className="font-devanagari">हिंदी</span>
-            </span>
-          </div>
-          <div>
-            <p className={COLUMN_HEADING}>Connect</p>
-            <p className="mt-[2px] mb-[10px] text-[9.5px] font-bold tracking-[0.5px] text-[#7A6A55]">
-              GET IN TOUCH
-            </p>
-            <a href="#" className="flex items-center gap-[11px] py-2">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] border border-white/10 bg-wa/20 text-[15px]">
-                💬
-              </span>
-              <span>
-                <span className="block text-[13px] leading-[1.35] font-medium text-hero-text">
-                  Chat on WhatsApp
-                </span>
-                <span className="mt-[1px] block text-[11px] leading-normal text-[#7A6A55]">
-                  Support · Mon–Sat, 10am–7pm IST
-                </span>
-              </span>
-            </a>
-            <a
-              href="mailto:help@thetapaco.com"
-              className="flex items-center gap-[11px] py-2"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] border border-white/10 bg-white/[0.06] text-[15px]">
-                ✉
-              </span>
-              <span>
-                <span className="block text-[13px] leading-[1.35] font-medium text-hero-text">
-                  Email us
-                </span>
-                <span className="mt-[1px] block text-[11px] leading-normal text-[#7A6A55]">
-                  help@thetapaco.com
-                </span>
-              </span>
-            </a>
-            <p className="mt-[22px] mb-[10px] text-[9.5px] font-bold tracking-[0.5px] text-[#7A6A55]">
-              FOLLOW
-            </p>
-            <div className="flex gap-[9px]">
-              {["Instagram", "Facebook", "LinkedIn", "YouTube"].map((name) => (
-                <a
-                  key={name}
-                  href="#"
-                  aria-label={name}
-                  className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-white/10 bg-white/[0.06] text-[11px] font-bold text-[#C4A882]"
-                >
-                  {name[0]}
-                </a>
-              ))}
-            </div>
-          </div>
+        <div className="border-b border-white/[0.07] pt-[18px] pb-9 md:pt-[34px]">
+          <FooterAccordion
+            sections={columnsAccordion}
+            gridClass="md:grid md:grid-cols-[1.05fr_1fr_1fr_1.15fr] md:gap-9"
+          />
         </div>
       </div>
 
@@ -374,7 +476,21 @@ export function Footer({
       {/* ── Band 6: Legal ── */}
       <div className="mx-auto max-w-[1280px] px-5 md:px-10">
         <div className="pt-6 pb-[30px]">
-          <div className="mb-4 flex flex-wrap gap-x-5 gap-y-[9px] border-b border-white/[0.06] pb-4">
+          {/* Trust badges — the three editorial promises, above the policy links */}
+          <div className="mb-4 flex flex-wrap gap-x-6 gap-y-2">
+            {TRUST_BADGES.map((badge) => (
+              <span
+                key={badge.label}
+                className="flex items-center gap-[7px] text-xs font-semibold text-[#C4A882]"
+              >
+                <span aria-hidden className="text-[13px]">
+                  {badge.icon}
+                </span>
+                {badge.label}
+              </span>
+            ))}
+          </div>
+          <div className="mb-4 flex flex-wrap gap-x-5 gap-y-[9px] border-y border-white/[0.06] py-4">
             {[
               { label: "Terms of Use", href: "/policies/terms" },
               { label: "Privacy Policy", href: "/policies/privacy" },
@@ -403,18 +519,28 @@ export function Footer({
           <p className="mt-3 text-[11.5px] leading-[1.8] text-[#5C4E36]">
             Tale Scale Networks Private Limited · Gurgaon, Haryana
           </p>
+          {/* Required before Gate 2 — business fills both registrations */}
+          <p className="mt-1 text-[11.5px] leading-[1.8] text-[#5C4E36]">
+            CIN [pending incorporation number] · GSTIN [pending registration]
+          </p>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.06] pt-4">
-            <div className="flex items-center gap-[10px]">
-              <span className="font-devanagari text-[22px] font-bold text-hero-text/85">
-                तप्
-              </span>
-              <span className="text-xs text-sub">
-                © 2026{" "}
-                <b className="font-semibold text-hero-text">
-                  Tale Scale Networks Private Limited
-                </b>
-                . All rights reserved.
-              </span>
+            <div className="flex flex-col gap-[6px]">
+              <div className="flex items-center gap-[10px]">
+                <span className="font-devanagari text-[22px] font-bold text-hero-text/85">
+                  तप्
+                </span>
+                <span className="text-xs text-sub">
+                  © 2026{" "}
+                  <b className="font-semibold text-hero-text">
+                    Tale Scale Networks Private Limited
+                  </b>
+                  . All rights reserved.
+                </span>
+              </div>
+              <p className="text-[11.5px] leading-[1.7] text-[#5C4E36]">
+                <span className="font-devanagari">तप्</span> · The Tapa Co. ·
+                the tapa company — © 2026 Komal Gupta. All rights reserved.
+              </p>
             </div>
             <span className="text-[11.5px] text-[#5C4E36]">
               Made in Gurgaon

@@ -22,7 +22,8 @@ import java.util.Set;
 
 /**
  * Mongo-backed search with the PRD's hard ranking rule baked in:
- * glossary definition → guides → dates → kits. Knowledge before commerce.
+ * glossary definition → guides → pujas → dates → downloads → kits.
+ * Knowledge first, commerce last (pujas and kits are flag-gated).
  *
  * Fuzziness is a normalized-token + edit-distance pass over a small corpus
  * (hundreds of documents) — plenty for Phase 1. A Typesense-backed provider
@@ -55,12 +56,14 @@ public class SearchService {
     private final SearchQueryRepository queryLog;
     private final PopularSearchRepository popular;
     private final co.thetapa.commerce.ProductRepository products;
+    private final co.thetapa.booking.PujaTypeRepository pujaTypes;
     private final co.thetapa.flags.FeatureFlagService flags;
 
     public SearchService(GlossaryRepository glossary, ArticleRepository articles,
                          ObservanceRepository observances, SearchQueryRepository queryLog,
                          PopularSearchRepository popular,
                          co.thetapa.commerce.ProductRepository products,
+                         co.thetapa.booking.PujaTypeRepository pujaTypes,
                          co.thetapa.flags.FeatureFlagService flags) {
         this.glossary = glossary;
         this.articles = articles;
@@ -68,6 +71,7 @@ public class SearchService {
         this.queryLog = queryLog;
         this.popular = popular;
         this.products = products;
+        this.pujaTypes = pujaTypes;
         this.flags = flags;
     }
 
@@ -78,6 +82,7 @@ public class SearchService {
         List<Hit> glossaryHits = new ArrayList<>();
         List<Hit> guideHits = new ArrayList<>();
         List<Hit> dateHits = new ArrayList<>();
+        List<Hit> downloadHits = new ArrayList<>();
 
         if (!tokens.isEmpty()) {
             for (GlossaryTerm term : glossary.findAllByOrderByTermAsc()) {
@@ -89,12 +94,23 @@ public class SearchService {
             for (Article a : articles.findByStatus(ArticleStatus.PUBLISHED,
                 org.springframework.data.domain.Pageable.unpaged())) {
                 var en = a.getLang().get("en");
-                if (en != null && matches(tokens, en.title(), en.deck(), a.getSubCategory())) {
+                if (en == null) {
+                    continue;
+                }
+                if (matches(tokens, en.title(), en.deck(), a.getSubCategory())) {
                     guideHits.add(new Hit(Hit.TYPE_GUIDE, en.title(),
                         "Vidhi, significance, samagri",
                         "/" + a.getCategory() + "/" + a.getSubCategory() + "/" + a.getSlug(),
                         a.getHueClass(),
                         a.getDpb() == null ? null : a.getDpb().classification().name()));
+                }
+                // every published ritual guide has a print-ready samagri card
+                if (a.getType() == co.thetapa.content.ArticleType.RITUAL_GUIDE
+                    && matches(tokens, en.title())) {
+                    downloadHits.add(new Hit(Hit.TYPE_DOWNLOAD, en.title(),
+                        "Samagri checklist card — PDF download",
+                        "/api/v1/cards/" + a.getSlug() + ".pdf",
+                        a.getHueClass(), "PDF"));
                 }
             }
             LocalDate today = LocalDate.now(co.thetapa.panchang.PanchangService.IST);
@@ -103,6 +119,26 @@ public class SearchService {
                     dateHits.add(new Hit(Hit.TYPE_DATE, o.getName(),
                         o.getDate() + (o.getTithiLabel() == null ? "" : " · " + o.getTithiLabel()),
                         "/panchang/o/" + o.getSlug(), "h-data", o.getType().name()));
+                }
+            }
+        }
+
+        // bookable pujas only surface once the purohit tab is live (flag-gated)
+        List<Hit> pujaHits = new ArrayList<>();
+        boolean purohitVisible = Boolean.TRUE.equals(flags.all().get(
+            co.thetapa.flags.FeatureFlagService.PUROHIT_TAB_VISIBLE));
+        if (purohitVisible && !tokens.isEmpty()) {
+            for (var puja : pujaTypes.findByActiveTrueOrderByNameAsc()) {
+                if (matches(tokens, puja.getName(), puja.getDescription())) {
+                    long minPaise = puja.getVariants() == null ? 0
+                        : puja.getVariants().stream()
+                            .mapToLong(co.thetapa.booking.PujaType.Variant::pricePaise)
+                            .min().orElse(0);
+                    pujaHits.add(new Hit(Hit.TYPE_PUJA, puja.getName(),
+                        (minPaise > 0 ? "From ₹" + (minPaise / 100) + " · " : "")
+                            + "Purohit-led, at your home",
+                        "/pujan-with-purohit/" + puja.getSlug(),
+                        puja.getHueClass(), "Book"));
                 }
             }
         }
@@ -126,14 +162,37 @@ public class SearchService {
             }
         }
 
-        int total = glossaryHits.size() + guideHits.size() + dateHits.size() + kitHits.size();
+        int total = glossaryHits.size() + guideHits.size() + pujaHits.size()
+            + dateHits.size() + downloadHits.size() + kitHits.size();
         List<String> didYouMean = total == 0 ? suggest(query) : List.of();
 
         logQuery(query, total);
 
         return new SearchResponse(query, total,
-            cap(glossaryHits), cap(guideHits), cap(dateHits), cap(kitHits),
-            didYouMean, popular.findByActiveTrueOrderByOrderAsc());
+            cap(glossaryHits), cap(guideHits), cap(pujaHits),
+            cap(dateHits), cap(downloadHits), cap(kitHits),
+            didYouMean, relatedSearches(glossaryHits, tokens),
+            popular.findByActiveTrueOrderByOrderAsc());
+    }
+
+    /**
+     * Curated companion queries for a matched glossary term — cheap static
+     * composition, no extra lookups (#123). Anchored on the hit whose NAME the
+     * query actually mentions (a definition-only match is a weaker anchor);
+     * empty when the query matched no term.
+     */
+    private static List<String> relatedSearches(List<Hit> glossaryHits, Set<String> queryTokens) {
+        if (glossaryHits.isEmpty()) {
+            return List.of();
+        }
+        String term = glossaryHits.stream()
+            .filter(h -> tokenize(h.title()).stream().anyMatch(
+                t -> queryTokens.stream().anyMatch(q -> t.contains(q) || q.contains(t))))
+            .findFirst()
+            .orElse(glossaryHits.get(0))
+            .title();
+        return List.of(term + " meaning", term + " vidhi",
+            term + " dates 2026", term + " samagri");
     }
 
     public List<SearchModels.SearchQuery> zeroResultQueries(int limit) {
@@ -180,7 +239,7 @@ public class SearchService {
         return suggestions.stream().distinct().limit(5).toList();
     }
 
-    private boolean matches(Set<String> queryTokens, String... fields) {
+    boolean matches(Set<String> queryTokens, String... fields) {
         Set<String> fieldTokens = new LinkedHashSet<>();
         for (String field : fields) {
             if (field != null) {
@@ -200,14 +259,97 @@ public class SearchService {
         return !queryTokens.isEmpty();
     }
 
-    private static Set<String> tokenize(String text) {
+    static Set<String> tokenize(String text) {
         Set<String> tokens = new LinkedHashSet<>();
         for (String token : normalize(text).split("[^a-z0-9\\u0900-\\u097F]+")) {
+            token = foldDevanagari(token);
             if (token.length() >= 2) {
                 tokens.add(SYNONYMS.getOrDefault(token, token));
             }
         }
         return tokens;
+    }
+
+    /* ── Devanagari → Latin folding (G38) ──────────────────────────────────
+     * A pragmatic akshara table covering the seeded vocabulary, so "एकादशी"
+     * matches "ekadashi" and "करवा चौथ" matches "karwa chauth" (व → "w" keeps
+     * the folded form within edit distance 1 of common Hindi romanizations).
+     * The inherent 'a' of a consonant is emitted only before another consonant
+     * or nasal sign — word-final schwa is dropped, Hindi-style. */
+
+    private static final Map<Character, String> DEVANAGARI_CONSONANTS = Map.ofEntries(
+        Map.entry('क', "k"), Map.entry('ख', "kh"), Map.entry('ग', "g"), Map.entry('घ', "gh"),
+        Map.entry('ङ', "n"), Map.entry('च', "ch"), Map.entry('छ', "chh"), Map.entry('ज', "j"),
+        Map.entry('झ', "jh"), Map.entry('ञ', "n"), Map.entry('ट', "t"), Map.entry('ठ', "th"),
+        Map.entry('ड', "d"), Map.entry('ढ', "dh"), Map.entry('ण', "n"), Map.entry('त', "t"),
+        Map.entry('थ', "th"), Map.entry('द', "d"), Map.entry('ध', "dh"), Map.entry('न', "n"),
+        Map.entry('प', "p"), Map.entry('फ', "ph"), Map.entry('ब', "b"), Map.entry('भ', "bh"),
+        Map.entry('म', "m"), Map.entry('य', "y"), Map.entry('र', "r"), Map.entry('ल', "l"),
+        Map.entry('ळ', "l"), Map.entry('व', "w"), Map.entry('श', "sh"), Map.entry('ष', "sh"),
+        Map.entry('स', "s"), Map.entry('ह', "h"),
+        Map.entry('ज़', "z"), Map.entry('फ़', "f") // ज़ फ़ (precomposed)
+    );
+
+    /** independent vowels + dependent matras, folded to their short Latin form */
+    private static final Map<Character, String> DEVANAGARI_VOWELS = Map.ofEntries(
+        Map.entry('अ', "a"), Map.entry('आ', "a"), Map.entry('इ', "i"), Map.entry('ई', "i"),
+        Map.entry('उ', "u"), Map.entry('ऊ', "u"), Map.entry('ऋ', "ri"), Map.entry('ए', "e"),
+        Map.entry('ऐ', "ai"), Map.entry('ओ', "o"), Map.entry('औ', "au"),
+        Map.entry('\u093E', "a"), Map.entry('\u093F', "i"), Map.entry('\u0940', "i"), Map.entry('\u0941', "u"),
+        Map.entry('\u0942', "u"), Map.entry('\u0943', "ri"), Map.entry('\u0947', "e"), Map.entry('\u0948', "ai"),
+        Map.entry('\u094B', "o"), Map.entry('\u094C', "au"), Map.entry('\u0949', "o"), Map.entry('\u0945', "a")
+    );
+
+    private static final char VIRAMA = '\u094D';
+    private static final char ANUSVARA = '\u0902';
+    private static final char CHANDRABINDU = '\u0901';
+    private static final char VISARGA = '\u0903';
+    private static final char NUKTA = '\u093C';
+
+    static String foldDevanagari(String token) {
+        boolean hasDevanagari = token.chars().anyMatch(c -> c >= 0x0900 && c <= 0x097F);
+        if (!hasDevanagari) {
+            return token;
+        }
+        StringBuilder out = new StringBuilder(token.length() + 4);
+        boolean pendingA = false;
+        for (char c : token.toCharArray()) {
+            String consonant = DEVANAGARI_CONSONANTS.get(c);
+            String vowel = DEVANAGARI_VOWELS.get(c);
+            if (consonant != null) {
+                if (pendingA) {
+                    out.append('a');
+                }
+                out.append(consonant);
+                pendingA = true;
+            } else if (vowel != null) {
+                out.append(vowel);
+                pendingA = false;
+            } else if (c == VIRAMA) {
+                pendingA = false;
+            } else if (c == ANUSVARA || c == CHANDRABINDU) {
+                if (pendingA) {
+                    out.append('a');
+                }
+                out.append('n');
+                pendingA = false;
+            } else if (c == VISARGA) {
+                if (pendingA) {
+                    out.append('a');
+                }
+                out.append('h');
+                pendingA = false;
+            } else if (c == NUKTA || (c >= 0x0900 && c <= 0x097F)) {
+                // unknown Devanagari sign — drop, keep the fold lossy-but-stable
+            } else {
+                if (pendingA) {
+                    out.append('a');
+                    pendingA = false;
+                }
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
 
     private static String normalize(String text) {

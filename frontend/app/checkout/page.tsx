@@ -6,7 +6,8 @@ import { CheckoutView } from "@/components/shop/CheckoutView";
 
 export const metadata: Metadata = {
   title: "Checkout",
-  description: "Delivery address and payment — prepaid only, no COD.",
+  description:
+    "Delivery address and payment for your cart — prepaid only, no COD.",
 };
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function CheckoutPage() {
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
-          { label: "Your bag", href: "/cart" },
+          { label: "Your cart", href: "/cart" },
           { label: "Checkout" },
         ]}
       />

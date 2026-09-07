@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CountdownPill } from "@/components/CountdownPill";
 import type { UpcomingObservance } from "@/lib/types";
-import { fmtShort, guideHref, weekday } from "@/lib/panchangExtras";
+import { guideHref, obsX } from "@/lib/panchangExtras";
+import { AmantaDate } from "./ConventionToggle";
 import { TypeBadge } from "./TypeBadge";
 
 /** Table shell: column header + rows. Columns collapse on mobile. */
@@ -38,15 +39,20 @@ export function ObservanceRow({
   highlight?: boolean;
 }) {
   const o = item.observance;
+  const isToday = o.date === now;
   return (
     <div
       className={`grid grid-cols-[86px_1fr] items-center gap-x-3 gap-y-1 border-b border-border-light px-5 py-[13px] last:border-b-0 md:grid-cols-[110px_1.4fr_1fr_180px] ${
-        highlight ? "bg-data-bg/40" : ""
+        isToday ? "bg-cta/10" : highlight ? "bg-data-bg/40" : ""
       }`}
     >
       <div>
-        <p className="text-[13.5px] font-bold text-ink">{fmtShort(o.date)}</p>
-        <p className="text-[11px] text-sub">{weekday(o.date)}</p>
+        <AmantaDate date={o.date} dateAmanta={obsX(o).dateAmanta} />
+        {isToday && (
+          <span className="mt-[3px] inline-flex items-center rounded-[5px] bg-cta px-[7px] py-[2px] text-[9px] font-bold tracking-[0.5px] text-white uppercase">
+            Today
+          </span>
+        )}
       </div>
       <div className="min-w-0">
         <p className="flex flex-wrap items-center gap-[7px]">
