@@ -3,6 +3,7 @@ package co.thetapa.engagement;
 import co.thetapa.common.ApiResponse;
 import co.thetapa.identity.AuthCookies;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +21,12 @@ import java.util.Map;
 public class AccountDeletionController {
 
     private final AccountDeletionService deletion;
+    private final String cookieDomain;
 
-    public AccountDeletionController(AccountDeletionService deletion) {
+    public AccountDeletionController(AccountDeletionService deletion,
+                                     @Value("${tapa.security.cookie-domain:}") String cookieDomain) {
         this.deletion = deletion;
+        this.cookieDomain = cookieDomain;
     }
 
     /** Itemised counts for the confirmation screen. Read-only. */
@@ -48,7 +52,7 @@ public class AccountDeletionController {
     public ApiResponse<Map<String, Object>> delete(@AuthenticationPrincipal String userId,
                                                    HttpServletResponse response) {
         var result = deletion.delete(userId);
-        AuthCookies.clear(response);
+        AuthCookies.clear(response, cookieDomain);
         return ApiResponse.ok(Map.of(
             "deleted", true,
             "retained", Map.of(

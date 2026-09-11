@@ -17,13 +17,17 @@ public final class AuthCookies {
     }
 
     /** Expires both auth cookies on the response — the browser session ends immediately. */
-    public static void clear(HttpServletResponse response) {
+    public static void clear(HttpServletResponse response, String cookieDomain) {
         for (String name : new String[]{ACCESS_COOKIE, REFRESH_COOKIE}) {
             Cookie cookie = new Cookie(name, "");
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(0);
             cookie.setAttribute("SameSite", "Lax");
+            if (cookieDomain != null && !cookieDomain.isBlank()) {
+                cookie.setDomain(cookieDomain);
+                cookie.setSecure(true);
+            }
             response.addCookie(cookie);
         }
     }

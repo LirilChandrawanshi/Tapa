@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,11 +30,14 @@ public class AuthController {
     private final OtpService otpService;
     private final JwtService jwtService;
     private final UserRepository users;
+    private final String cookieDomain;
 
-    public AuthController(OtpService otpService, JwtService jwtService, UserRepository users) {
+    public AuthController(OtpService otpService, JwtService jwtService, UserRepository users,
+                         @Value("${tapa.security.cookie-domain:}") String cookieDomain) {
         this.otpService = otpService;
         this.jwtService = jwtService;
         this.users = users;
+        this.cookieDomain = cookieDomain;
     }
 
     public record PhoneRequest(@NotBlank String phone) {
@@ -124,6 +128,10 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         cookie.setAttribute("SameSite", "Lax");
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            cookie.setDomain(cookieDomain);
+            cookie.setSecure(true);
+        }
         response.addCookie(cookie);
     }
 

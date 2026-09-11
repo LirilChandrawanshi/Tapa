@@ -21,6 +21,8 @@ management:
         include: health,info
 
 tapa:
+  security:
+    cookie-domain: ${TAPA_COOKIE_DOMAIN:}
   jwt:
     # override in prod via TAPA_JWT_SECRET
     secret: ${TAPA_JWT_SECRET:dev-only-secret-change-me-0123456789abcdef0123456789abcdef}
