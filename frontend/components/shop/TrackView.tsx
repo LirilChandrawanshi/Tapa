@@ -8,6 +8,7 @@ import {
   fetchOrder,
   formatDateMedium,
   formatPaise,
+  refuseDelivery,
   type OrderView,
 } from "@/lib/shop";
 
@@ -25,6 +26,7 @@ function stepIndex(status: string): number {
     case "PACKING":
       return 1;
     case "DISPATCHED":
+    case "DELAYED":
     case "SHIPPED":
     case "OUT_FOR_DELIVERY":
       return 2;
@@ -155,6 +157,7 @@ export function TrackView() {
           onAskCancel={() => setConfirmingCancel(true)}
           onKeep={() => setConfirmingCancel(false)}
           onConfirmCancel={() => void onCancel(state.order)}
+          onOrderUpdated={(order) => setState({ kind: "ready", order })}
         />
       )}
     </div>
@@ -169,6 +172,7 @@ function OrderCard({
   onAskCancel,
   onKeep,
   onConfirmCancel,
+  onOrderUpdated,
 }: {
   order: OrderView;
   phone: string;
@@ -177,7 +181,19 @@ function OrderCard({
   onAskCancel: () => void;
   onKeep: () => void;
   onConfirmCancel: () => void;
+  onOrderUpdated: (order: OrderView) => void;
 }) {
+  const [keepAcknowledged, setKeepAcknowledged] = useState(false);
+  const [refusing, setRefusing] = useState(false);
+
+  async function handleRefuse() {
+    if (refusing) return;
+    setRefusing(true);
+    const res = await refuseDelivery(order.orderNumber, phone);
+    setRefusing(false);
+    if (res.ok) onOrderUpdated(res.data);
+  }
+
   const cancelled = ["CANCELLED", "REFUND_INITIATED", "REFUNDED"].includes(
     order.status.toUpperCase(),
   );
@@ -266,6 +282,50 @@ function OrderCard({
             );
           })}
         </ol>
+      )}
+
+      {/* delivery delayed — proactive, states the choice plainly */}
+      {order.status.toUpperCase() === "DELAYED" && (
+        <div className="mb-4 rounded-[12px] border border-pratha-bd bg-pratha-bg px-4 py-3">
+          <p className="text-[13.5px] font-bold text-ink">
+            Your order is running late
+          </p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-sub">
+            {order.revisedDeliveryDate
+              ? `The courier now expects delivery by ${formatDateMedium(order.revisedDeliveryDate)}.`
+              : "We're waiting on a revised delivery date from the courier."}{" "}
+            Keep the order, or refuse it at the door — it comes back to us
+            and the full amount is returned within 3–7 working days of it
+            reaching the warehouse.
+          </p>
+          {order.refusalRequested ? (
+            <p className="mt-2 text-[12.5px] font-semibold text-body">
+              Noted — we&apos;ll start the refund once it&apos;s back with us.
+            </p>
+          ) : keepAcknowledged ? (
+            <p className="mt-2 text-[12.5px] font-semibold text-body">
+              Good — no action needed, we&apos;ll keep you posted.
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setKeepAcknowledged(true)}
+                className="rounded-[9px] bg-ink px-4 py-[9px] text-[12.5px] font-bold text-white"
+              >
+                Keep the order
+              </button>
+              <button
+                type="button"
+                disabled={refusing}
+                onClick={() => void handleRefuse()}
+                className="rounded-[9px] border border-border bg-card px-4 py-[9px] text-[12.5px] font-bold text-body disabled:opacity-60"
+              >
+                {refusing ? "…" : "I will refuse the delivery"}
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* courier + tracking id, whenever the courier has it (#174) */}
@@ -384,8 +444,8 @@ function OrderCard({
           Report a problem ›
         </Link>
         <p className="mt-1 text-[11.5px] text-sub">
-          Damaged box, broken or missing item — replacement or refund, your
-          choice, within one working day.
+          Damaged box, broken or missing item — item-level replacement
+          first, within one working day.
         </p>
       </div>
     </div>

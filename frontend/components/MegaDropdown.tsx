@@ -467,7 +467,7 @@ export function MegaDropdown({
               <div className="mb-[10px] flex items-start gap-[9px] rounded-[11px] border border-data-bd bg-data-bg px-[14px] py-3">
                 <span
                   aria-hidden
-                  className="mt-[5px] h-[7px] w-[7px] shrink-0 rounded-full bg-[#3FBF6A] shadow-[0_0_0_3px_rgba(63,191,106,0.2)]"
+                  className="live-dot mt-[5px] h-[7px] w-[7px] shrink-0 rounded-full bg-[#3FBF6A] shadow-[0_0_0_3px_rgba(63,191,106,0.2)]"
                 />
                 <span>
                   <span className="block text-[9.5px] font-bold tracking-[0.5px] text-data-fg">

@@ -24,7 +24,8 @@ export function KitManifest({ items }: { items: KitItem[] }) {
         What&apos;s in this kit
       </h2>
       <p className="mb-4 text-[13px] text-sub">
-        {items.length} items, weighed and sealed separately.
+        {items.length} {items.length === 1 ? "item" : "items"}, weighed and
+        sealed separately.
       </p>
       <ol className="overflow-hidden rounded-[14px] border border-border bg-card">
         {visible.map((item) => (

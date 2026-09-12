@@ -15,15 +15,15 @@ export interface FestivalDay {
 
 /** Devi / colour / offering strip — practitioner custom, navratri only. */
 const NAVRATRI_ROWS = [
-  { devi: "Shailputri", colour: "Orange", offering: "Cow's ghee" },
-  { devi: "Brahmacharini", colour: "White", offering: "Sugar" },
-  { devi: "Chandraghanta", colour: "Red", offering: "Milk" },
-  { devi: "Kushmanda", colour: "Royal blue", offering: "Malpua" },
-  { devi: "Skandamata", colour: "Yellow", offering: "Banana" },
-  { devi: "Katyayani", colour: "Green", offering: "Honey" },
-  { devi: "Kaalratri", colour: "Grey", offering: "Jaggery" },
-  { devi: "Mahagauri", colour: "Purple", offering: "Coconut" },
-  { devi: "Siddhidatri", colour: "Peacock green", offering: "Sesame" },
+  { devi: "Shailputri", colour: "Orange", swatch: "#E8952A", offering: "Cow's ghee" },
+  { devi: "Brahmacharini", colour: "White", swatch: "#FFFFFF", offering: "Sugar" },
+  { devi: "Chandraghanta", colour: "Red", swatch: "#D02040", offering: "Milk" },
+  { devi: "Kushmanda", colour: "Royal blue", swatch: "#1B4F9C", offering: "Malpua" },
+  { devi: "Skandamata", colour: "Yellow", swatch: "#EFC42A", offering: "Banana" },
+  { devi: "Katyayani", colour: "Green", swatch: "#3E8B4A", offering: "Honey" },
+  { devi: "Kaalratri", colour: "Grey", swatch: "#8A8A8A", offering: "Jaggery" },
+  { devi: "Mahagauri", colour: "Purple", swatch: "#7A4A96", offering: "Coconut" },
+  { devi: "Siddhidatri", colour: "Peacock green", swatch: "#2E8B7A", offering: "Sesame" },
 ] as const;
 
 /** Notable-day flag for one row — simple derived rules, never invented data. */
@@ -79,7 +79,9 @@ export function DayByDayTable({
           return (
             <div
               key={d.date}
-              className={`grid items-baseline gap-3 border-b border-border-light px-5 py-[11px] last:border-b-0 ${cols}`}
+              className={`grid items-baseline gap-3 border-b border-border-light px-5 py-[11px] last:border-b-0 ${cols} ${
+                flag ? "bg-data-bg/50" : ""
+              }`}
             >
               <span className="text-[13.5px] font-bold text-data-fg">
                 {i + 1}
@@ -113,7 +115,16 @@ export function DayByDayTable({
                 </span>
               )}
               {isNavratri && (
-                <span className="text-[12px] text-mid">{nav?.colour ?? "—"}</span>
+                <span className="flex items-center gap-[6px] text-[12px] text-mid">
+                  {nav && (
+                    <span
+                      aria-hidden
+                      className="inline-block size-[11px] shrink-0 rounded-full border border-border"
+                      style={{ backgroundColor: nav.swatch }}
+                    />
+                  )}
+                  {nav?.colour ?? "—"}
+                </span>
               )}
               {isNavratri ? (
                 <span className="text-[12px] text-mid">
@@ -185,41 +196,164 @@ export function MuhuratWindows({ day1 }: { day1: PanchangDay | null }) {
 /* ── "What's unusual this year" band ─────────────────────────────────── */
 
 export interface TithiAnomaly {
+  kind: "vriddhi" | "merge";
   tithi: string;
-  dates: [string, string];
+  /** Both civil dates for a vriddhi; the single join date for a merge. */
+  dates: string[];
+  /** For a merge: the tithi that begins at the same moment. */
+  into?: string;
 }
 
-/** Consecutive civil days carrying the same sunrise tithi → vriddhi. */
+/**
+ * The two shapes the spec calls out by name.
+ *
+ * `vriddhi` — consecutive civil days carrying the same sunrise tithi, so the
+ * observance stretches a day longer than its name suggests.
+ * `merge` — one tithi ends and the next begins inside the same civil day, so
+ * two numbered days collapse onto one date.
+ *
+ * Both are read off the tithi windows we already hold. Nothing is inferred
+ * where a day payload is missing: an absent tithi simply yields no anomaly.
+ */
 export function detectAnomalies(days: FestivalDay[]): TithiAnomaly[] {
   const out: TithiAnomaly[] = [];
   for (let i = 1; i < days.length; i++) {
     const a = days[i - 1]?.day?.tithi?.name;
     const b = days[i]?.day?.tithi?.name;
     if (a && b && a === b) {
-      out.push({ tithi: a, dates: [days[i - 1].date, days[i].date] });
+      out.push({
+        kind: "vriddhi",
+        tithi: a,
+        dates: [days[i - 1].date, days[i].date],
+      });
     }
+  }
+  // A tithi that ends part-way through its own civil day hands over to the
+  // next one on that same date — the Ashtami/Navami join the spec describes.
+  for (let i = 0; i < days.length - 1; i++) {
+    const here = days[i]?.day?.tithi;
+    const next = days[i + 1]?.day?.tithi?.name;
+    if (!here?.name || !here.endsAt || !next || next === here.name) continue;
+    if (here.endsAt.slice(0, 10) !== days[i].date) continue;
+    out.push({
+      kind: "merge",
+      tithi: here.name,
+      into: next,
+      dates: [days[i].date],
+    });
   }
   return out;
 }
 
+const ORDINAL = ["One", "Two", "Three", "Four"] as const;
+
 export function UnusualBand({ anomalies }: { anomalies: TithiAnomaly[] }) {
   if (anomalies.length === 0) return null;
   return (
-    <section className="rounded-[15px] border border-pratha-bd bg-pratha-bg p-6">
-      <p className="mb-1 text-[10px] font-bold tracking-[0.8px] text-pratha-fg uppercase">
-        What&rsquo;s unusual this year
-      </p>
-      {anomalies.map((a) => (
-        <p
-          key={`${a.tithi}-${a.dates[0]}`}
-          className="mt-2 text-[13px] leading-relaxed text-pratha-fg"
-        >
-          <b>{a.tithi} is long.</b> It covers both {fmtShort(a.dates[0])} and{" "}
-          {fmtShort(a.dates[1])}, so two civil days carry the same tithi label
-          and the observance stretches a day further than usual. This is
-          normal tithi vriddhi — nothing has gone wrong.
+    <section>
+      <div className="mb-3">
+        <p className="text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
+          Stated, not smoothed over
         </p>
-      ))}
+        <h2 className="text-[17px] font-bold text-ink">
+          {anomalies.length === 1
+            ? "One thing makes this year unusual"
+            : `${anomalies.length} things make this year unusual`}
+        </h2>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {anomalies.slice(0, 4).map((a, i) => (
+          <div
+            key={`${a.kind}-${a.tithi}-${a.dates[0]}`}
+            className="rounded-[15px] border border-pratha-bd bg-pratha-bg p-5"
+          >
+            <p className="mb-1 text-[9.5px] font-bold tracking-[0.9px] text-pratha-fg/70 uppercase">
+              {ORDINAL[i] ?? `${i + 1}`}
+            </p>
+            {a.kind === "vriddhi" ? (
+              <>
+                <p className="text-[14.5px] font-bold text-pratha-fg">
+                  {a.tithi} is long
+                </p>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-pratha-fg/85">
+                  It covers both {fmtShort(a.dates[0])} and{" "}
+                  {fmtShort(a.dates[1])}, so two civil days carry the same
+                  tithi label and the observance stretches a day further than
+                  usual. This is normal tithi vriddhi and nothing has gone
+                  wrong.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[14.5px] font-bold text-pratha-fg">
+                  {a.tithi} and {a.into} merge
+                </p>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-pratha-fg/85">
+                  On {fmtShort(a.dates[0])}. {a.tithi} ends and {a.into}{" "}
+                  begins at that same moment, so both fall on one civil date
+                  and the sandhi window sits across the join.
+                </p>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ── "Where panchangs disagree" ──────────────────────────────────────── */
+
+export interface VarianceSource {
+  name: string;
+  position: string;
+}
+
+/**
+ * The spec's variance block: when a tithi merge moves an observance between
+ * two defensible dates, both readings are named and neither is presented as
+ * the correct one. This is a difference of panchang convention, not of
+ * scripture, and the PRD's truth-first rule says to state it rather than
+ * pick a winner.
+ */
+export function PanchangVariance({
+  lead,
+  sources,
+}: {
+  lead: string;
+  sources: readonly VarianceSource[];
+}) {
+  if (sources.length === 0) return null;
+  return (
+    <section className="rounded-[15px] border border-border bg-card p-6">
+      <p className="mb-1 text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
+        Stated, not hidden
+      </p>
+      <h2 className="text-[16.5px] leading-snug font-bold text-ink">{lead}</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {sources.map((s) => (
+          <div
+            key={s.name}
+            className="rounded-[13px] border border-data-bd bg-data-bg px-4 py-[14px]"
+          >
+            <p className="mb-1 text-[9.5px] font-bold tracking-[0.9px] text-data-fg/60 uppercase">
+              {s.name}
+            </p>
+            <p className="text-[12.5px] leading-relaxed text-data-fg">
+              {s.position}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-[13px] leading-relaxed text-sub">
+        Both are defensible. This is a difference of{" "}
+        <b className="text-ink">panchang convention, not of scripture</b>, and
+        we will not present one as the correct answer.
+      </p>
+      <p className="mt-2 text-[13px] leading-relaxed text-sub">
+        Follow your family or community panchang. If you have none, follow the
+        one your local temple uses.
+      </p>
     </section>
   );
 }

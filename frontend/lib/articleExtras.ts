@@ -110,6 +110,58 @@ export function hueFromClass(
     : fallback;
 }
 
+const DEITY_HUE: Record<string, DeityHue> = {
+  shiva: "shiva",
+  mahadev: "shiva",
+  krishna: "krishna",
+  vishnu: "vishnu",
+  ganesh: "ganesh",
+  ganesha: "ganesh",
+  ganpati: "ganesh",
+  devi: "devi",
+  parvati: "devi",
+  durga: "devi",
+  lakshmi: "devi",
+};
+
+/** Free-text Observance.deity ("Shiva", "Parvati") → DeityHue, substring match. */
+export function deityHue(deity: string | undefined, fallback: DeityHue = "gold"): DeityHue {
+  if (!deity) return fallback;
+  const key = deity.trim().toLowerCase();
+  if (DEITY_HUE[key]) return DEITY_HUE[key];
+  const found = Object.keys(DEITY_HUE).find((k) => key.includes(k));
+  return found ? DEITY_HUE[found] : fallback;
+}
+
+/**
+ * Canonical presiding deities for `Article.deity` — the admin picker and
+ * the /all-articles facet read the same list, so they cannot drift.
+ * Null/absent is legitimate: Panchang and most concepts serve no one deity.
+ */
+export const DEITIES = [
+  { slug: "shiva", label: "Shiva" },
+  { slug: "vishnu", label: "Vishnu" },
+  { slug: "krishna", label: "Krishna" },
+  { slug: "devi", label: "Devi" },
+  { slug: "ganesha", label: "Ganesha" },
+  { slug: "surya", label: "Surya" },
+  { slug: "hanuman", label: "Hanuman" },
+] as const;
+
+/** Free-text or slug deity → canonical DEITIES slug, or null when unclaimed. */
+export function normalizeDeity(deity: string | undefined | null): string | null {
+  if (!deity) return null;
+  const key = deity.trim().toLowerCase();
+  const exact = DEITIES.find((d) => d.slug === key);
+  if (exact) return exact.slug;
+  // tolerate the aliases editors actually type ("Ganpati", "Mahadev", "Durga")
+  const alias = DEITY_HUE[key] ?? DEITY_HUE[
+    Object.keys(DEITY_HUE).find((k) => key.includes(k)) ?? ""
+  ];
+  if (alias === "ganesh") return "ganesha";
+  return DEITIES.find((d) => d.slug === alias)?.slug ?? null;
+}
+
 /** Lowercase Pill/DpbBadge tag from the API's uppercase classification. */
 export function dpbTagOf(dpb: Dpb): "dharma" | "pratha" | "bhranti" {
   if (dpb.classification === "PRATHA") return "pratha";
@@ -307,6 +359,11 @@ export function compositionCounts(article: Article): {
     if (block.type === "MYTHS") {
       corrections += block.myths?.length ?? 0;
     }
+    // section-level tags (the concept template's per-section tag row)
+    const sectionTag = block.dpb?.classification;
+    if (sectionTag === "DHARMA" || sectionTag === "MIXED") scriptural += 1;
+    else if (sectionTag === "PRATHA") regional += 1;
+    else if (sectionTag === "BHRANTI") corrections += 1;
     for (const step of block.steps ?? []) {
       const tag = step.dpb?.classification;
       if (tag === "DHARMA" || tag === "MIXED") scriptural += 1;

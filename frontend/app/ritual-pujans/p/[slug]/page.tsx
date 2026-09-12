@@ -10,6 +10,7 @@ import { BuyBox } from "@/components/shop/BuyBox";
 import { KitManifest } from "@/components/shop/KitManifest";
 import { PincodeCheck } from "@/components/shop/PincodeCheck";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { ProductGallery } from "@/components/shop/ProductGallery";
 import {
   articleHref,
   fetchRelatedSafe,
@@ -148,6 +149,11 @@ export default async function ProductPage({
     description: p.description,
     sku: p.slug,
     url: productUrl,
+    // absolute URLs — Google rejects relative ones in Product.image
+    ...((p.imageIds ?? []).length > 0 && {
+      image: (p.imageIds ?? []).map((id) => `${SITE_URL}/api/v1/media/${id}`),
+    }),
+    ...(p.titleDevanagari && { alternateName: p.titleDevanagari }),
     brand: { "@type": "Brand", name: "The Tapa Company" },
     offers: {
       "@type": "Offer",
@@ -244,21 +250,14 @@ export default async function ProductPage({
       <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-10">
         {/* ── Top fold: visual + buy column ── */}
         <div className="mb-11 grid items-start gap-7 md:grid-cols-[0.95fr_1.05fr] md:gap-10">
-          <div
-            className={`${p.hueClass} flex min-h-[260px] flex-col justify-between rounded-[18px] p-6 md:min-h-[340px]`}
-          >
-            <span className="self-end rounded-[5px] border border-white/30 bg-white/20 px-[9px] py-[3px] text-[9.5px] font-bold tracking-[0.4px] text-white">
-              {p.eyebrow}
-            </span>
-            <div>
-              <p className="font-devanagari text-[64px] leading-none text-white/95 md:text-[84px]">
-                {p.titleDevanagari}
-              </p>
-              <p className="mt-3 text-[11px] font-bold tracking-[1px] text-white/70 uppercase">
-                {p.items.length} items · weighed and sealed separately
-              </p>
-            </div>
-          </div>
+          <ProductGallery
+            imageIds={p.imageIds ?? []}
+            title={p.title}
+            titleDevanagari={p.titleDevanagari}
+            eyebrow={p.eyebrow}
+            hueClass={p.hueClass}
+            itemCount={p.items.length}
+          />
 
           <div>
             <p className="mb-[8px] text-[10px] font-bold tracking-[0.8px] text-gold uppercase">

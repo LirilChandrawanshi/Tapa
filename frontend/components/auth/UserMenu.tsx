@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AUTH_EVENT, getMe, logout, type Me } from "@/lib/auth";
 
+function WhatsAppIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Z" />
+    </svg>
+  );
+}
+
 function initialsOf(name: string, phone: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -23,7 +31,14 @@ const MENU_LINKS = [
  * initials avatar with the account menu (per the Header spec). Refreshes on
  * mount, window focus and the AUTH_EVENT fired by sign-in/sign-out.
  */
-export function UserMenu({ variant }: { variant: "desktop" | "drawer" }) {
+export function UserMenu({
+  variant,
+  showCreateAccount = true,
+}: {
+  variant: "desktop" | "drawer";
+  /** Desktop only — phase 2 drops "Create account" in favour of the cart. */
+  showCreateAccount?: boolean;
+}) {
   const [me, setMe] = useState<Me | null>(null);
   const [checked, setChecked] = useState(false);
   const [open, setOpen] = useState(false);
@@ -74,12 +89,26 @@ export function UserMenu({ variant }: { variant: "desktop" | "drawer" }) {
   if (variant === "drawer") {
     if (!me) {
       return (
-        <Link
-          href="/sign-in"
-          className="mb-[9px] block w-full rounded-xl bg-cta py-[14px] text-center text-[14.5px] font-bold text-white"
-        >
-          Sign in
-        </Link>
+        <div className="flex flex-col gap-[9px]">
+          <Link
+            href="/tapa-circle?from=/"
+            className="flex items-center justify-center gap-[9px] rounded-xl bg-wa py-[14px] text-center text-[14.5px] font-bold text-white"
+          >
+            <WhatsAppIcon /> Join the Tapa Circle
+          </Link>
+          <Link
+            href="/sign-in"
+            className="block w-full rounded-xl bg-cta py-[14px] text-center text-[14.5px] font-bold text-white"
+          >
+            Create account
+          </Link>
+          <Link
+            href="/sign-in"
+            className="block w-full rounded-xl border-[1.5px] border-border py-[14px] text-center text-[14.5px] font-bold text-body"
+          >
+            Sign in
+          </Link>
+        </div>
       );
     }
     return (
@@ -106,12 +135,22 @@ export function UserMenu({ variant }: { variant: "desktop" | "drawer" }) {
   /* ---------- desktop ---------- */
   if (!checked || !me) {
     return (
-      <Link
-        href="/sign-in"
-        className="hidden rounded-[10px] bg-cta px-5 py-[11px] text-[13.5px] font-bold whitespace-nowrap text-white lg:block"
-      >
-        Sign in
-      </Link>
+      <div className="hidden items-center gap-[9px] lg:flex">
+        <Link
+          href="/sign-in"
+          className="rounded-[10px] border-[1.5px] border-border px-[17px] py-[10px] text-[13.5px] font-semibold whitespace-nowrap text-body"
+        >
+          Sign in
+        </Link>
+        {showCreateAccount && (
+          <Link
+            href="/sign-in"
+            className="rounded-[10px] bg-cta px-[19px] py-[11px] text-[13.5px] font-bold whitespace-nowrap text-white"
+          >
+            Create account
+          </Link>
+        )}
+      </div>
     );
   }
 

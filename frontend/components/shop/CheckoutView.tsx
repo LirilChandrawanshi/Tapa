@@ -494,7 +494,7 @@ export function CheckoutView() {
             })}
           </div>
           <p className="mt-3 text-[11.5px] text-sub">
-            Prepaid only. Pre-booked items cancel free within 48 hours,
+            Prepaid only. Pre-booked items cancel free within 72 hours,
             in-stock items within 24 — stated again on your confirmation.
           </p>
         </section>
@@ -527,9 +527,10 @@ export function CheckoutView() {
               charged.
             </p>
             <p className="mb-1 text-[12.5px] text-sub">
-              Your cart is intact. Try the payment again whenever you are ready.
-              {earliestOrderBy &&
-                ` Your pre-booking is held until ${formatDateMedium(earliestOrderBy)} — the order-by cut-off.`}
+              Your cart is intact.
+              {earliestOrderBy
+                ? ` Your pre-booking is held until ${formatDateMedium(earliestOrderBy)} — there is no rush, try again whenever you are ready.`
+                : " Try the payment again whenever you are ready."}
             </p>
             <p className="mb-2 text-[12.5px] text-sub">
               If money left your account, it returns on its own within 5
@@ -557,14 +558,21 @@ export function CheckoutView() {
         )}
 
         {phase.kind !== "payment_failed" && (
-          <button
-            type="button"
-            onClick={onPay}
-            disabled={busy}
-            className="w-full rounded-[10px] bg-cta px-6 py-[13px] text-[14.5px] font-bold text-white hover:opacity-90 disabled:opacity-60"
-          >
-            {busy ? "Taking you to payment…" : `Pay ${formatPaise(total)}`}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={onPay}
+              disabled={busy}
+              className="w-full rounded-[10px] bg-cta px-6 py-[13px] text-[14.5px] font-bold text-white hover:opacity-90 disabled:opacity-60"
+            >
+              {busy ? "Processing your payment…" : `Pay ${formatPaise(total)}`}
+            </button>
+            {busy && (
+              <p className="mt-2 text-center text-[11.5px] text-sub">
+                Do not close this screen.
+              </p>
+            )}
+          </>
         )}
       </div>
 

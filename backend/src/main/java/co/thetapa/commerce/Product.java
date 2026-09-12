@@ -53,9 +53,6 @@ public class Product {
     private LocalDate festivalDate;
     private Integer stock;            // null = untracked
 
-    /** 48 for pre-book, 24 for live (hours after order in which cancellation is free) */
-    private int cancellationHours = 48;
-
     private List<String> linkedGuideSlugs;
     private String linkedObservanceSlug;
 
@@ -109,8 +106,8 @@ public class Product {
     public void setFestivalDate(LocalDate festivalDate) { this.festivalDate = festivalDate; }
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
-    public int getCancellationHours() { return cancellationHours; }
-    public void setCancellationHours(int cancellationHours) { this.cancellationHours = cancellationHours; }
+    /** Locked policy: 72 hours free cancellation on a pre-booked kit, 24 on an in-stock one. */
+    public int getCancellationHours() { return availability == Availability.PREBOOK ? 72 : 24; }
     public List<String> getLinkedGuideSlugs() { return linkedGuideSlugs; }
     public void setLinkedGuideSlugs(List<String> linkedGuideSlugs) { this.linkedGuideSlugs = linkedGuideSlugs; }
     public String getLinkedObservanceSlug() { return linkedObservanceSlug; }

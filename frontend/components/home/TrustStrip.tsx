@@ -61,7 +61,9 @@ export async function TrustStrip({ kitsLaunched }: { kitsLaunched?: boolean }) {
   const badges = launched ? P2_BADGES : P1_BADGES;
 
   return (
-    <section className="border-b border-border bg-card">
+    // mt-10 matches the pt-10 rhythm every other section uses — without it
+    // this full-bleed band butts straight into the card above it.
+    <section className="mt-10 border-y border-border bg-card">
       <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-x-4 gap-y-4 px-4 py-5 md:grid-cols-4 md:px-10">
         {badges.map((b) => (
           <div key={b.label} className="flex items-start gap-[10px]">

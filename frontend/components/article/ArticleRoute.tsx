@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleView } from "./ArticleView";
+import { ConceptView } from "./ConceptView";
 import { fetchArticleSafe } from "@/lib/articleExtras";
 import { getSection, type NavSectionKey } from "@/lib/taxonomy";
 
@@ -45,8 +46,14 @@ export async function ArticleRoute({
     );
   }
 
+  // Dharmic Concepts get their own template — a concept is an argument, not
+  // a procedure, so the ritual-guide furniture (samagri, muhurat, ritual card)
+  // does not apply. See ConceptView.
+  const Template =
+    article.type === "DHARMIC_CONCEPT" ? ConceptView : ArticleView;
+
   return (
-    <ArticleView
+    <Template
       article={article}
       sectionKey={sectionKey}
       sectionLabel={section.label}

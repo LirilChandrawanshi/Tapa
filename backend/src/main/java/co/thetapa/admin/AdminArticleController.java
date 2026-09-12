@@ -31,10 +31,13 @@ public class AdminArticleController {
 
     private final ArticleRepository repository;
     private final ArticleService articleService;
+    private final org.springframework.context.ApplicationEventPublisher events;
 
-    public AdminArticleController(ArticleRepository repository, ArticleService articleService) {
+    public AdminArticleController(ArticleRepository repository, ArticleService articleService,
+                                  org.springframework.context.ApplicationEventPublisher events) {
         this.repository = repository;
         this.articleService = articleService;
+        this.events = events;
     }
 
     @GetMapping
@@ -84,7 +87,14 @@ public class AdminArticleController {
         body.setStatus(existing.getStatus());
         body.setPublishedAt(existing.getPublishedAt());
         body.setCreatedAt(existing.getCreatedAt());
-        return ApiResponse.ok(repository.save(body));
+        Article saved = repository.save(body);
+        // Editing an already-live article has to purge the frontend's ISR cache
+        // too — otherwise a hero image swapped in the CMS stays invisible until
+        // the 1-hour TTL lapses. Publishing already fired this; updating did not.
+        if (saved.getStatus() == ArticleStatus.PUBLISHED) {
+            events.publishEvent(new ArticleService.ArticlePublishedEvent(saved.getSlug()));
+        }
+        return ApiResponse.ok(saved);
     }
 
     @PostMapping("/{slug}/submit-review")

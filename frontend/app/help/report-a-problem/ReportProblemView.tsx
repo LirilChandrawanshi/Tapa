@@ -2,20 +2,23 @@
 
 /**
  * Report-a-problem form (#147/#160). Order number + phone prefill from
- * ?on= & ?phone=; no photo upload yet — we request photos on WhatsApp.
- * After submit: "WHAT HAPPENS NEXT" — replacement or refund, buyer's choice,
- * reply within one working day. All copy fear-free.
+ * ?on= & ?phone=; up to four photos can be attached after the report is
+ * created. Resolution is item-level replacement first — a coupon code only
+ * if the item can't be replaced, never a cash refund on a damage claim.
  */
 
 import Link from "next/link";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
+  addIssuePhoto,
   ISSUE_REASONS,
   reportIssue,
   type IssueReason,
   type IssueView,
 } from "@/lib/orders";
+
+const MAX_PHOTOS = 4;
 
 const inputCls =
   "w-full rounded-[9px] border border-border bg-bg px-[13px] py-[10px] text-[13.5px] text-ink outline-none focus:border-cta";
@@ -31,6 +34,8 @@ export function ReportProblemView() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<IssueView | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [photoError, setPhotoError] = useState("");
 
   const canSubmit =
     orderNumber.trim().length > 0 && /^\d{10}$/.test(phone) && reason !== null;
@@ -57,6 +62,16 @@ export function ReportProblemView() {
     }
   };
 
+  const uploadPhoto = async (file: File) => {
+    if (!done || uploading || done.photoIds.length >= MAX_PHOTOS) return;
+    setUploading(true);
+    setPhotoError("");
+    const res = await addIssuePhoto(done.orderNumber, done.id, phone, file);
+    setUploading(false);
+    if (res.ok) setDone(res.data);
+    else setPhotoError(res.message);
+  };
+
   /* ---- after submit: what happens next ---- */
   if (done) {
     return (
@@ -76,6 +91,45 @@ export function ReportProblemView() {
           </p>
         </div>
 
+        <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
+          <p className="mb-2 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
+            Add photos — optional, up to {MAX_PHOTOS}
+          </p>
+          <p className="mb-3 text-[12px] leading-relaxed text-sub">
+            One photo of the outer box and one of the item usually settles
+            this in a single step.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            {done.photoIds.map((id) => (
+              <img
+                key={id}
+                src={`/api/v1/media/${encodeURIComponent(id)}`}
+                alt=""
+                className="size-[56px] rounded-[9px] border border-border object-cover"
+              />
+            ))}
+            {done.photoIds.length < MAX_PHOTOS && (
+              <label className="flex size-[56px] cursor-pointer items-center justify-center rounded-[9px] border border-dashed border-border bg-bg text-[18px] text-sub hover:border-cta">
+                {uploading ? "…" : "+"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void uploadPhoto(file);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            )}
+          </div>
+          {photoError && (
+            <p className="mt-2 text-[12px] text-pratha-fg">{photoError}</p>
+          )}
+        </div>
+
         <div className="rounded-[14px] border border-border bg-card p-[18px]">
           <p className="mb-3 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
             What happens next
@@ -83,8 +137,8 @@ export function ReportProblemView() {
           <ol className="space-y-[10px]">
             {[
               "We reply within one working day — usually much sooner.",
-              "We'll request photos on WhatsApp if they help resolve this faster. No forms.",
-              "Your choice of fix: an item-level replacement, or a refund for what went wrong. You decide, not us.",
+              "We replace the affected item — not the whole kit, only what arrived wrong.",
+              "If that item can't be replaced, we send a coupon code to make up for it instead of a cash refund.",
             ].map((step, i) => (
               <li
                 key={step}
@@ -97,6 +151,13 @@ export function ReportProblemView() {
               </li>
             ))}
           </ol>
+          {done.resolution && (
+            <p className="mt-3 border-t border-border-light pt-3 text-[13px] font-semibold text-ink">
+              {done.resolution === "REPLACEMENT"
+                ? "Resolved — a replacement is on its way."
+                : `Resolved — coupon code ${done.couponCode} is yours to use on your next order.`}
+            </p>
+          )}
           <p className="mt-3 border-t border-border-light pt-3 text-[12px] text-sub">
             Prefer email? Write to{" "}
             <a
@@ -199,8 +260,8 @@ export function ReportProblemView() {
         </label>
 
         <p className="mt-3 text-[11.5px] leading-relaxed text-sub">
-          No photo upload needed here — we&apos;ll request photos on WhatsApp
-          if they help resolve this faster.
+          You can add photos on the next screen — one of the outer box and
+          one of the item usually settles this fastest.
         </p>
 
         {error && (
@@ -217,8 +278,8 @@ export function ReportProblemView() {
           {busy ? "Sending…" : "Send the report"}
         </button>
         <p className="mt-2 text-center text-[11.5px] text-sub">
-          Item-level replacement or refund — your choice. We reply within one
-          working day.
+          Item-level replacement first — a coupon if we can&apos;t replace it.
+          We reply within one working day.
         </p>
       </div>
     </form>

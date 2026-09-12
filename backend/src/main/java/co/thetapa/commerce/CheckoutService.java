@@ -230,6 +230,26 @@ public class CheckoutService {
         return saved;
     }
 
+    /**
+     * Buyer chooses "I will refuse the delivery" on a delayed order. Records
+     * intent only — the refund follows once the courier confirms the return
+     * (an admin transition to CANCELLED), same as the mockup's own open item
+     * on the reverse-pickup leg.
+     */
+    public Order requestRefusal(String orderNumber, String requesterPhone) {
+        Order order = orders.findByOrderNumber(orderNumber)
+            .orElseThrow(() -> new NotFoundException("order", orderNumber));
+        if (!order.getPhone().equals(requesterPhone)) {
+            throw new NotFoundException("order", orderNumber); // no ownership leak
+        }
+        if (order.getStatus() != Order.Status.DISPATCHED && order.getStatus() != Order.Status.DELAYED) {
+            throw new ValidationFailedException(List.of("This order isn't out for delivery yet."));
+        }
+        order.setRefusalRequested(true);
+        order.setStatusNote("You asked to refuse this delivery — we'll start the refund once it's back with us.");
+        return orders.save(order);
+    }
+
     /** TK-YYYY-NNNN via an atomic counter document. */
     String nextOrderNumber() {
         int year = Year.now(co.thetapa.panchang.PanchangService.IST).getValue();

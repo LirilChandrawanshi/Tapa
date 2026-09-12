@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumb } from "@/components/Breadcrumb";
 import { CategoryHero } from "@/components/CategoryHero";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { CountdownPill } from "@/components/CountdownPill";
@@ -12,10 +11,7 @@ import {
   VerifyingPanel,
 } from "@/components/panchang/DataMeta";
 import { ConventionToggle } from "@/components/panchang/ConventionToggle";
-import {
-  ObservanceRow,
-  ObservanceTable,
-} from "@/components/panchang/ObservanceRow";
+import { ObservanceFilter } from "@/components/panchang/ObservanceFilter";
 import {
   CitySelect,
   PdfDownloadLink,
@@ -25,6 +21,11 @@ import {
   PanchangDashboard,
 } from "@/components/panchang/PanchangDashboard";
 import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
+import { ControlBar, ControlSep } from "@/components/panchang/ControlBar";
+import {
+  StickyActionBar,
+  StickyLabel,
+} from "@/components/panchang/StickyActionBar";
 import {
   fetchCalendarMonth,
   fetchPanchangToday,
@@ -33,15 +34,17 @@ import {
 import {
   CITY_LABEL,
   daysBetween,
+  fetchCalendarYear,
   fmtEnds,
   fmtLong,
+  fmtShort,
   guideHref,
   mergeObservances,
   monthKey,
   safeFetch,
   todayIst,
 } from "@/lib/panchangExtras";
-import type { DayPayload } from "@/lib/types";
+import type { DayPayload, UpcomingObservance } from "@/lib/types";
 
 /**
  * ISR at 5 minutes — this dashboard renders "today" strings server-side
@@ -57,7 +60,16 @@ export const metadata: Metadata = {
 };
 
 /** Hero side card — compact snapshot of today. */
-function TodaySnapshot({ payload, now }: { payload: DayPayload | null; now: string }) {
+function TodaySnapshot({
+  payload,
+  now,
+  next,
+}: {
+  payload: DayPayload | null;
+  now: string;
+  /** The nearest upcoming observance — rendered as the card's footer. */
+  next?: UpcomingObservance | null;
+}) {
   const day = payload?.day ?? null;
   if (!day) {
     return (
@@ -79,6 +91,12 @@ function TodaySnapshot({ payload, now }: { payload: DayPayload | null; now: stri
     ["Nakshatra", day.nakshatra?.name ?? "—"],
     ["Sunrise / Sunset", day.sunrise && day.sunset ? `${day.sunrise} / ${day.sunset}` : "—"],
     ["Rahu Kaal", day.rahuKaal ? `${day.rahuKaal.from} – ${day.rahuKaal.to}` : "—"],
+    [
+      "Yoga · Karana",
+      day.yoga || day.karana
+        ? [day.yoga, day.karana].filter(Boolean).join(" · ")
+        : "—",
+    ],
   ];
   return (
     <div>
@@ -119,48 +137,87 @@ function TodaySnapshot({ payload, now }: { payload: DayPayload | null; now: stri
         verified={payload?.verified}
         className="mt-2 !text-hero-text/50"
       />
+      {next && <NextMajorDate item={next} />}
     </div>
   );
 }
 
-const FOUR_WAYS = [
-  {
-    icon: "☀",
-    title: "Today's Panchang",
-    text: "The full day — tithi, nakshatra, yoga, sunrise, sunset and Rahu Kaal.",
-    href: "/panchang",
-    cta: "You are here",
-  },
-  {
-    icon: "📿",
-    title: "2026 Vrat Calendar",
-    text: "Every Ekadashi, Teej, Purnima and Amavasya of the year, with its tithi.",
-    href: "/panchang/vrat-calendar",
-    cta: "Open the calendar ›",
-  },
-  {
-    icon: "🎆",
-    title: "Festival Calendar",
-    text: "Season by season, for anyone who plans in months rather than tithis.",
-    href: "/panchang/festival-calendar",
-    cta: "Browse festivals ›",
-  },
-  {
-    icon: "🌑",
-    title: "Eclipses & Sutak",
-    text: "What an eclipse means for puja, and why visibility decides everything.",
-    href: "/panchang/eclipses",
-    cta: "Read the explainer ›",
-  },
-] as const;
+/** Today-card footer: the nearest observance and the way into its page. */
+function NextMajorDate({ item }: { item: UpcomingObservance }) {
+  const o = item.observance;
+  return (
+    <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2 border-t border-white/10 pt-3">
+      <p className="text-[11.5px] text-hero-text/75">
+        <b className="font-bold text-hero-text">Next major date —</b>{" "}
+        {o.name}, {fmtShort(o.date)}
+      </p>
+      <Link
+        href={o.articleSlug ? guideHref(o.articleSlug) : `/panchang/o/${o.slug}`}
+        className="text-[11.5px] font-bold whitespace-nowrap text-eyebrow-dark hover:underline"
+      >
+        {o.articleSlug ? "Open guide ›" : "Timing details ›"}
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * "Four ways in" — the spec's sub-category cards. The CTA carries a live
+ * count where we have one, so the card states the size of what it opens.
+ */
+function fourWaysIn(counts: {
+  year: string;
+  vrat: number;
+  festival: number;
+  eclipse: number;
+}) {
+  return [
+    {
+      icon: "☀",
+      title: "Today's Panchang",
+      text: "The full day — tithi, nakshatra, yoga, karana, sunrise, sunset and Rahu Kaal.",
+      href: "/panchang",
+      cta: "You are here",
+    },
+    {
+      icon: "📿",
+      title: `${counts.year} Vrat Calendar`,
+      text: "Every Ekadashi, Pradosh, Chaturthi, Purnima and Amavasya for the year.",
+      href: "/panchang/vrat-calendar",
+      cta: counts.vrat > 0 ? `${counts.vrat} dates ›` : "Open the calendar ›",
+    },
+    {
+      icon: "🎆",
+      title: "Festival Calendar",
+      text: "Gregorian dates month by month, for anyone who thinks in months rather than tithis.",
+      href: "/panchang/festival-calendar",
+      cta:
+        counts.festival > 0
+          ? `${counts.festival} festivals ›`
+          : "Browse by month ›",
+    },
+    {
+      icon: "🌑",
+      title: "Eclipse & Grahan",
+      text: "Upcoming eclipses, visibility by city, and what actually determines Sutak Kaal.",
+      href: "/panchang/eclipses",
+      cta:
+        counts.eclipse > 0
+          ? `${counts.eclipse} in ${counts.year} ›`
+          : "Read the explainer ›",
+    },
+  ] as const;
+}
 
 export default async function PanchangPage() {
   const now = todayIst();
-  const [today, upcoming, monthA, monthB] = await Promise.all([
+  const year = now.slice(0, 4);
+  const [today, upcoming, monthA, monthB, yearItems] = await Promise.all([
     safeFetch(fetchPanchangToday()),
     safeFetch(fetchUpcoming(3)),
     safeFetch(fetchCalendarMonth(monthKey(now))),
     safeFetch(fetchCalendarMonth(monthKey(now, 1))),
+    fetchCalendarYear(year, fetchCalendarMonth),
   ]);
 
   const day = today?.day ?? null;
@@ -169,39 +226,55 @@ export default async function PanchangPage() {
     return d >= 0 && d <= 30;
   });
 
+  // Hero counters — real figures off the year, never a hardcoded "142".
+  const vratCount = yearItems.filter(
+    (u) =>
+      u.observance.type === "VRAT" || u.observance.type === "PURNIMA_AMAVASYA",
+  ).length;
+  const eclipseCount = yearItems.filter(
+    (u) => u.observance.type === "ECLIPSE",
+  ).length;
+  const festivalCount = yearItems.filter(
+    (u) =>
+      u.observance.type === "FESTIVAL" ||
+      u.observance.type === "SPECIAL_SEASONAL",
+  ).length;
+
   return (
     <main className="pb-16">
-      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Panchang" }]} />
-
       <CategoryHero
         variant="pa"
+        image="/brand/calender.png"
         eyebrow="Panchang"
         title="The calendar that follows the Moon"
         description="Today's tithi, the year's vrat dates, and how to read any of it yourself. This page answers when — the ritual guides answer how."
         meta={[
           { value: "365", label: "days computed" },
-          { value: CITY_LABEL, label: "IST timings" },
+          vratCount > 0
+            ? { value: String(vratCount), label: `vrat dates in ${year}` }
+            : { value: CITY_LABEL, label: "IST timings" },
           { value: "Drik Panchang", label: "source" },
         ]}
-        side={<TodaySnapshot payload={today} now={now} />}
+        side={
+          <TodaySnapshot payload={today} now={now} next={upcoming?.[0]} />
+        }
       />
 
       <PanchangSubnav active="today" />
 
       {/* Control strip: marker, city, convention, PDF */}
-      <div className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 md:px-10">
-          <TimingDataTag />
-          <CitySelect />
-          <ConventionToggle />
-          <PdfDownloadLink
-            surface="landing-strip"
-            className="ml-auto rounded-[9px] border border-data-fg bg-data-fg px-[14px] py-[7px] text-[12px] font-bold text-white hover:opacity-90"
-          >
-            ↓ Download 2026 calendar (PDF)
-          </PdfDownloadLink>
-        </div>
-      </div>
+      <ControlBar>
+        <TimingDataTag />
+        <CitySelect />
+        <ControlSep />
+        <ConventionToggle />
+        <PdfDownloadLink
+          surface="landing-strip"
+          className="ml-auto rounded-[9px] border border-data-fg bg-data-fg px-[14px] py-[7px] text-[12px] font-bold text-white hover:opacity-90"
+        >
+          ↓ Download {year} calendar (PDF)
+        </PdfDownloadLink>
+      </ControlBar>
 
       <div className="mx-auto max-w-[1280px] px-4 md:px-10">
         {/* Dashboard */}
@@ -335,7 +408,12 @@ export default async function PanchangPage() {
             title="What you can look up"
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FOUR_WAYS.map((w) => (
+            {fourWaysIn({
+              year,
+              vrat: vratCount,
+              festival: festivalCount,
+              eclipse: eclipseCount,
+            }).map((w) => (
               <Link
                 key={w.title}
                 href={w.href}
@@ -370,16 +448,7 @@ export default async function PanchangPage() {
           />
           {next30.length > 0 ? (
             <>
-              <ObservanceTable>
-                {next30.map((u, i) => (
-                  <ObservanceRow
-                    key={`${u.observance.slug}-${u.observance.date}`}
-                    item={u}
-                    now={now}
-                    highlight={i === 0}
-                  />
-                ))}
-              </ObservanceTable>
+              <ObservanceFilter items={next30} now={now} />
               <SourceStrip className="mt-2" />
             </>
           ) : (
@@ -416,7 +485,7 @@ export default async function PanchangPage() {
               📅 One PDF, the whole year
             </p>
             <h2 className="text-[17px] font-bold text-hero-text">
-              The full 2026 calendar
+              The full {year} calendar
             </h2>
             <p className="mt-2 text-[13px] leading-relaxed text-hero-text/65">
               Every tithi, vrat and festival date for the year — print it, or
@@ -426,11 +495,35 @@ export default async function PanchangPage() {
               surface="landing-band"
               className="mt-4 inline-block w-fit rounded-[9px] bg-cta px-4 py-2 text-[12.5px] font-bold text-white"
             >
-              Download 2026 calendar (PDF)
+              Download {year} calendar (PDF)
             </PdfDownloadLink>
           </div>
         </section>
       </div>
+
+      {/* Sticky download bar — the spec pins the calendar to every panchang page */}
+      <StickyActionBar
+        secondary={
+          <p className="min-w-0 truncate text-[12.5px] text-mid">
+            <b className="text-ink">Download the full {year} calendar</b>
+            <span className="hidden text-sub sm:inline">
+              {" "}
+              — every tithi, vrat and festival date
+            </span>
+          </p>
+        }
+        primary={
+          <PdfDownloadLink
+            surface="landing-sticky"
+            className="rounded-[9px] bg-cta px-4 py-[7px] text-[12px] font-bold text-white hover:opacity-90"
+          >
+            <StickyLabel
+              title="Download PDF"
+              note={vratCount > 0 ? `${vratCount} vrat dates` : undefined}
+            />
+          </PdfDownloadLink>
+        }
+      />
     </main>
   );
 }

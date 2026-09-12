@@ -3,18 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CountdownPill } from "@/components/CountdownPill";
 import { LANG_EVENT, type Lang } from "@/components/LangToggle";
 import { OtpBottomSheet } from "@/components/auth/OtpBottomSheet";
-import {
-  getMe,
-  getSavedRituals,
-  logout,
-  unsaveRitual,
-  updateMe,
-  type Me,
-  type SavedRitual,
-} from "@/lib/auth";
+import { getMe, getSavedRituals, logout, updateMe, type Me } from "@/lib/auth";
 import { getReminders } from "@/lib/account";
 import { getMyBookings } from "@/lib/booking";
 import { getMyMandaliRequests } from "@/lib/mandali";
@@ -27,43 +18,18 @@ function initialsOf(name: string, phone: string): string {
   return phone.slice(-2);
 }
 
-function prettyCategory(category: string): string {
-  return category
-    .split("-")
-    .filter(Boolean)
-    .map((w) => w[0].toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
-/** Mirrors lib/articleExtras.articleHref — saved items don't carry subCategory. */
-function savedHref(item: SavedRitual): string {
-  const base =
-    item.category === "dharmic-concepts"
-      ? "/dharmic-concepts"
-      : "/ritual-guides";
-  return `${base}/all/${item.articleSlug}`;
-}
-
-function prettyDate(iso: string): string {
-  const d = new Date(`${iso}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 const ROW =
   "flex w-full items-center gap-3 px-4 py-[14px] text-left text-[14px]";
+
+const GROUP_HEADER =
+  "border-b border-border-light bg-bg px-4 py-[10px] text-[11px] font-bold uppercase tracking-[1px] text-mid";
 
 export default function AccountPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<Me | null>(null);
-  const [savedItems, setSavedItems] = useState<SavedRitual[]>([]);
-  const [savedOpen, setSavedOpen] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
   const [bookingCount, setBookingCount] = useState(0);
   const [mandaliCount, setMandaliCount] = useState(0);
@@ -71,9 +37,7 @@ export default function AccountPage() {
   const [circleStatus, setCircleStatus] = useState<string>("NONE");
   const [circleOpen, setCircleOpen] = useState(false);
   const [gateOpen, setGateOpen] = useState(false);
-  const [now, setNow] = useState<Date | null>(null);
   const [langBusy, setLangBusy] = useState(false);
-  const [removing, setRemoving] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const [
@@ -99,7 +63,9 @@ export default function AccountPage() {
         .catch(() => null),
     ]);
     setMe(meRes.ok ? meRes.data : null);
-    setSavedItems(savedRes.ok ? savedRes.data : []);
+    setSavedCount(
+      savedRes.ok ? savedRes.data.length : (meRes.ok ? meRes.data.savedCount : 0),
+    );
     setOrderCount(ordersRes.ok ? (ordersRes.data ?? []).length : 0);
     setBookingCount(bookingsRes.ok ? (bookingsRes.data ?? []).length : 0);
     setMandaliCount(mandaliRes.ok ? (mandaliRes.data ?? []).length : 0);
@@ -109,7 +75,6 @@ export default function AccountPage() {
   }, []);
 
   useEffect(() => {
-    setNow(new Date());
     void load();
   }, [load]);
 
@@ -128,24 +93,9 @@ export default function AccountPage() {
     }
   }
 
-  async function removeSaved(slug: string) {
-    if (removing) return;
-    setRemoving(slug);
-    const res = await unsaveRitual(slug);
-    setRemoving(null);
-    if (res.ok) {
-      setSavedItems((items) => items.filter((i) => i.articleSlug !== slug));
-      setMe((m) =>
-        m ? { ...m, savedCount: Math.max(0, m.savedCount - 1) } : m,
-      );
-    }
-  }
-
   async function onLogout() {
     await logout();
     setMe(null);
-    setSavedItems([]);
-    setSavedOpen(false);
     router.refresh();
   }
 
@@ -207,7 +157,6 @@ export default function AccountPage() {
 
   /* ---------- signed in ---------- */
   const displayName = me.name || "Tapa Member";
-  const savedCount = savedItems.length || me.savedCount;
 
   return (
     <main className="mx-auto w-full max-w-[680px] px-4 py-8">
@@ -313,200 +262,146 @@ export default function AccountPage() {
         </div>
       )}
 
-      {/* rows */}
-      <div className="mt-6 divide-y divide-border-light overflow-hidden rounded-2xl border border-border bg-card">
-        {/* Saved Rituals (expandable) */}
-        <div>
-          <button
-            type="button"
-            className={`${ROW} hover:bg-bg/60`}
-            aria-expanded={savedOpen}
-            onClick={() => setSavedOpen((v) => !v)}
-          >
+      {/* WHAT I KEEP */}
+      <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+        <h2 className={GROUP_HEADER}>What I keep</h2>
+        <div className="divide-y divide-border-light">
+          <Link href="/account/saved" className={`${ROW} hover:bg-bg/60`}>
             <span aria-hidden>🔖</span>
             <span className="flex-1 font-semibold text-body">
               Saved Rituals
             </span>
             <span className="text-[12px] text-sub">{savedCount}</span>
-            <span
-              aria-hidden
-              className={`text-[11px] text-sub transition-transform ${savedOpen ? "rotate-180" : ""}`}
-            >
-              ▼
+            <span aria-hidden className="text-[11px] text-sub">
+              ›
             </span>
+          </Link>
+
+          <Link href="/account/reminders" className={`${ROW} hover:bg-bg/60`}>
+            <span aria-hidden>⏰</span>
+            <span className="flex-1 font-semibold text-body">My Reminders</span>
+            <span className="text-[12px] text-sub">{reminderCount}</span>
+            <span aria-hidden className="text-[11px] text-sub">
+              ›
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      {/* WHAT I BOUGHT */}
+      <section className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <h2 className={GROUP_HEADER}>What I bought</h2>
+        <div className="divide-y divide-border-light">
+          <Link href="/account/orders" className={`${ROW} hover:bg-bg/60`}>
+            <span aria-hidden>📦</span>
+            <span className="flex-1 font-semibold text-body">Orders</span>
+            <span className="text-[12px] text-sub">{orderCount}</span>
+            <span aria-hidden className="text-[11px] text-sub">
+              ›
+            </span>
+          </Link>
+
+          <Link href="/account/bookings" className={`${ROW} hover:bg-bg/60`}>
+            <span aria-hidden>🪔</span>
+            <span className="flex-1 font-semibold text-body">Puja Bookings</span>
+            <span className="text-[12px] text-sub">{bookingCount}</span>
+            <span aria-hidden className="text-[11px] text-sub">
+              ›
+            </span>
+          </Link>
+
+          <Link href="/bhajan-mandali/track" className={`${ROW} hover:bg-bg/60`}>
+            <span aria-hidden>🎶</span>
+            <span className="flex-1 font-semibold text-body">Mandali Requests</span>
+            <span className="text-[12px] text-sub">{mandaliCount}</span>
+            <span aria-hidden className="text-[11px] text-sub">
+              ›
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      {/* SETTINGS */}
+      <section className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <h2 className={GROUP_HEADER}>Settings</h2>
+        <div className="divide-y divide-border-light">
+          <div className={ROW}>
+            <span aria-hidden>🌐</span>
+            <span className="flex-1 font-semibold text-body">Language</span>
+            <div
+              role="group"
+              aria-label="Language preference"
+              className="flex gap-[2px] rounded-lg bg-bg p-[3px]"
+            >
+              {(
+                [
+                  { value: "en", label: "EN" },
+                  { value: "hi", label: "हिं" },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  disabled={langBusy}
+                  aria-pressed={me.languagePref === option.value}
+                  onClick={() => void chooseLang(option.value)}
+                  className={`rounded-md px-[11px] py-[5px] text-xs font-bold ${
+                    me.languagePref === option.value
+                      ? "bg-cta text-white"
+                      : "bg-transparent text-cta"
+                  } ${option.value === "hi" ? "font-devanagari" : ""}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Link href="/account/notifications" className={`${ROW} hover:bg-bg/60`}>
+            <span aria-hidden>🔔</span>
+            <span className="flex-1 font-semibold text-body">
+              Notification Preferences
+            </span>
+            <span aria-hidden className="text-[11px] text-sub">
+              ›
+            </span>
+          </Link>
+
+          <a href="mailto:help@thetapaco.com" className={`${ROW} hover:bg-bg/60`}>
+            <span aria-hidden>💬</span>
+            <span className="flex-1 font-semibold text-body">
+              Help &amp; Support
+            </span>
+            <span className="text-[12px] text-sub">help@thetapaco.com</span>
+          </a>
+        </div>
+      </section>
+
+      {/* ACCOUNT */}
+      <section className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <h2 className={GROUP_HEADER}>Account</h2>
+        <div className="divide-y divide-border-light">
+          <button
+            type="button"
+            onClick={() => void onLogout()}
+            className={`${ROW} hover:bg-bg/60`}
+          >
+            <span aria-hidden>↩</span>
+            <span className="flex-1 font-bold text-cta">Log out</span>
           </button>
 
-          {savedOpen && (
-            <div className="border-t border-border-light bg-bg/40 px-4 py-2">
-              {savedItems.length === 0 ? (
-                <p className="py-3 text-[13px] text-sub">
-                  Nothing saved yet. Tap <b>🔖 Save</b> on any ritual guide and
-                  it will wait for you here.
-                </p>
-              ) : (
-                <ul className="divide-y divide-border-light">
-                  {savedItems.map((item) => (
-                    <li
-                      key={item.articleSlug}
-                      className={`flex items-center gap-3 py-3 ${item.past ? "opacity-50" : ""}`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <Link
-                          href={savedHref(item)}
-                          className="block truncate text-[13.5px] font-semibold text-body hover:text-cta"
-                        >
-                          {item.title}
-                        </Link>
-                        <p className="mt-[2px] text-[11px] uppercase tracking-[0.5px] text-sub">
-                          {prettyCategory(item.category)}
-                          {item.observanceDate &&
-                            ` · ${prettyDate(item.observanceDate)}`}
-                        </p>
-                      </div>
-                      {item.past ? (
-                        <span className="rounded-[5px] border border-border bg-card px-[8px] py-[3px] text-[9.5px] font-bold tracking-[0.4px] text-sub">
-                          RETURNS 2027
-                        </span>
-                      ) : (
-                        item.observanceDate &&
-                        now && (
-                          <CountdownPill date={item.observanceDate} now={now} />
-                        )
-                      )}
-                      <button
-                        type="button"
-                        disabled={removing === item.articleSlug}
-                        onClick={() => void removeSaved(item.articleSlug)}
-                        className="text-[12px] font-semibold text-sub underline underline-offset-2 hover:text-cta disabled:opacity-40"
-                        aria-label={`Remove ${item.title} from saved rituals`}
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          <Link href="/account/delete" className={`${ROW} hover:bg-red-50`}>
+            <span aria-hidden>🗑</span>
+            <span className="flex-1 font-bold text-red-600">
+              Delete my account
+            </span>
+            <span className="text-[11.5px] text-sub">permanent</span>
+            <span aria-hidden className="text-[11px] text-red-400">
+              ›
+            </span>
+          </Link>
         </div>
-
-        {/* Orders */}
-        <Link href="/account/orders" className={`${ROW} hover:bg-bg/60`}>
-          <span aria-hidden>📦</span>
-          <span className="flex-1 font-semibold text-body">Orders</span>
-          <span className="text-[12px] text-sub">{orderCount}</span>
-          <span aria-hidden className="text-[11px] text-sub">
-            ›
-          </span>
-        </Link>
-
-        {/* Puja Bookings */}
-        <Link href="/account/bookings" className={`${ROW} hover:bg-bg/60`}>
-          <span aria-hidden>🪔</span>
-          <span className="flex-1 font-semibold text-body">Puja Bookings</span>
-          <span className="text-[12px] text-sub">{bookingCount}</span>
-          <span aria-hidden className="text-[11px] text-sub">
-            ›
-          </span>
-        </Link>
-
-        {/* Mandali Requests */}
-        <Link href="/bhajan-mandali/track" className={`${ROW} hover:bg-bg/60`}>
-          <span aria-hidden>🎶</span>
-          <span className="flex-1 font-semibold text-body">Mandali Requests</span>
-          <span className="text-[12px] text-sub">{mandaliCount}</span>
-          <span aria-hidden className="text-[11px] text-sub">
-            ›
-          </span>
-        </Link>
-
-        {/* My Reminders */}
-        <Link href="/account/reminders" className={`${ROW} hover:bg-bg/60`}>
-          <span aria-hidden>⏰</span>
-          <span className="flex-1 font-semibold text-body">My Reminders</span>
-          <span className="text-[12px] text-sub">{reminderCount}</span>
-          <span aria-hidden className="text-[11px] text-sub">
-            ›
-          </span>
-        </Link>
-
-        {/* Language */}
-        <div className={ROW}>
-          <span aria-hidden>🌐</span>
-          <span className="flex-1 font-semibold text-body">Language</span>
-          <div
-            role="group"
-            aria-label="Language preference"
-            className="flex gap-[2px] rounded-lg bg-bg p-[3px]"
-          >
-            {(
-              [
-                { value: "en", label: "EN" },
-                { value: "hi", label: "हिं" },
-              ] as const
-            ).map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                disabled={langBusy}
-                aria-pressed={me.languagePref === option.value}
-                onClick={() => void chooseLang(option.value)}
-                className={`rounded-md px-[11px] py-[5px] text-xs font-bold ${
-                  me.languagePref === option.value
-                    ? "bg-cta text-white"
-                    : "bg-transparent text-cta"
-                } ${option.value === "hi" ? "font-devanagari" : ""}`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Notification Preferences */}
-        <Link href="/account/notifications" className={`${ROW} hover:bg-bg/60`}>
-          <span aria-hidden>🔔</span>
-          <span className="flex-1 font-semibold text-body">
-            Notification Preferences
-          </span>
-          <span aria-hidden className="text-[11px] text-sub">
-            ›
-          </span>
-        </Link>
-
-        {/* Help & Support */}
-        <a href="mailto:help@thetapaco.com" className={`${ROW} hover:bg-bg/60`}>
-          <span aria-hidden>💬</span>
-          <span className="flex-1 font-semibold text-body">
-            Help &amp; Support
-          </span>
-          <span className="text-[12px] text-sub">help@thetapaco.com</span>
-        </a>
-
-        {/* Log out — always last */}
-        <button
-          type="button"
-          onClick={() => void onLogout()}
-          className={`${ROW} hover:bg-bg/60`}
-        >
-          <span aria-hidden>↩</span>
-          <span className="flex-1 font-bold text-cta">Log out</span>
-        </button>
-      </div>
-
-      {/* danger zone */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-red-300 bg-card">
-        <Link href="/account/delete" className={`${ROW} hover:bg-red-50`}>
-          <span aria-hidden>🗑</span>
-          <span className="flex-1 font-bold text-red-600">
-            Delete my account
-          </span>
-          <span className="text-[11.5px] text-sub">permanent</span>
-          <span aria-hidden className="text-[11px] text-red-400">
-            ›
-          </span>
-        </Link>
-      </div>
+      </section>
     </main>
   );
 }

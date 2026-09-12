@@ -19,13 +19,15 @@ class IssueControllerTest {
 
     private IssueReportRepository issues;
     private OrderRepository orders;
+    private co.thetapa.media.MediaService media;
     private IssueController controller;
 
     @BeforeEach
     void setUp() {
         issues = Mockito.mock(IssueReportRepository.class);
         orders = Mockito.mock(OrderRepository.class);
-        controller = new IssueController(issues, orders);
+        media = Mockito.mock(co.thetapa.media.MediaService.class);
+        controller = new IssueController(issues, orders, media);
         when(issues.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Order order = new Order();
@@ -40,7 +42,7 @@ class IssueControllerTest {
             new IssueController.IssueBody("9812340001", "ITEM_MISSING", "The diya is missing"));
         assertThat(res.data().status()).isEqualTo("NEW");
         assertThat(res.data().reason()).isEqualTo("ITEM_MISSING");
-        assertThat(res.data().photoNote()).contains("WhatsApp");
+        assertThat(res.data().photoIds()).isEmpty();
         verify(issues).save(any());
     }
 

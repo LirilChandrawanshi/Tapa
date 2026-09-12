@@ -3,6 +3,7 @@ package co.thetapa.taxonomy;
 import jakarta.annotation.PostConstruct;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.List;
 public class TaxonomyService {
 
     private final TaxonomyRepository repository;
+    private final ApplicationEventPublisher events;
 
-    public TaxonomyService(TaxonomyRepository repository) {
+    public TaxonomyService(TaxonomyRepository repository, ApplicationEventPublisher events) {
         this.repository = repository;
+        this.events = events;
     }
 
     @PostConstruct
@@ -61,6 +64,10 @@ public class TaxonomyService {
     @CacheEvict(value = "taxonomy", allEntries = true)
     public Taxonomy save(Taxonomy taxonomy) {
         taxonomy.setId(Taxonomy.SINGLETON_ID);
-        return repository.save(taxonomy);
+        Taxonomy saved = repository.save(taxonomy);
+        events.publishEvent(new TaxonomyChangedEvent());
+        return saved;
     }
+
+    public record TaxonomyChangedEvent() {}
 }

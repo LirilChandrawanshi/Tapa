@@ -8,7 +8,10 @@
   "readMinutes": 6,
   "isFestival": false,
   "isFeatured": false,
-  "relatedSlugs": ["aja-ekadashi", "shravana-putrada-ekadashi"],
+  "relatedSlugs": [
+    "aja-ekadashi",
+    "shravana-putrada-ekadashi"
+  ],
   "dpb": {
     "classification": "DHARMA",
     "confidenceScore": 3,
@@ -28,7 +31,16 @@
           "type": "SIGNIFICANCE_QUOTE",
           "title": "The rule most people never hear",
           "text": "The sutak is observed only where the grahan is visible; where the eclipse is not seen, no restriction applies.",
-          "meta": { "attribution": "Dharmasindhu, Grahana-prakarana" }
+          "meta": {
+            "attribution": "Dharmasindhu, Grahana-prakarana"
+          },
+          "dpb": {
+            "classification": "DHARMA",
+            "confidenceScore": 3,
+            "sourceName": "Dharmasindhu",
+            "sourceRef": "Grahana-prakarana",
+            "sourceClass": "NIBANDHA"
+          }
         },
         {
           "type": "PROSE",
@@ -39,21 +51,46 @@
           "type": "ORIGIN",
           "title": "Where sutak comes from",
           "text": "Sutak is the quiet period the nibandha texts, the Dharmasindhu chief among them, attach to an eclipse: from roughly four praharas (about twelve hours) before a surya grahan, and three praharas (about nine hours) before a chandra grahan, until the eclipse releases. During it, tradition pauses eating, temple worship and new beginnings, and takes a snan at moksha — the eclipse's end. Two limits in the texts themselves keep sutak humane: it applies only where the eclipse is actually visible, and children, the elderly, the ill and pregnant women are expressly permitted food and medicine. Sutak is a devotional pause, not a quarantine.",
-          "meta": { "attribution": "Dharmasindhu, Grahana-prakarana" }
+          "meta": {
+            "attribution": "Dharmasindhu, Grahana-prakarana",
+            "subtitle": "Nine hours, twelve hours — and two limits the texts set on themselves."
+          },
+          "dpb": {
+            "classification": "DHARMA",
+            "confidenceScore": 3,
+            "sourceName": "Dharmasindhu",
+            "sourceRef": "Grahana-prakarana",
+            "sourceClass": "NIBANDHA"
+          }
         },
         {
           "type": "PROSE",
           "title": "What tradition sets aside — and what it never asked",
-          "text": "Within a visible eclipse's sutak, tradition sets aside meals, murti-sparsh in temples and muhurat-dependent beginnings, and favours japa, path and daan — the eclipse hours are considered especially fruitful for mantra. That is the whole of it. The texts do not ask you to fear the sky, to stay frozen indoors, to throw away food, or to book a remedial puja. If an eclipse is not visible in your city, the panchang position is simple: for you, that day carries no sutak at all."
+          "text": "Within a visible eclipse's sutak, tradition sets aside meals, murti-sparsh in temples and muhurat-dependent beginnings, and favours japa, path and daan — the eclipse hours are considered especially fruitful for mantra. That is the whole of it. The texts do not ask you to fear the sky, to stay frozen indoors, to throw away food, or to book a remedial puja. If an eclipse is not visible in your city, the panchang position is simple: for you, that day carries no sutak at all.",
+          "meta": {
+            "turn": "Where the eclipse is not visible, the tradition asks nothing of you at all."
+          }
         },
         {
           "type": "MYTHS",
           "title": "Eclipse fears — answered",
           "myths": [
-            { "question": "Will an eclipse harm my unborn child if I move around or step outside?", "answer": "No text grounds this fear. The shastra's actual provision runs the other way — pregnant women are expressly exempted from sutak's fasting and permitted food, rest and medicine. Resting during the eclipse is a caring custom; harm from a shadow is not Dharma, and not science." },
-            { "question": "Does food cooked before an eclipse become poisonous?", "answer": "No. The texts ask that eating pause during sutak — a devotional fast, not a contamination warning. The custom of placing tulsi or kusha on stored food is a pratha of sanctity. Refrigerated food after an eclipse is exactly as safe as before it." },
-            { "question": "Is a grahan a bad omen that requires a dosh-nivaran puja?", "answer": "The same tradition that observes grahan predicts it to the minute — the Surya Siddhanta treats eclipses as celestial mechanics, not wrath. Japa and daan during the eclipse are the traditional observances, and they are free. A fear-priced 'remedy' puja has no textual basis." }
-          ]
+            {
+              "question": "Will an eclipse harm my unborn child if I move around or step outside?",
+              "answer": "No text grounds this fear. The shastra's actual provision runs the other way — pregnant women are expressly exempted from sutak's fasting and permitted food, rest and medicine. Resting during the eclipse is a caring custom; harm from a shadow is not Dharma, and not science."
+            },
+            {
+              "question": "Does food cooked before an eclipse become poisonous?",
+              "answer": "No. The texts ask that eating pause during sutak — a devotional fast, not a contamination warning. The custom of placing tulsi or kusha on stored food is a pratha of sanctity. Refrigerated food after an eclipse is exactly as safe as before it."
+            },
+            {
+              "question": "Is a grahan a bad omen that requires a dosh-nivaran puja?",
+              "answer": "The same tradition that observes grahan predicts it to the minute — the Surya Siddhanta treats eclipses as celestial mechanics, not wrath. Japa and daan during the eclipse are the traditional observances, and they are free. A fear-priced 'remedy' puja has no textual basis."
+            }
+          ],
+          "dpb": {
+            "classification": "BHRANTI"
+          }
         }
       ]
     },
@@ -67,7 +104,16 @@
           "type": "SIGNIFICANCE_QUOTE",
           "title": "वह नियम जो प्रायः कोई नहीं सुनता",
           "text": "सूतक वहीं माना जाता है जहाँ ग्रहण दिखाई देता है; जहाँ ग्रहण दिखे ही नहीं, वहाँ कोई प्रतिबंध लागू नहीं होता।",
-          "meta": { "attribution": "धर्मसिंधु, ग्रहण-प्रकरण" }
+          "meta": {
+            "attribution": "धर्मसिंधु, ग्रहण-प्रकरण"
+          },
+          "dpb": {
+            "classification": "DHARMA",
+            "confidenceScore": 3,
+            "sourceName": "Dharmasindhu",
+            "sourceRef": "Grahana-prakarana",
+            "sourceClass": "NIBANDHA"
+          }
         },
         {
           "type": "PROSE",
@@ -78,21 +124,46 @@
           "type": "ORIGIN",
           "title": "सूतक कहाँ से आता है",
           "text": "सूतक वह शांत अवधि है जो निबंध ग्रंथ — उनमें प्रमुख धर्मसिंधु — ग्रहण से जोड़ते हैं: सूर्य ग्रहण से लगभग चार प्रहर (लगभग बारह घंटे) पहले से, और चंद्र ग्रहण से तीन प्रहर (लगभग नौ घंटे) पहले से, ग्रहण के मोक्ष तक। इस अवधि में परंपरा भोजन, मंदिर-पूजन और नए आरंभों को विराम देती है, और मोक्ष — ग्रहण की समाप्ति — पर स्नान करती है। ग्रंथों की ही दो सीमाएँ सूतक को मानवीय बनाए रखती हैं: यह वहीं लागू होता है जहाँ ग्रहण वास्तव में दिखाई दे, और बच्चों, वृद्धों, रोगियों और गर्भवती स्त्रियों को भोजन और औषधि की स्पष्ट अनुमति है। सूतक भक्ति का विराम है, कोई बंदी नहीं।",
-          "meta": { "attribution": "धर्मसिंधु, ग्रहण-प्रकरण" }
+          "meta": {
+            "attribution": "धर्मसिंधु, ग्रहण-प्रकरण",
+            "subtitle": "नौ घंटे, बारह घंटे — और दो सीमाएँ जो ग्रंथ स्वयं पर लगाते हैं।"
+          },
+          "dpb": {
+            "classification": "DHARMA",
+            "confidenceScore": 3,
+            "sourceName": "Dharmasindhu",
+            "sourceRef": "Grahana-prakarana",
+            "sourceClass": "NIBANDHA"
+          }
         },
         {
           "type": "PROSE",
           "title": "परंपरा क्या स्थगित करती है — और क्या उसने कभी नहीं माँगा",
-          "text": "दृश्य ग्रहण के सूतक में परंपरा भोजन, मंदिरों में मूर्ति-स्पर्श और मुहूर्त-आधारित आरंभों को स्थगित करती है, और जप, पाठ और दान को वरीयता देती है — ग्रहण के घंटे मंत्र के लिए विशेष फलदायी माने गए हैं। बस इतना ही। ग्रंथ आपसे आकाश से डरने, घर में जड़ होकर बैठने, भोजन फेंकने या कोई निवारण-पूजा कराने को नहीं कहते। यदि ग्रहण आपके नगर में दिखाई ही न दे, तो पंचांग की स्थिति सरल है: आपके लिए उस दिन कोई सूतक है ही नहीं।"
+          "text": "दृश्य ग्रहण के सूतक में परंपरा भोजन, मंदिरों में मूर्ति-स्पर्श और मुहूर्त-आधारित आरंभों को स्थगित करती है, और जप, पाठ और दान को वरीयता देती है — ग्रहण के घंटे मंत्र के लिए विशेष फलदायी माने गए हैं। बस इतना ही। ग्रंथ आपसे आकाश से डरने, घर में जड़ होकर बैठने, भोजन फेंकने या कोई निवारण-पूजा कराने को नहीं कहते। यदि ग्रहण आपके नगर में दिखाई ही न दे, तो पंचांग की स्थिति सरल है: आपके लिए उस दिन कोई सूतक है ही नहीं।",
+          "meta": {
+            "turn": "जहाँ ग्रहण दिखाई ही नहीं देता, वहाँ परंपरा आपसे कुछ भी नहीं माँगती।"
+          }
         },
         {
           "type": "MYTHS",
           "title": "ग्रहण के भय — उत्तर सहित",
           "myths": [
-            { "question": "क्या हिलने-डुलने या बाहर निकलने से ग्रहण मेरे गर्भस्थ शिशु को हानि पहुँचाएगा?", "answer": "किसी ग्रंथ में इस भय का आधार नहीं। शास्त्र का वास्तविक प्रावधान उल्टी दिशा में है — गर्भवती स्त्रियों को सूतक के उपवास से स्पष्ट छूट है और भोजन, विश्राम और औषधि की अनुमति है। ग्रहण में विश्राम एक स्नेह भरी प्रथा है; छाया से हानि न धर्म है, न विज्ञान।" },
-            { "question": "क्या ग्रहण से पहले पका भोजन विषाक्त हो जाता है?", "answer": "नहीं। ग्रंथ सूतक में भोजन का विराम कहते हैं — एक भक्तिपूर्ण उपवास, कोई संदूषण की चेतावनी नहीं। रखे भोजन पर तुलसी या कुश रखना पवित्रता की प्रथा है। ग्रहण के बाद फ्रिज का भोजन उतना ही सुरक्षित है जितना पहले था।" },
-            { "question": "क्या ग्रहण कोई अपशकुन है जिसके लिए दोष-निवारण पूजा चाहिए?", "answer": "जो परंपरा ग्रहण का पालन करती है, वही उसकी मिनट तक भविष्यवाणी भी करती है — सूर्य सिद्धांत ग्रहण को खगोलीय गति मानता है, कोप नहीं। ग्रहण में जप और दान ही पारंपरिक आचरण हैं, और वे निःशुल्क हैं। भय के मूल्य पर बिकने वाली 'उपाय' पूजा का कोई शास्त्रीय आधार नहीं।" }
-          ]
+            {
+              "question": "क्या हिलने-डुलने या बाहर निकलने से ग्रहण मेरे गर्भस्थ शिशु को हानि पहुँचाएगा?",
+              "answer": "किसी ग्रंथ में इस भय का आधार नहीं। शास्त्र का वास्तविक प्रावधान उल्टी दिशा में है — गर्भवती स्त्रियों को सूतक के उपवास से स्पष्ट छूट है और भोजन, विश्राम और औषधि की अनुमति है। ग्रहण में विश्राम एक स्नेह भरी प्रथा है; छाया से हानि न धर्म है, न विज्ञान।"
+            },
+            {
+              "question": "क्या ग्रहण से पहले पका भोजन विषाक्त हो जाता है?",
+              "answer": "नहीं। ग्रंथ सूतक में भोजन का विराम कहते हैं — एक भक्तिपूर्ण उपवास, कोई संदूषण की चेतावनी नहीं। रखे भोजन पर तुलसी या कुश रखना पवित्रता की प्रथा है। ग्रहण के बाद फ्रिज का भोजन उतना ही सुरक्षित है जितना पहले था।"
+            },
+            {
+              "question": "क्या ग्रहण कोई अपशकुन है जिसके लिए दोष-निवारण पूजा चाहिए?",
+              "answer": "जो परंपरा ग्रहण का पालन करती है, वही उसकी मिनट तक भविष्यवाणी भी करती है — सूर्य सिद्धांत ग्रहण को खगोलीय गति मानता है, कोप नहीं। ग्रहण में जप और दान ही पारंपरिक आचरण हैं, और वे निःशुल्क हैं। भय के मूल्य पर बिकने वाली 'उपाय' पूजा का कोई शास्त्रीय आधार नहीं।"
+            }
+          ],
+          "dpb": {
+            "classification": "BHRANTI"
+          }
         }
       ]
     }

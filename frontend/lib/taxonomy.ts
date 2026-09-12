@@ -25,11 +25,11 @@ export interface NavSection {
   readonly label: string;
   readonly href: string;
   /** Feature flag that must be on for this section to be live. */
-  readonly gatedBy?: "kits_launched";
+  readonly gatedBy?: "kits_launched" | "purohit_tab_visible" | "mandali_visible";
   readonly children: readonly TaxonomyLink[];
 }
 
-export const TAXONOMY: readonly NavSection[] = [
+export const FALLBACK_TAXONOMY: readonly NavSection[] = [
   {
     key: "ritual-guides",
     label: "Ritual Guides",
@@ -153,8 +153,38 @@ export const TAXONOMY: readonly NavSection[] = [
   },
 ];
 
+const API_BASE = process.env.API_BASE_URL ?? "http://localhost:8080";
+
+export async function fetchTaxonomy(): Promise<NavSection[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/taxonomy`, {
+      next: { revalidate: 3600, tags: ["taxonomy"] },
+    });
+    if (!res.ok) return [...FALLBACK_TAXONOMY];
+    const body = await res.json().catch(() => null);
+    const pillars = body?.data?.pillars;
+    if (!Array.isArray(pillars) || pillars.length === 0) return [...FALLBACK_TAXONOMY];
+    return pillars.map((p: any) => ({
+      key: p.key as NavSectionKey,
+      label: p.labelEn,
+      href: p.href,
+      gatedBy: p.gateFlag as "kits_launched" | "purohit_tab_visible" | "mandali_visible" | undefined,
+      children: (p.children || []).map((n: any) => ({
+        label: n.labelEn,
+        href: n.href,
+        description: undefined,
+        lead: false,
+      })),
+    })) as NavSection[];
+  } catch {
+    return [...FALLBACK_TAXONOMY];
+  }
+}
+
+export const TAXONOMY = FALLBACK_TAXONOMY;
+
 export function getSection(key: NavSectionKey): NavSection {
-  const section = TAXONOMY.find((s) => s.key === key);
+  const section = FALLBACK_TAXONOMY.find((s) => s.key === key);
   if (!section) throw new Error(`Unknown nav section: ${key}`);
   return section;
 }

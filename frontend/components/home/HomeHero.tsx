@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { DpbBadge } from "@/components/DpbBadge";
+import { HomeHeroBackdrop } from "@/components/home/HeroBackdrop";
 import { fetchArticle } from "@/lib/api";
 import {
   articleHref,
@@ -37,7 +38,16 @@ interface FeaturedKit {
  * (best-effort — app/page.tsx passes only articles) so a dead backend
  * just means no extra slide.
  */
-export function HomeHero({ cards, today }: { cards: HomeCard[]; today: string }) {
+export function HomeHero({
+  cards,
+  today,
+  panchangSlot,
+}: {
+  cards: HomeCard[];
+  today: string;
+  /** Server-rendered <PanchangCard> — kept out of this client component's own fetch. */
+  panchangSlot?: ReactNode;
+}) {
   const [index, setIndex] = useState(0);
   const [kit, setKit] = useState<FeaturedKit | null>(null);
 
@@ -122,46 +132,50 @@ export function HomeHero({ cards, today }: { cards: HomeCard[]; today: string })
   if (isKitSlide && kit) {
     const p = kit.product;
     return (
-      <section className={p.hueClass}>
-        <div className="mx-auto max-w-[1280px] px-4 py-12 md:px-10 md:py-16">
-          <p className="mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
-            Ritual Pujans · Pre-booking open
-          </p>
-          {p.orderByDate && (
-            <span className="mb-4 inline-flex items-center gap-[6px] rounded-[6px] border border-white/30 bg-white/15 px-[10px] py-[4px] text-[10.5px] font-bold tracking-[0.6px] text-hero-text">
-              ◷ ORDER BY {formatDateShortCaps(p.orderByDate)}
-            </span>
-          )}
-          <h1 className="max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
-            {p.title}
-          </h1>
-          <p className="mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
-            {p.festivalDate
-              ? `For ${formatDateLong(p.festivalDate)} · `
-              : ""}
-            {formatPaise(p.pricePaise)} — everything the vidhi calls for,
-            sourced and sealed, with the guide attached.
-          </p>
-          <p className="mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
-            {TRUST_LINE}
-          </p>
+      <section className={`${p.hueClass} hero-scene relative overflow-hidden`}>
+        <HomeHeroBackdrop />
+        <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
+          <div>
+            <p className="anim-rise mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
+              Ritual Pujans · Pre-booking open
+            </p>
+            {p.orderByDate && (
+              <span className="mb-4 inline-flex items-center gap-[6px] rounded-[6px] border border-white/30 bg-white/15 px-[10px] py-[4px] text-[10.5px] font-bold tracking-[0.6px] text-hero-text">
+                ◷ ORDER BY {formatDateShortCaps(p.orderByDate)}
+              </span>
+            )}
+            <h1 className="anim-rise-lcp max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
+              {p.title}
+            </h1>
+            <p className="anim-rise anim-d2 mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
+              {p.festivalDate
+                ? `For ${formatDateLong(p.festivalDate)} · `
+                : ""}
+              {formatPaise(p.pricePaise)} — everything the vidhi calls for,
+              sourced and sealed, with the guide attached.
+            </p>
+            <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
+              {TRUST_LINE}
+            </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link
-              href={`/ritual-pujans/p/${p.slug}`}
-              className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
-            >
-              Pre-book the kit ›
-            </Link>
-            <Link
-              href={kit.guideHref}
-              className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
-            >
-              📖 Read the guide first
-            </Link>
+            <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                href={`/ritual-pujans/p/${p.slug}`}
+                className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
+              >
+                Pre-book the kit ›
+              </Link>
+              <Link
+                href={kit.guideHref}
+                className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
+              >
+                📖 Read the guide first
+              </Link>
+            </div>
+
+            {dots}
           </div>
-
-          {dots}
+          {panchangSlot}
         </div>
       </section>
     );
@@ -176,52 +190,58 @@ export function HomeHero({ cards, today }: { cards: HomeCard[]; today: string })
     : formatObservanceDate(today);
 
   return (
-    <section className={`h-${hueFromClass(article.hueClass ?? undefined, "devi")}`}>
-      <div className="mx-auto max-w-[1280px] px-4 py-12 md:px-10 md:py-16">
-        <p className="mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
-          Today&rsquo;s Ritual · {dateLine}
-        </p>
-        {tag && (
-          <DpbBadge
-            tag={tag}
-            score={tag !== "bhranti" ? (article.dpbScore ?? undefined) : undefined}
-            className="mb-4"
-          />
-        )}
-        <h1 className="max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
-          {article.title}
-        </h1>
-        {article.subtitle && (
-          <p className="mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
-            {article.subtitle}
+    <section
+      className={`h-${hueFromClass(article.hueClass ?? undefined, "devi")} hero-scene relative overflow-hidden`}
+    >
+      <HomeHeroBackdrop />
+      <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
+        <div>
+          <p className="anim-rise mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
+            Today&rsquo;s Ritual · {dateLine}
           </p>
-        )}
-        <p className="mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
-          {TRUST_LINE}
-        </p>
+          {tag && (
+            <DpbBadge
+              tag={tag}
+              score={tag !== "bhranti" ? (article.dpbScore ?? undefined) : undefined}
+              className="mb-4"
+            />
+          )}
+          <h1 className="anim-rise-lcp max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
+            {article.title}
+          </h1>
+          {article.subtitle && (
+            <p className="anim-rise anim-d2 mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
+              {article.subtitle}
+            </p>
+          )}
+          <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
+            {TRUST_LINE}
+          </p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Link
-            href={href}
-            className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
-          >
-            ▶ Start today&rsquo;s vrat
-          </Link>
-          <Link
-            href={href}
-            className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
-          >
-            📖 Read complete vidhi
-          </Link>
-          <Link
-            href={`${href}#audio`}
-            className="rounded-[10px] border border-white/30 px-5 py-[11px] text-[13px] font-bold text-hero-text/90 hover:bg-white/10"
-          >
-            🎧 Listen instead
-          </Link>
+          <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href={href}
+              className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
+            >
+              ▶ Start today&rsquo;s vrat
+            </Link>
+            <Link
+              href={href}
+              className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
+            >
+              📖 Read complete vidhi
+            </Link>
+            <Link
+              href={`${href}#audio`}
+              className="rounded-[10px] border border-white/30 px-5 py-[11px] text-[13px] font-bold text-hero-text/90 hover:bg-white/10"
+            >
+              🎧 Listen instead
+            </Link>
+          </div>
+
+          {dots}
         </div>
-
-        {dots}
+        {panchangSlot}
       </div>
     </section>
   );
@@ -231,37 +251,47 @@ export function HomeHero({ cards, today }: { cards: HomeCard[]; today: string })
  * Server-rendered fallback hero for a dead backend or an empty featured
  * rotation — the section never disappears, it just loses the article CTA.
  */
-export function HomeHeroFallback({ today }: { today: string }) {
+export function HomeHeroFallback({
+  today,
+  panchangSlot,
+}: {
+  today: string;
+  panchangSlot?: ReactNode;
+}) {
   return (
-    <section className="hero-rg">
-      <div className="mx-auto max-w-[1280px] px-4 py-12 md:px-10 md:py-16">
-        <p className="mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
-          Today&rsquo;s Ritual · {formatObservanceDate(today)}
-        </p>
-        <h1 className="max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
-          Dharma does not demand fear. It demands devotion.
-        </h1>
-        <p className="mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
-          Today&rsquo;s featured ritual is being verified — every guide is
-          checked against a named text before it is featured here.
-        </p>
-        <p className="mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
-          {TRUST_LINE}
-        </p>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Link
-            href="/ritual-guides"
-            className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
-          >
-            ▶ Browse ritual guides
-          </Link>
-          <Link
-            href="/panchang"
-            className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
-          >
-            ☀ Today&rsquo;s Panchang
-          </Link>
+    <section className="hero-rg hero-scene relative overflow-hidden">
+      <HomeHeroBackdrop />
+      <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
+        <div>
+          <p className="anim-rise mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
+            Today&rsquo;s Ritual · {formatObservanceDate(today)}
+          </p>
+          <h1 className="anim-rise-lcp max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
+            Dharma does not demand fear. It demands devotion.
+          </h1>
+          <p className="anim-rise anim-d2 mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
+            Today&rsquo;s featured ritual is being verified — every guide is
+            checked against a named text before it is featured here.
+          </p>
+          <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
+            {TRUST_LINE}
+          </p>
+          <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href="/ritual-guides"
+              className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
+            >
+              ▶ Browse ritual guides
+            </Link>
+            <Link
+              href="/panchang"
+              className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
+            >
+              ☀ Today&rsquo;s Panchang
+            </Link>
+          </div>
         </div>
+        {panchangSlot}
       </div>
     </section>
   );

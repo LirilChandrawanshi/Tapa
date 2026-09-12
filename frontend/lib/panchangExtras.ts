@@ -228,16 +228,53 @@ export function mergeObservances(
   return out.sort((a, b) => a.observance.date.localeCompare(b.observance.date));
 }
 
+/**
+ * Every observance of a calendar year, merged and date-sorted.
+ *
+ * Twelve month calls rather than one year endpoint — each is separately
+ * ISR-cached under the `panchang` tag, so an admin edit to one month does
+ * not invalidate the other eleven. Any month that fails resolves to null and
+ * simply contributes nothing.
+ */
+export async function fetchCalendarYear(
+  year: string,
+  fetchMonth: (month: string) => Promise<UpcomingObservance[]>,
+): Promise<UpcomingObservance[]> {
+  const months = Array.from({ length: 12 }, (_, i) => monthKeyOfYear(year, i));
+  const payloads = await Promise.all(
+    months.map((m) => safeFetch(fetchMonth(m))),
+  );
+  return mergeObservances(...payloads);
+}
+
+/** "2026" + index 8 → "2026-09". */
+export function monthKeyOfYear(year: string, index: number): string {
+  return `${year}-${String(index + 1).padStart(2, "0")}`;
+}
+
+/** month key → count, for the Jan–Dec month tabs. */
+export function countByMonth(
+  items: readonly UpcomingObservance[],
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const u of items) {
+    const key = u.observance.date.slice(0, 7);
+    out[key] = (out[key] ?? 0) + 1;
+  }
+  return out;
+}
+
 /* ── Vrat-calendar filter chips ──────────────────────────────────────── */
 
 export const VRAT_FILTERS = [
   { key: "all", label: "All" },
   { key: "ekadashi", label: "Ekadashi" },
+  { key: "pradosh", label: "Pradosh" },
+  { key: "chaturthi", label: "Chaturthi" },
   { key: "teej", label: "Teej" },
   { key: "sawan-somwar", label: "Sawan Somwar" },
   { key: "purnima", label: "Purnima" },
   { key: "amavasya", label: "Amavasya" },
-  { key: "pradosh", label: "Pradosh" },
   { key: "eclipse", label: "Eclipse" },
 ] as const;
 
@@ -260,6 +297,9 @@ export function matchesVratFilter(o: Observance, f: VratFilterKey): boolean {
       return hay.includes("amavasya");
     case "pradosh":
       return hay.includes("pradosh");
+    case "chaturthi":
+      // Sankashti and Vinayaka both, but never Anant/Ganesh *Chaturdashi*
+      return /chaturthi/.test(hay);
     case "eclipse":
       return (
         o.type === "ECLIPSE" ||

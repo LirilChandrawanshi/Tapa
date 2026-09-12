@@ -14,6 +14,7 @@ export default function RitualGuidesPage() {
     <CategoryLanding
       sectionKey="ritual-guides"
       variant="rg"
+      heroImage="/brand/ritual-guides.jpg"
       eyebrow="The Tapa Co. · Knowledge"
       description="Every guide names its source, separates scripture from custom, and never uses fear to make you act. Sankalp, samagri, vidhi and mantra — complete, and calm."
     />

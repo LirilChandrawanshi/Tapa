@@ -584,16 +584,23 @@ export function BookingWizard({
             )}
 
             {phase.kind !== "payment_failed" && (
-              <button
-                type="button"
-                onClick={() => void onPay()}
-                disabled={busy || !ready}
-                className="w-full rounded-[10px] bg-cta px-6 py-[13px] text-[14.5px] font-bold text-white hover:opacity-90 disabled:opacity-60"
-              >
-                {busy
-                  ? "Taking you to payment…"
-                  : `Confirm & pay${variant ? ` — ${formatPaise(variant.pricePaise)}` : ""}`}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => void onPay()}
+                  disabled={busy || !ready}
+                  className="w-full rounded-[10px] bg-cta px-6 py-[13px] text-[14.5px] font-bold text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  {busy
+                    ? "Processing your payment…"
+                    : `Confirm & pay${variant ? ` — ${formatPaise(variant.pricePaise)}` : ""}`}
+                </button>
+                {busy && (
+                  <p className="mt-2 text-center text-[11.5px] text-sub">
+                    Do not close this screen.
+                  </p>
+                )}
+              </>
             )}
           </>
         )}

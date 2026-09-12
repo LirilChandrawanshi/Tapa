@@ -47,7 +47,7 @@ export function ContentCard({
   return (
     <Link
       href={href}
-      className="group flex flex-col overflow-hidden rounded-[15px] border border-border bg-card transition-colors hover:border-cta"
+      className="group hover-lift reveal flex flex-col overflow-hidden rounded-[15px] border border-border bg-card hover:border-cta"
     >
       <div
         className={`h-${hue} flex h-[100px] items-start justify-between p-[13px]`}

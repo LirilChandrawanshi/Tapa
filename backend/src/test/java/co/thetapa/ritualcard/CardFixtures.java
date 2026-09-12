@@ -201,26 +201,26 @@ final class CardFixtures {
         List<Block.SamagriItem> samagri = items.stream()
             .map(n -> new Block.SamagriItem(n, null, false)).toList();
         return new Block(Block.BlockType.SAMAGRI, "Samagri", null, null, samagri,
-            null, null, null, null, meta);
+            null, null, null, null, null, null, meta);
     }
 
     private static Block vidhiBlock(List<Block.VidhiStep> steps, Map<String, String> meta) {
         return new Block(Block.BlockType.VIDHI, "Vidhi", null, steps, null,
-            null, null, null, null, meta);
+            null, null, null, null, null, null, meta);
     }
 
     private static Block mantraBlock(String devanagari, String translit, int defaultCount, List<Integer> presets) {
         return new Block(Block.BlockType.MANTRA, "Mantra", null, null, null, null,
             new Block.Mantra(devanagari, translit, null, defaultCount, presets, null, null),
-            null, null, null);
+            null, null, null, null, null);
     }
 
     private static Block fastingBlock(List<Block.FastingForm> forms) {
         return new Block(Block.BlockType.FASTING, "Fasting", null, null, null,
-            null, null, null, forms, null);
+            null, null, null, forms, null, null, null);
     }
 
     private static Block.VidhiStep step(int number, String title, String note) {
-        return new Block.VidhiStep(number, title, null, note, null, null);
+        return new Block.VidhiStep(number, title, null, note, null, null, false);
     }
 }

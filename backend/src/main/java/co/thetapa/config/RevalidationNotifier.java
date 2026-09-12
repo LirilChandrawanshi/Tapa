@@ -68,6 +68,18 @@ public class RevalidationNotifier {
         notifyFrontend(List.of("flags", "home", "articles"));
     }
 
+    @Async
+    @EventListener
+    public void onFeedChanged(co.thetapa.feed.FeedService.FeedChangedEvent event) {
+        notifyFrontend(List.of("feed", "home"));
+    }
+
+    @Async
+    @EventListener
+    public void onTaxonomyChanged(co.thetapa.taxonomy.TaxonomyService.TaxonomyChangedEvent event) {
+        notifyFrontend(List.of("taxonomy"));
+    }
+
     private void notifyFrontend(List<String> tags) {
         try {
             HttpRequest request = HttpRequest.newBuilder()

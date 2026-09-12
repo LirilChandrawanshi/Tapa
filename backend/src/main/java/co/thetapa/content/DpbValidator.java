@@ -35,6 +35,10 @@ public class DpbValidator {
                 .forEach(s -> validateDpb(s.dpb(), "vidhi step " + s.number(), errors));
 
             en.blocks().stream()
+                .filter(b -> b.dpb() != null)
+                .forEach(b -> validateDpb(b.dpb(), "section \"" + (b.title() == null ? b.type() : b.title()) + "\"", errors));
+
+            en.blocks().stream()
                 .filter(b -> b.type() == Block.BlockType.SAMAGRI && b.samagri() != null)
                 .filter(b -> b.samagri().size() > 8)
                 .forEach(b -> errors.add("Samagri checklist may hold at most 8 items (PRD)."));

@@ -21,6 +21,16 @@ export function SamagriChecklist({
   const [checked, setChecked] = useState<boolean[]>(() =>
     items.map(() => false),
   );
+  /**
+   * Filled in after mount, never during render. Reading window.location
+   * inline made the share href differ between server ("") and client (the
+   * URL), which broke hydration for the whole article body.
+   */
+  const [pageUrl, setPageUrl] = useState("");
+
+  useEffect(() => {
+    setPageUrl(window.location.href);
+  }, []);
 
   useEffect(() => {
     try {
@@ -54,7 +64,7 @@ export function SamagriChecklist({
     const lines = [
       `${title} — samagri checklist`,
       ...items.map((it) => `• ${it.name}${it.optional ? " (optional)" : ""}`),
-      typeof window !== "undefined" ? window.location.href : "",
+      pageUrl,
     ];
     return `https://wa.me/?text=${encodeURIComponent(lines.join("\n"))}`;
   }
@@ -72,19 +82,21 @@ export function SamagriChecklist({
       {items.map((item, i) => (
         <label
           key={`${item.name}-${i}`}
-          className={`flex cursor-pointer items-baseline gap-[14px] border-b-[0.5px] border-border-light px-[18px] py-3 last:border-b-0 hover:bg-[#FCFAF6] ${
-            item.optional ? "opacity-70" : ""
-          }`}
+          className="flex cursor-pointer items-baseline gap-[14px] border-b-[0.5px] border-border-light px-[18px] py-3 last:border-b-0 hover:bg-[#FCFAF6]"
         >
           <input
             type="checkbox"
             checked={checked[i] ?? false}
             onChange={() => toggle(i)}
-            className="relative top-[2px] size-4 shrink-0 accent-cta"
+            className="relative top-[2px] size-4 shrink-0 rounded-[4px] accent-cta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
           />
           <span
-            className={`flex-[0_0_44%] text-[13.5px] font-semibold text-ink ${
-              checked[i] ? "line-through opacity-60" : ""
+            className={`flex-[0_0_44%] text-[13.5px] font-semibold ${
+              checked[i]
+                ? "text-sub line-through"
+                : item.optional
+                  ? "text-mid"
+                  : "text-ink"
             }`}
           >
             {item.name}

@@ -36,6 +36,8 @@ export interface Product {
   mrpPaise?: number;
   taxInclusive: boolean;
   hueClass: string;
+  /** Media asset ids, first one leads the PDP gallery. Empty → hue-gradient plate. */
+  imageIds?: string[];
   items: KitItem[];
   availability: Availability;
   orderByDate?: string;
@@ -90,6 +92,10 @@ export interface OrderView {
   trackingId?: string;
   courier?: string;
   createdAt: string;
+  /** set once a dispatched order is running late */
+  revisedDeliveryDate?: string;
+  /** buyer chose "I will refuse the delivery" on a delayed order */
+  refusalRequested?: boolean;
 }
 
 export type PaymentMethod = "upi" | "card" | "netbanking";
@@ -207,6 +213,13 @@ export const fetchOrder = (orderNumber: string, phone: string) =>
 
 export const cancelOrder = (orderNumber: string, phone: string) =>
   call<OrderView>(`/orders/${encodeURIComponent(orderNumber.trim())}/cancel`, {
+    method: "POST",
+    body: { phone: phone.trim() },
+  });
+
+/** "I will refuse the delivery" on a delayed/dispatched order. */
+export const refuseDelivery = (orderNumber: string, phone: string) =>
+  call<OrderView>(`/orders/${encodeURIComponent(orderNumber.trim())}/refuse`, {
     method: "POST",
     body: { phone: phone.trim() },
   });

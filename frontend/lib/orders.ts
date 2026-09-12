@@ -36,6 +36,7 @@ export type OrderStatus =
   | "CONFIRMED"
   | "PACKING"
   | "DISPATCHED"
+  | "DELAYED"
   | "DELIVERED"
   | "CANCELLED"
   | "REFUND_INITIATED"
@@ -67,6 +68,10 @@ export interface OrderView {
   paymentMethod?: string | null;
   /** Refund amount in paise (full refund policy — equals totalPaise). */
   refundPaise?: number | null;
+  /** ISO date — set once a dispatched order is running late. */
+  revisedDeliveryDate?: string | null;
+  /** True once the buyer has chosen "I will refuse the delivery". */
+  refusalRequested?: boolean;
 }
 
 export type OrdersResult<T> =
@@ -133,6 +138,10 @@ export const cancelOrder = (orderNumber: string, phone: string, reason?: string)
     ...(reason ? { reason } : {}),
   });
 
+/** "I will refuse the delivery" on a delayed/dispatched order. */
+export const refuseDelivery = (orderNumber: string, phone: string) =>
+  call<OrderView>(`/orders/${encodeURIComponent(orderNumber)}/refuse`, "POST", { phone });
+
 /** Guest-friendly order lookup — order number + the phone it was placed with. */
 export const getOrder = (orderNumber: string, phone: string) =>
   call<OrderView>(
@@ -162,8 +171,11 @@ export interface IssueView {
   orderNumber: string;
   reason: IssueReason;
   details: string;
-  photoNote: string;
+  photoIds: string[];
   status: "NEW" | "IN_REVIEW" | "RESOLVED";
+  /** Set by support on resolve — item-level replacement first, coupon only if unreplaceable. */
+  resolution?: "REPLACEMENT" | "COUPON" | null;
+  couponCode?: string | null;
   createdAt?: string | null;
 }
 
@@ -176,6 +188,41 @@ export const reportIssue = (
     "POST",
     body,
   );
+
+/** Attach a photo (up to four) to an already-submitted report. */
+export async function addIssuePhoto(
+  orderNumber: string,
+  issueId: string,
+  phone: string,
+  file: File,
+): Promise<OrdersResult<IssueView>> {
+  const form = new FormData();
+  form.append("file", file);
+  let res: Response;
+  try {
+    res = await fetch(
+      `/api/v1/orders/${encodeURIComponent(orderNumber.trim())}/issues/${encodeURIComponent(issueId)}/photos?phone=${encodeURIComponent(phone.trim())}`,
+      { method: "POST", credentials: "include", cache: "no-store", body: form },
+    );
+  } catch {
+    return { ok: false, status: 0, code: "network", message: NETWORK_COPY };
+  }
+  let envelope: Envelope<IssueView> | null = null;
+  try {
+    envelope = (await res.json()) as Envelope<IssueView>;
+  } catch {
+    envelope = null;
+  }
+  if (!res.ok || envelope?.error) {
+    return {
+      ok: false,
+      status: res.status,
+      code: envelope?.error?.code ?? "unknown",
+      message: envelope?.error?.message ?? GENERIC_COPY,
+    };
+  }
+  return { ok: true, data: (envelope?.data ?? null) as IssueView };
+}
 
 /* ---------- address book (#158) ---------- */
 
@@ -256,6 +303,7 @@ export const STATUS_META: Record<OrderStatus, StatusMeta> = {
   CONFIRMED: { label: "Confirmed", tone: "good", step: 0 },
   PACKING: { label: "Being packed", tone: "progress", step: 1 },
   DISPATCHED: { label: "On its way", tone: "progress", step: 2 },
+  DELAYED: { label: "Running late", tone: "attention", step: 2 },
   DELIVERED: { label: "Delivered", tone: "good", step: 3 },
   CANCELLED: { label: "Cancelled", tone: "neutral", step: null },
   REFUND_INITIATED: { label: "Refund on its way", tone: "progress", step: null },

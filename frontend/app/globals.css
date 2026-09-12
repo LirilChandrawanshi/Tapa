@@ -69,11 +69,133 @@
 .h-sanskar { background: linear-gradient(150deg, #4a2a5c, #241432); }
 .h-gold { background: linear-gradient(150deg, #7a4a12, #2a1408); }
 
-/* Category hero gradients — one per parent category (PLP prototype). */
-.hero-rg { background: linear-gradient(150deg, #3a0c1b 0%, #7a1838 42%, #2a0810 100%); }
-.hero-pa { background: linear-gradient(150deg, #0c1a26 0%, #1b3a52 42%, #070f17 100%); }
-.hero-dc { background: linear-gradient(150deg, #101a0e 0%, #2a3e1c 42%, #0c1006 100%); }
-.hero-rk { background: linear-gradient(150deg, #2a1408 0%, #7a4a12 42%, #1c0c04 100%); }
+/*
+ * Category hero gradients — one per parent category (PLP prototype).
+ *
+ * The linear ramp is the locked colour token and never moves. Each class
+ * additionally publishes three mesh hues that the shared .hero-mesh and
+ * .hero-key layers read, so a hero gains depth without its base colour
+ * changing — the PRD locks the palette, not the lighting.
+ */
+.hero-rg {
+  background: linear-gradient(150deg, #3a0c1b 0%, #7a1838 42%, #2a0810 100%);
+  --mesh-lift: rgba(171, 36, 79, 0.5);
+  --mesh-deep: rgba(24, 5, 11, 0.6);
+  --mesh-key: rgba(232, 160, 32, 0.17);
+}
+.hero-pa {
+  background: linear-gradient(150deg, #0c1a26 0%, #1b3a52 42%, #070f17 100%);
+  --mesh-lift: rgba(42, 92, 128, 0.5);
+  --mesh-deep: rgba(4, 9, 14, 0.6);
+  --mesh-key: rgba(195, 214, 228, 0.15);
+}
+.hero-dc {
+  background: linear-gradient(150deg, #101a0e 0%, #2a3e1c 42%, #0c1006 100%);
+  --mesh-lift: rgba(62, 92, 40, 0.5);
+  --mesh-deep: rgba(7, 11, 4, 0.6);
+  --mesh-key: rgba(160, 120, 0, 0.17);
+}
+.hero-rk {
+  background: linear-gradient(150deg, #2a1408 0%, #7a4a12 42%, #1c0c04 100%);
+  --mesh-lift: rgba(150, 94, 26, 0.5);
+  --mesh-deep: rgba(18, 8, 2, 0.6);
+  --mesh-key: rgba(227, 181, 103, 0.17);
+}
+
+/*
+ * Shared hero depth layers, stacked under the content by <CategoryHero/>:
+ *   mesh → motif → key light → scrim → grain → content
+ *
+ * All four are pure CSS, so they cost nothing to download, survive any
+ * crop, and cannot drift off the locked palette the way a photograph can.
+ */
+
+/* Colour depth: a warm lift upper-right, a deep anchor lower-left. */
+.hero-mesh {
+  background:
+    radial-gradient(
+      ellipse 72% 92% at 82% 16%,
+      var(--mesh-lift, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 82% 100% at 10% 94%,
+      var(--mesh-deep, transparent) 0%,
+      transparent 62%
+    );
+}
+
+/* The key light, at the same 80%/40% the side card sits against. */
+.hero-key {
+  background: radial-gradient(
+    ellipse 54% 72% at 79% 38%,
+    var(--mesh-key, transparent) 0%,
+    transparent 64%
+  );
+}
+
+/*
+ * Contrast guarantee. The headline occupies the left ~60% at every width,
+ * so that band is held down regardless of what the mesh does above it.
+ */
+.hero-scrim {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.44) 0%,
+      rgba(0, 0, 0, 0.24) 34%,
+      transparent 62%
+    ),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0%, transparent 38%);
+}
+
+/*
+ * Home hero. Its gradient is not fixed — it follows the featured ritual's
+ * deity hue, the featured kit's hue, or hero-rg on the fallback. So the mesh
+ * here is deliberately hue-agnostic: a warm lamp lift and a black anchor,
+ * which tint themselves against whichever gradient is underneath.
+ *
+ * No --mesh-key: on the home hero the aarti flame itself is the key light,
+ * so a second CSS glow would only wash it out.
+ */
+.hero-scene {
+  --mesh-lift: rgba(255, 214, 150, 0.11);
+  --mesh-deep: rgba(0, 0, 0, 0.5);
+}
+
+/*
+ * One band height for every pillar hero. Left to their own content the
+ * category heroes ranged 290–477px against the home hero's 482, so the
+ * pillars each looked like a different template. The floor is set here
+ * rather than per-page so there is one number to move.
+ *
+ * Content centres in the band instead of sitting at the top, which is what
+ * keeps a short hero (Dharmic Concepts) reading the same as a tall one
+ * (Panchang, with its full snapshot card).
+ */
+.hero-band {
+  display: flex;
+  align-items: center;
+  padding-block: 3rem;
+}
+@media (min-width: 768px) {
+  .hero-band {
+    min-height: 482px;
+    padding-block: 4rem;
+  }
+}
+
+/*
+ * Film grain. Dark gradients band badly on wide displays; fractal noise at
+ * a few percent dithers the ramp and is the single biggest reason these
+ * heroes stop reading as flat CSS.
+ */
+.hero-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+  opacity: 0.085;
+}
 
 /* System-page gradients (404 / 500) — search-system prototype. */
 .hero-404 { background: linear-gradient(155deg, #2a1408 0%, #6b3410 42%, #1c0c04 100%); }
@@ -85,4 +207,183 @@ body {
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.6;
+}
+
+/* ==================================================================
+ * Motion
+ *
+ * House rules, from the brand: short, small-distance, ease-out. Nothing
+ * bounces, nothing flies in from off-screen, and nothing moves while a
+ * reader is trying to read it. This is a knowledge site — motion points
+ * at the content, it is never the point.
+ *
+ * Two hard constraints encoded below:
+ *
+ * 1. No animation may be the reason text is invisible. Every rule ends
+ *    at the element's natural state via `both` fill, and the scroll
+ *    reveal is gated on @supports so an unsupporting browser simply
+ *    renders everything visible rather than blank.
+ *
+ * 2. prefers-reduced-motion disables all of it, wholesale.
+ * ================================================================== */
+
+@keyframes tapa-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * LCP-safe variant. A headline is usually the Largest Contentful Paint
+ * element, and Chrome does not count a fully transparent element as
+ * painted — fading one in delays LCP by the whole duration. So the
+ * headline paints at full opacity immediately and only travels.
+ */
+@keyframes tapa-rise-opaque {
+  from {
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* A diya breathes. Slow enough to read as calm, not as a flicker. */
+@keyframes tapa-live-ping {
+  0% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+}
+
+@keyframes tapa-flame {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scaleY(1.07);
+  }
+}
+
+.anim-rise {
+  animation: tapa-rise 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.anim-rise-lcp {
+  animation: tapa-rise-opaque 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Hero stagger. Caps at ~0.24s so the fold never feels slow to arrive. */
+.anim-d1 { animation-delay: 0.06s; }
+.anim-d2 { animation-delay: 0.12s; }
+.anim-d3 { animation-delay: 0.18s; }
+.anim-d4 { animation-delay: 0.24s; }
+
+/* Cards lift by 2px. A lift, not a jump. */
+.hover-lift {
+  transition:
+    transform 0.18s ease-out,
+    border-color 0.18s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Links grow their own underline instead of snapping one on. */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.25s ease-out;
+}
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+.flame-breathe {
+  animation: tapa-flame 4.5s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+/*
+ * Live indicator — the ring is a ::after so the markup stays one span, and
+ * `background-color: inherit` picks up whatever colour the dot itself is set
+ * to. At scale 1 the ring sits exactly over the dot in the same colour, so
+ * there is nothing to hide behind and no stacking-context games.
+ */
+.live-dot {
+  position: relative;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: inherit;
+  animation: tapa-live-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/*
+ * The kill switch. Anything added later inherits this for free, which is
+ * the point of doing it with a universal selector rather than per-rule.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Scroll reveal.
+ *
+ * Driven by IntersectionObserver (see components/RevealOnScroll.tsx), not
+ * by animation-timeline: view(). Two reasons the scroll-driven CSS version
+ * was dropped:
+ *
+ *   1. It only exists in Chromium. Safari and Firefox got no animation at
+ *      all, which is most of the point of the feature missing.
+ *   2. A scroll-driven animation is scrubbed, so scrolling back up faded
+ *      the content out again. A reveal should happen once and stay.
+ *
+ * Nothing here is hidden by CSS alone: an element only goes transparent
+ * once the script has marked it [data-reveal="pending"]. With JS off, a
+ * failed hydration, or a crawler reading the page, every word is visible.
+ * For a knowledge site that is the only acceptable failure direction.
+ * ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="pending"] {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  [data-reveal="shown"] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+      transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Set per element by the observer so a batch arriving together
+       cascades instead of snapping in as one block. */
+    transition-delay: var(--reveal-delay, 0ms);
+  }
 }

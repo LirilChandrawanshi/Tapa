@@ -12,15 +12,13 @@ export const PHONES = {
   admin: "9876543210", // seeded ADMIN role
   member: "9812399999", // plain member used by auth.spec sign-in flow
   saver: "9812366666", // plain member used by the article save-gate flow
-  nonAdmin: "9812388888", // plain member that must NOT see /admin
+  nonAdmin: "9812388888", // plain member without the EDITOR/ADMIN role
 } as const;
 
 export const ARTICLE_PATH =
   "/ritual-guides/festive-pujans/sawan-somwar-vrat";
 export const ARTICLE_TITLE_EN = "Sawan Somwar Vrat — the complete guide";
 export const ARTICLE_TITLE_HI = "सावन सोमवार व्रत — सम्पूर्ण विधि";
-
-export const ADMIN_STORAGE_STATE = "e2e/.auth/admin.json";
 
 /**
  * Completes the phone → OTP UI flow rendered inside `scope` (the inline

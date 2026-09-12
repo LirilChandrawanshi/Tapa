@@ -69,6 +69,14 @@ public class OrderController {
         return ApiResponse.ok(OrderView.of(checkout.cancel(orderNumber, phone, body.get("reason"))));
     }
 
+    /** Buyer chooses to refuse a delayed/dispatched delivery at the door. */
+    @PostMapping("/orders/{orderNumber}/refuse")
+    public ApiResponse<OrderView> refuse(@PathVariable String orderNumber,
+                                         @RequestBody Map<String, String> body) {
+        String phone = OtpService.normalize(body.get("phone"));
+        return ApiResponse.ok(OrderView.of(checkout.requestRefusal(orderNumber, phone)));
+    }
+
     /** Account order history (authed). */
     @GetMapping("/me/orders")
     public ApiResponse<List<OrderView>> myOrders(@AuthenticationPrincipal String userId) {
@@ -103,7 +111,8 @@ public class OrderController {
                             long totalPaise, Order.Address address, String expectedDelivery,
                             String festivalDate, String cancellableUntil, String trackingId,
                             String courier, String createdAt, String cancelledAt,
-                            String paymentMethod, Long refundPaise) {
+                            String paymentMethod, Long refundPaise,
+                            String revisedDeliveryDate, boolean refusalRequested) {
 
         static OrderView of(Order o) {
             return new OrderView(o.getOrderNumber(), o.getStatus().name(), o.getStatusNote(),
@@ -115,7 +124,9 @@ public class OrderController {
                 o.getTrackingId(), o.getCourier(),
                 o.getCreatedAt() == null ? null : o.getCreatedAt().toString(),
                 o.getCancelledAt() == null ? null : o.getCancelledAt().toString(),
-                o.getPaymentMethod(), o.getRefundPaise());
+                o.getPaymentMethod(), o.getRefundPaise(),
+                o.getRevisedDeliveryDate() == null ? null : o.getRevisedDeliveryDate().toString(),
+                o.isRefusalRequested());
         }
     }
 }

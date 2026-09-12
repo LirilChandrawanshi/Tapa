@@ -184,7 +184,7 @@ function GlossaryEntry({ term }: { term: GlossaryTerm }) {
   return (
     <article
       id={term.slug}
-      className="scroll-mt-24 rounded-[15px] border border-border bg-card px-5 py-4"
+      className="reveal scroll-mt-24 rounded-[15px] border border-border bg-card px-5 py-4"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-[17px] font-bold text-ink">{term.term}</h3>

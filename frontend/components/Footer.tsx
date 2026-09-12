@@ -4,7 +4,8 @@ import {
   type FooterAccordionSection,
 } from "@/components/FooterAccordion";
 import { CIRCLE_WHATSAPP_NUMBER } from "@/lib/staticExtras";
-import { TAXONOMY, getSection } from "@/lib/taxonomy";
+import type { NavSection } from "@/lib/taxonomy";
+import type { Flags } from "@/lib/flags";
 
 /*
  * Footer — six bands, in this order on every page:
@@ -95,20 +96,19 @@ function ComingSoonTile({
 }
 
 export function Footer({
-  kitsLaunched = false,
-  purohitVisible = false,
-  mandaliVisible = false,
+  sections,
+  flags,
 }: {
-  kitsLaunched?: boolean;
-  /** DB flag `purohit_tab_visible` — turns the coming-soon tile into a live link. */
-  purohitVisible?: boolean;
-  /** DB flag `mandali_visible` — turns the Bhajan Mandali tile into a live link. */
-  mandaliVisible?: boolean;
+  sections: NavSection[];
+  flags: Flags;
 }) {
-  const rk = getSection("ritual-pujans");
-  const sitemapSections = TAXONOMY.filter(
-    (s) => s.gatedBy !== "kits_launched" || kitsLaunched,
-  );
+  const isOpen = (s: NavSection) =>
+    !s.gatedBy ||
+    (s.gatedBy === "kits_launched" && flags.kits_launched) ||
+    (s.gatedBy === "purohit_tab_visible" && flags.purohit_tab_visible) ||
+    (s.gatedBy === "mandali_visible" && flags.mandali_visible);
+
+  const sitemapSections = sections.filter(isOpen);
 
   const sitemapAccordion: FooterAccordionSection[] = sitemapSections.map(
     (section) => ({
@@ -355,7 +355,7 @@ export function Footer({
           </Link>
           <div className="flex items-center gap-[10px] md:ml-auto">
             <span className="mr-1 hidden text-xs text-[#7A6A55] lg:block">
-              {kitsLaunched
+              {flags.kits_launched
                 ? "Save rituals, track orders and manage reminders"
                 : "Save rituals and manage reminders"}
             </span>
@@ -387,14 +387,14 @@ export function Footer({
           />
           {/* Phase-locked cells: a date, not a SOON pill, never a dead link */}
           <div className="mt-[26px] grid gap-[22px] border-t border-dashed border-white/[0.09] pt-6 md:grid-cols-4 md:gap-[30px]">
-            {!kitsLaunched && (
+            {!flags.kits_launched && (
               <ComingSoonTile
-                title={rk.label}
+                title="Ritual Pujans"
                 when="Pre-booking opens 15 September 2026"
                 copy="Samagri kits for every ritual guide, delivered before the date. Full amount at pre-booking; cancellable within 48 hours."
               />
             )}
-            {purohitVisible ? (
+            {flags.purohit_tab_visible ? (
               <div>
                 <p className="mb-[10px] border-b border-white/10 pb-[9px] text-[14.5px] font-bold text-hero-text">
                   Purohit &amp; Puja
@@ -416,7 +416,7 @@ export function Footer({
                 copy="Book a verified purohit for your home."
               />
             )}
-            {mandaliVisible ? (
+            {flags.mandali_visible ? (
               <div>
                 <p className="mb-[10px] border-b border-white/10 pb-[9px] text-[14.5px] font-bold text-hero-text">
                   Bhajan Mandali

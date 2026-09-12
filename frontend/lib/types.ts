@@ -33,6 +33,8 @@ export interface VidhiStep {
   note?: string;
   dpb?: Dpb;
   mantraChip?: string;
+  /** Opts this step into the "current" pink treatment, overriding the last-step default. */
+  highlight?: boolean;
 }
 
 export interface SamagriItem {
@@ -68,6 +70,11 @@ export interface FastingForm {
   recommended: boolean;
 }
 
+export interface KathaBeat {
+  title: string;
+  description: string;
+}
+
 export interface Block {
   type: BlockType;
   title?: string;
@@ -78,6 +85,10 @@ export interface Block {
   mantra?: Mantra;
   sankalpa?: Sankalpa;
   fasting?: FastingForm[];
+  /** KATHA — structured story beats; flat `text` still renders when absent. */
+  beats?: KathaBeat[];
+  /** Section-level classification — the concept template's per-section tag row. */
+  dpb?: Dpb;
   meta?: Record<string, string>;
 }
 
@@ -92,7 +103,7 @@ export interface ArticleContent {
 
 export interface Article {
   slug: string;
-  type: "RITUAL_GUIDE" | "DHARMIC_CONCEPT" | "BEGINNER_GUIDE" | "FESTIVAL_GUIDE";
+  type: "RITUAL_GUIDE" | "DHARMIC_CONCEPT" | "BEGINNER_GUIDE";
   status: string;
   category: string;
   subCategory?: string;
@@ -100,10 +111,14 @@ export interface Article {
   dpb?: Dpb;
   heroImageId?: string;
   hueClass?: string;
+  /** Presiding deity slug — see DEITIES in lib/articleExtras. Null = unclaimed. */
+  deity?: string;
   readMinutes?: number;
   observanceDate?: string;
   linkedObservanceSlug?: string;
   relatedSlugs?: string[];
+  /** Cross-links a Ritual Guide and its Beginner's Guide, either direction. */
+  companionSlug?: string;
   isFeatured?: boolean;
   publishedAt?: string;
 }
@@ -177,9 +192,19 @@ export interface Observance {
   seasonBlock?: string;
   blurb?: string;
   articleSlug?: string;
+  heroImageId?: string;
   notes?: string[];
   verified: boolean;
+  /* ── Eclipse-only ─────────────────────────────────────────────────────
+   * Absent on every other observance type. `visibility` is the rule that
+   * decides Sutak; absent means unconfirmed, never "visible". */
+  visibility?: EclipseVisibility;
+  pathOfTotality?: string;
+  sutakNote?: string;
+  timingNote?: string;
 }
+
+export type EclipseVisibility = "VISIBLE" | "NOT_VISIBLE" | "UNCONFIRMED";
 
 export interface UpcomingObservance {
   observance: Observance;

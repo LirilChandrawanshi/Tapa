@@ -1,29 +1,34 @@
 import { MethodBand } from "@/components/MethodBand";
-import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { BeginnersRail } from "@/components/home/BeginnersRail";
+import { CalendarShelf } from "@/components/home/CalendarShelf";
+import { CategorySpotlight } from "@/components/home/CategorySpotlight";
 import { CategoryTiles } from "@/components/home/CategoryTiles";
+import { CircleBand } from "@/components/home/CircleBand";
 import { CorrectionsBand } from "@/components/home/CorrectionsBand";
 import { GuidesRail } from "@/components/home/GuidesRail";
 import { HomeHero, HomeHeroFallback } from "@/components/home/HomeHero";
 import { JourneyStepper } from "@/components/home/JourneyStepper";
 import { KitsShelf } from "@/components/home/KitsShelf";
-import { PanchangFold } from "@/components/home/PanchangFold";
+import { LaunchBar } from "@/components/home/LaunchBar";
+import { PanchangCard } from "@/components/home/PanchangCard";
 import { PurohitStrip } from "@/components/home/PurohitStrip";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { fetchHomeSafe } from "@/lib/homeExtras";
 import { todayIst } from "@/lib/panchangExtras";
 
 /**
- * Homepage — the PRD's locked 12-section order. Sections 1 (announce bar),
- * 2 (top nav) and 12 (footer) come from app/layout.tsx; this page renders
- * 3–11 in order:
+ * Homepage — matches the Home Phase 1 mock's locked order, sections 3–11
+ * (1/2/12 — announce bar, top nav, footer — come from app/layout.tsx):
  *
- *   3. Hero            4. Trust badge strip   5. Panchang first fold
- *   6. Ritual kits     7. Journey stepper     8. From ritual guides
- *   9. Purohit strip  10. WhatsApp nudge     11. Explore by category
+ *   3. Launch bar         4. Hero (+ inline panchang card)
+ *   5. Next four weeks    6. Three ways in (category tiles)
+ *   7. Dharmic Concepts spotlight   8. Corrections, not warnings
+ *   9. New to this?      10. How we decide what is true
+ *  11. The Tapa Circle
  *
- * Between 8 and 9 sit the P1 prototype's editorial bands (#25–#27):
- * Corrections, Beginner's rail, and the Dharma/Pratha/Bhranti MethodBand.
+ * TrustStrip, KitsShelf, JourneyStepper, GuidesRail and PurohitStrip aren't
+ * in that mock at all — kept and appended after it rather than cut, in
+ * their prior relative order, so no live functionality is lost.
  *
  * One composed fetch (GET /api/v1/home); the backend may be down, so every
  * section carries its own fallback — nothing renders blank.
@@ -36,58 +41,61 @@ export default async function Home() {
 
   const hero = home?.hero ?? [];
   const heroCard = hero[0] ?? null;
-  const nextObservance = home?.nextObservances?.[0] ?? null;
+  const nextObservances = home?.nextObservances ?? [];
   const kitsLaunched = home?.flags.kits_launched ?? false;
 
+  const panchangSlot = (
+    <PanchangCard
+      payload={home?.panchangToday ?? null}
+      nextObservance={nextObservances[0] ?? null}
+      now={now}
+    />
+  );
+
   return (
-    <main>
-      {/* 3 — HERO */}
+    // pb-14 (56px) — sections only carry padding-top, so the last one needs
+    // this or it sits flush against the footer. Matches the mock's
+    // `.footer { margin-top: 56px }`.
+    <main className="pb-14">
+      {/* 3 — LAUNCH BAR */}
+      <LaunchBar />
+
+      {/* 4 — HERO (+ inline panchang card) */}
       {hero.length > 0 ? (
-        <HomeHero cards={hero} today={now} />
+        <HomeHero cards={hero} today={now} panchangSlot={panchangSlot} />
       ) : (
-        <HomeHeroFallback today={now} />
+        <HomeHeroFallback today={now} panchangSlot={panchangSlot} />
       )}
 
-      {/* 4 — TRUST BADGE STRIP */}
-      <TrustStrip />
+      {/* 5 — NEXT FOUR WEEKS */}
+      <CalendarShelf observances={nextObservances} />
 
-      {/* 5 — PANCHANG FIRST FOLD */}
-      <PanchangFold
-        payload={home?.panchangToday ?? null}
-        nextObservance={nextObservance}
-        now={now}
-      />
+      {/* 6 — THREE WAYS IN */}
+      <CategoryTiles counts={home?.counts ?? {}} kitsLaunched={kitsLaunched} />
 
-      {/* 6 — RITUAL KITS SHELF */}
-      <KitsShelf kitsLaunched={kitsLaunched} />
+      {/* 7 — DHARMIC CONCEPTS SPOTLIGHT */}
+      <CategorySpotlight />
 
-      {/* 7 — TODAY'S RITUAL JOURNEY STEPPER */}
-      <JourneyStepper heroCard={heroCard} />
-
-      {/* 8 — FROM RITUAL GUIDES */}
-      <GuidesRail cards={home?.guidesRail ?? []} now={now} />
-
-      {/* 8a — CORRECTIONS, NOT WARNINGS */}
+      {/* 8 — CORRECTIONS, NOT WARNINGS */}
       <CorrectionsBand />
 
-      {/* 8b — BEGINNER'S RAIL */}
+      {/* 9 — NEW TO THIS? */}
       <BeginnersRail />
 
-      {/* 8c — HOW WE DECIDE WHAT IS TRUE */}
+      {/* 10 — HOW WE DECIDE WHAT IS TRUE */}
       <div className="mx-auto max-w-[1280px] px-4 pt-10 md:px-10">
         <MethodBand />
       </div>
 
-      {/* 9 — PUJAN WITH PUROHIT STRIP */}
+      {/* 11 — THE TAPA CIRCLE */}
+      <CircleBand />
+
+      {/* — sections not in the Phase 1 mock, kept and appended — */}
+      <TrustStrip />
+      <KitsShelf kitsLaunched={kitsLaunched} />
+      <JourneyStepper heroCard={heroCard} />
+      <GuidesRail cards={home?.guidesRail ?? []} now={now} />
       <PurohitStrip />
-
-      {/* 10 — WHATSAPP NUDGE */}
-      <div className="mx-auto max-w-[1280px] px-4 pt-5 md:px-10">
-        <WhatsAppNudge copy="Never miss a vrat date" />
-      </div>
-
-      {/* 11 — EXPLORE BY CATEGORY */}
-      <CategoryTiles counts={home?.counts ?? {}} kitsLaunched={kitsLaunched} />
     </main>
   );
 }

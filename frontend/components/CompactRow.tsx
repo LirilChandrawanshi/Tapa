@@ -16,7 +16,7 @@ export function CompactRow({
   return (
     <Link
       href={href}
-      className="flex items-center gap-4 border-b-[0.5px] border-border-light px-5 py-[15px] last:border-b-0 hover:bg-[#FCFAF6]"
+      className="flex items-center gap-4 border-b-[0.5px] border-border-light px-5 py-[15px] transition-colors duration-150 last:border-b-0 hover:bg-[#FCFAF6]"
     >
       <span className="min-w-0 flex-1">
         <span className="block text-[15.5px] leading-tight font-semibold text-ink">

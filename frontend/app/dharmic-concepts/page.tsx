@@ -14,6 +14,7 @@ export default function DharmicConceptsPage() {
     <CategoryLanding
       sectionKey="dharmic-concepts"
       variant="dc"
+      heroImage="/brand/dharmic.png"
       eyebrow="The Tapa Co. · Knowledge"
       description="What the bilva leaf means. Why the kalash is dressed. Where the word puja comes from. The ideas behind the ritual, each traced to a text you could open yourself."
     />

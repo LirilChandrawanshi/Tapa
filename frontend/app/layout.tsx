@@ -3,8 +3,11 @@ import { Noto_Sans_Devanagari, Tiro_Devanagari_Hindi } from "next/font/google";
 import { AnalyticsLoader } from "@/components/AnalyticsLoader";
 import { AnnounceBar } from "@/components/AnnounceBar";
 import { Footer } from "@/components/Footer";
+import { RevealOnScroll } from "@/components/RevealOnScroll";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { TopNav } from "@/components/TopNav";
 import { getFlags } from "@/lib/flags";
+import { fetchTaxonomy } from "@/lib/taxonomy";
 import "./globals.css";
 
 /**
@@ -47,6 +50,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const flags = await getFlags();
+  const taxonomy = await fetchTaxonomy();
 
   return (
     <html
@@ -56,9 +60,14 @@ export default async function RootLayout({
       <body>
         <AnalyticsLoader />
         <AnnounceBar />
-        <TopNav kitsLaunched={flags.kits_launched} />
-        {children}
-        <Footer kitsLaunched={flags.kits_launched} purohitVisible={flags.purohit_tab_visible} mandaliVisible={flags.mandali_visible} />
+        <TopNav sections={taxonomy} flags={flags} />
+        {/* Scope for the sitewide text reveal. Chrome — the announce bar,
+            TopNav, Footer and the offline banner — sits outside it and is
+            therefore never animated, which is the point of the wrapper. */}
+        <div className="page-flow">{children}</div>
+        <Footer sections={taxonomy} flags={flags} />
+        <OfflineBanner />
+        <RevealOnScroll />
       </body>
     </html>
   );

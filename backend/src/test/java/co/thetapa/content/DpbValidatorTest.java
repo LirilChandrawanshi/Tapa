@@ -82,9 +82,9 @@ class DpbValidatorTest {
     @Test
     void perStepTagsAreValidated() {
         var badStep = new Block.VidhiStep(1, "Step", null, null,
-            new Dpb(DpbTag.DHARMA, 1, "Shiva Purana", null, null, null, null), null);
+            new Dpb(DpbTag.DHARMA, 1, "Shiva Purana", null, null, null, null), null, false);
         var vidhi = new Block(Block.BlockType.VIDHI, "Vidhi", null, List.of(badStep),
-            null, null, null, null, null, null);
+            null, null, null, null, null, null, null, null);
         Article a = article(new Dpb(DpbTag.DHARMA, 4, "Shiva Purana", null, null, null, null));
         a.setLang(Map.of("en", new Article.ArticleContent("Title", null, null, null, List.of(vidhi), null)));
         assertThat(validator.validate(a))
@@ -97,7 +97,7 @@ class DpbValidatorTest {
             .mapToObj(i -> new Block.SamagriItem("Item " + i, null, false))
             .toList();
         var samagri = new Block(Block.BlockType.SAMAGRI, "Samagri", null, null,
-            items, null, null, null, null, null);
+            items, null, null, null, null, null, null, null);
         Article a = article(new Dpb(DpbTag.DHARMA, 4, "Shiva Purana", null, null, null, null));
         a.setLang(Map.of("en", new Article.ArticleContent("Title", null, null, null, List.of(samagri), null)));
         assertThat(validator.validate(a))

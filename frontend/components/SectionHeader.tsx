@@ -17,7 +17,7 @@ export function SectionHeader({
   viewAllLabel?: string;
 }) {
   return (
-    <div className="mb-4 flex flex-col items-start justify-between gap-3 border-b border-border pb-3 md:flex-row md:items-end md:gap-5">
+    <div className="reveal mb-4 flex flex-col items-start justify-between gap-3 border-b border-border pb-3 md:flex-row md:items-end md:gap-5">
       <div>
         {eyebrow && (
           <p className="mb-[6px] text-[10px] font-bold tracking-[0.8px] text-cta uppercase">
@@ -36,7 +36,7 @@ export function SectionHeader({
       {viewAllHref && (
         <Link
           href={viewAllHref}
-          className="shrink-0 text-[12.5px] font-bold whitespace-nowrap text-cta"
+          className="link-underline shrink-0 text-[12.5px] font-bold whitespace-nowrap text-cta"
         >
           {count && (
             <span className="mr-2 font-medium text-sub">{count}</span>

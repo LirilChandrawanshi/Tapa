@@ -52,7 +52,6 @@ class CheckoutServiceTest {
         p.setTitle(slug);
         p.setPricePaise(pricePaise);
         p.setAvailability(Product.Availability.LIVE);
-        p.setCancellationHours(24);
         return p;
     }
 

@@ -57,6 +57,21 @@ public class Observance {
     private String articleSlug;   // linked ritual guide
     private String heroImageId;
 
+    /**
+     * Eclipse-only fields. Visibility is the rule that decides everything else:
+     * where a grahan cannot be seen, Sutak Kaal is not observed. We never infer
+     * it — an unentered eclipse reads UNCONFIRMED and the page says so.
+     */
+    public enum Visibility { VISIBLE, NOT_VISIBLE, UNCONFIRMED }
+
+    private Visibility visibility;
+    /** e.g. "Arctic · Greenland · Iceland · northern Spain and Portugal" */
+    private String pathOfTotality;
+    /** what Sutak Kaal does on this date, in words. */
+    private String sutakNote;
+    /** free-text timing line, or the reason we are not printing minutes. */
+    private String timingNote;
+
     private List<String> notes;   // e.g. "Not visible in India" for eclipses
 
     private boolean verified;
@@ -104,6 +119,14 @@ public class Observance {
     public void setArticleSlug(String articleSlug) { this.articleSlug = articleSlug; }
     public String getHeroImageId() { return heroImageId; }
     public void setHeroImageId(String heroImageId) { this.heroImageId = heroImageId; }
+    public Visibility getVisibility() { return visibility; }
+    public void setVisibility(Visibility visibility) { this.visibility = visibility; }
+    public String getPathOfTotality() { return pathOfTotality; }
+    public void setPathOfTotality(String pathOfTotality) { this.pathOfTotality = pathOfTotality; }
+    public String getSutakNote() { return sutakNote; }
+    public void setSutakNote(String sutakNote) { this.sutakNote = sutakNote; }
+    public String getTimingNote() { return timingNote; }
+    public void setTimingNote(String timingNote) { this.timingNote = timingNote; }
     public List<String> getNotes() { return notes; }
     public void setNotes(List<String> notes) { this.notes = notes; }
     public boolean isVerified() { return verified; }

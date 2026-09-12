@@ -9,10 +9,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CountdownPill } from "@/components/CountdownPill";
 import { OtpBottomSheet } from "@/components/auth/OtpBottomSheet";
 import { CancelOrderDialog } from "@/components/account/CancelOrderDialog";
 import { getMe, type Me } from "@/lib/auth";
+import { addToCart } from "@/lib/shop";
 import {
   canCancel,
   claimGuestOrders,
@@ -44,6 +46,7 @@ function createdCopy(iso: string | null | undefined): string {
 }
 
 export default function AccountOrdersPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<Me | null>(null);
   const [orders, setOrders] = useState<OrderView[]>([]);
@@ -77,6 +80,11 @@ export default function AccountOrdersPage() {
     setNow(new Date());
     void load();
   }, [load]);
+
+  function reorder(order: OrderView) {
+    order.items.forEach((line) => addToCart(line.productSlug, line.qty));
+    router.push("/cart");
+  }
 
   /* ---------- loading ---------- */
   if (loading) {
@@ -241,6 +249,21 @@ export default function AccountOrdersPage() {
                       {formatDeadline(order.cancellableUntil)}
                     </button>
                   )}
+                  {order.status === "DELIVERED" && (
+                    <button
+                      type="button"
+                      onClick={() => reorder(order)}
+                      className="rounded-lg border border-border bg-bg px-3 py-1.5 text-[12px] font-bold text-body hover:bg-bg/70"
+                    >
+                      Reorder
+                    </button>
+                  )}
+                  <a
+                    href={`/api/v1/orders/${encodeURIComponent(order.orderNumber)}/invoice?phone=${encodeURIComponent(me.phone)}`}
+                    className="rounded-lg border border-border bg-bg px-3 py-1.5 text-[12px] font-bold text-body hover:bg-bg/70"
+                  >
+                    Invoice
+                  </a>
                   <Link
                     href={`/account/orders/${order.orderNumber}`}
                     className="rounded-lg bg-cta px-4 py-1.5 text-[12px] font-bold text-white hover:opacity-90"

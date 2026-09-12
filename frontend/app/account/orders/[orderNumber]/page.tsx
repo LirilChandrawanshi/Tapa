@@ -12,6 +12,7 @@ import { OtpBottomSheet } from "@/components/auth/OtpBottomSheet";
 import { CancelOrderDialog } from "@/components/account/CancelOrderDialog";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { getMe, type Me } from "@/lib/auth";
+import { CIRCLE_WHATSAPP_NUMBER } from "@/lib/staticExtras";
 import {
   canCancel,
   claimGuestOrders,
@@ -19,6 +20,7 @@ import {
   formatDeadline,
   formatPaise,
   getMyOrders,
+  refuseDelivery,
   statusMeta,
   type OrderView,
 } from "@/lib/orders";
@@ -34,6 +36,8 @@ export default function OrderDetailPage() {
   const [gateOpen, setGateOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
+  const [keepAcknowledged, setKeepAcknowledged] = useState(false);
+  const [refusing, setRefusing] = useState(false);
 
   const load = useCallback(async () => {
     const meRes = await getMe();
@@ -130,6 +134,20 @@ export default function OrderDetailPage() {
     order.status === "CANCELLED" ||
     order.status === "REFUND_INITIATED" ||
     order.status === "REFUNDED";
+  const alreadyShipped = order.status === "DISPATCHED" || order.status === "DELIVERED";
+  // Free cancellation is no longer available, but the order hasn't been cancelled/refunded.
+  const windowClosed = now !== null && !cancellable && !closed;
+  const talkToUsUrl = `https://wa.me/${CIRCLE_WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `Hi, I have a question about order ${order.orderNumber}.`,
+  )}`;
+
+  async function handleRefuse() {
+    if (refusing) return;
+    setRefusing(true);
+    const res = await refuseDelivery(order!.orderNumber, me!.phone);
+    setRefusing(false);
+    if (res.ok) setOrder(res.data);
+  }
 
   return (
     <main className="mx-auto w-full max-w-[680px] px-4 py-8">
@@ -219,6 +237,50 @@ export default function OrderDetailPage() {
           </p>
         )}
       </section>
+
+      {/* delivery delayed — proactive, states the choice plainly */}
+      {order.status === "DELAYED" && (
+        <section className="mt-4 rounded-2xl border border-pratha-bd bg-pratha-bg px-4 py-4">
+          <p className="text-[13.5px] font-bold text-ink">
+            Your order is running late
+          </p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-sub">
+            {order.revisedDeliveryDate
+              ? `The courier now expects delivery by ${formatDay(order.revisedDeliveryDate)}.`
+              : "We're waiting on a revised delivery date from the courier."}{" "}
+            Keep the order, or refuse it at the door — it comes back to us
+            and the full amount is returned within 3–7 working days of it
+            reaching the warehouse.
+          </p>
+          {order.refusalRequested ? (
+            <p className="mt-2 text-[12.5px] font-semibold text-body">
+              Noted — we&apos;ll start the refund once it&apos;s back with us.
+            </p>
+          ) : keepAcknowledged ? (
+            <p className="mt-2 text-[12.5px] font-semibold text-body">
+              Good — no action needed, we&apos;ll keep you posted.
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setKeepAcknowledged(true)}
+                className="rounded-lg bg-ink px-4 py-2 text-[12.5px] font-bold text-white"
+              >
+                Keep the order
+              </button>
+              <button
+                type="button"
+                disabled={refusing}
+                onClick={() => void handleRefuse()}
+                className="rounded-lg border border-border bg-card px-4 py-2 text-[12.5px] font-bold text-body hover:bg-bg/70 disabled:opacity-60"
+              >
+                {refusing ? "…" : "I will refuse the delivery"}
+              </button>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* the four actions (#165) */}
       <section className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -334,6 +396,41 @@ export default function OrderDetailPage() {
           >
             Cancel this order
           </button>
+        </section>
+      )}
+
+      {/* cancellation window passed — states the rule, then leaves a route open */}
+      {windowClosed && (
+        <section className="mt-4 rounded-2xl border border-pratha-bd bg-pratha-bg px-4 py-4">
+          <p className="text-[13.5px] font-bold text-ink">
+            {alreadyShipped
+              ? "This order has already been dispatched, so it can no longer be cancelled."
+              : order.cancellableUntil
+                ? `The free-cancellation window closed on ${formatDeadline(order.cancellableUntil)}. This order is confirmed and in packing.`
+                : "This order can no longer be cancelled."}
+          </p>
+          <p className="mt-2 text-[12.5px] leading-relaxed text-sub">
+            You can still refuse the delivery at the door — it comes back to
+            us and the full amount is returned within 3–7 working days of it
+            reaching the warehouse. Or accept it and tell us about any damage
+            or missing item afterwards.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href="#timeline"
+              className="rounded-lg border border-border bg-card px-4 py-2 text-[12.5px] font-bold text-body hover:bg-bg/70"
+            >
+              Track this order
+            </a>
+            <a
+              href={talkToUsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-border bg-card px-4 py-2 text-[12.5px] font-bold text-body hover:bg-bg/70"
+            >
+              Talk to us on WhatsApp
+            </a>
+          </div>
         </section>
       )}
 

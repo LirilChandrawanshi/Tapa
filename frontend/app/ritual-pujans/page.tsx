@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CategoryHero } from "@/components/CategoryHero";
-import { SectionHeader } from "@/components/SectionHeader";
-import { ProductCard } from "@/components/shop/ProductCard";
+import { PujanShelves } from "@/components/shop/PujanShelves";
 import { PhaseClosed } from "@/components/PhaseClosed";
 import { getFlags } from "@/lib/flags";
 import { fetchProducts } from "@/lib/shop";
@@ -28,19 +27,19 @@ export default async function RitualPujansPage() {
   const [flags, products] = await Promise.all([getFlags(), fetchProducts()]);
 
   const shelves = section.children
-    .map((child) => {
-      const category = child.href.split("/").pop() ?? "";
-      return {
-        child,
-        items: products.filter((p) => p.category === category),
-      };
-    })
-    .filter((s) => s.items.length > 0);
+    .map((child) => ({
+      label: child.label,
+      href: child.href,
+      description: child.description,
+      category: child.href.split("/").pop() ?? "",
+    }))
+    .filter((s) => products.some((p) => p.category === s.category));
 
   return (
     <div>
       <CategoryHero
         variant="rk"
+        image="/brand/ritual_pujans.png"
         eyebrow="The Tapa Co. · Ritual Pujans"
         title="Ritual Pujans"
         description={ANTI_UPSELL}
@@ -96,21 +95,7 @@ export default async function RitualPujansPage() {
             </Link>
           </div>
         ) : (
-          shelves.map(({ child, items }) => (
-            <section key={child.href} className="mb-11 last:mb-0">
-              <SectionHeader
-                title={child.label}
-                description={child.description}
-                count={`${items.length} pujan${items.length === 1 ? "" : "s"}`}
-                viewAllHref={child.href}
-              />
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((p) => (
-                  <ProductCard key={p.slug} product={p} />
-                ))}
-              </div>
-            </section>
-          ))
+          <PujanShelves shelves={shelves} products={products} />
         )}
       </div>
     </div>

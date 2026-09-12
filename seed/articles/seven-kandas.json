@@ -1,0 +1,102 @@
+{
+  "slug": "seven-kandas",
+  "type": "BEGINNER_GUIDE",
+  "status": "PUBLISHED",
+  "category": "ritual-guides",
+  "subCategory": "beginners-guides",
+  "hueClass": "h-gold",
+  "readMinutes": 6,
+  "isFeatured": false,
+  "dpb": {
+    "classification": "DHARMA",
+    "confidenceScore": 5,
+    "sourceName": "Ramcharitmanas",
+    "sourceRef": "Tulsidas — the seven-kanda division",
+    "sourceClass": "ITIHASA",
+    "confidenceNote": "The kanda structure and their order are the text's own — not suppressed on this page, only its citations and score are (Beginner's Guides rule)."
+  },
+  "lang": {
+    "en": {
+      "title": "Ramcharitmanas: The Seven Kandas Explained",
+      "heroSubtitle": "What each section contains, why each matters, and where Sundarkand fits.",
+      "deck": "A map before the journey — the seven kandas of Tulsidas's Ramcharitmanas, in order, with no prior reading required.",
+      "introHtml": "<p>The Ramcharitmanas is Tulsidas's retelling of the Ramayana in Awadhi, and it is divided into seven sections called kandas. Each covers a phase of Ram's story.</p><p>If you are starting with Sundarkand — as most people do — this shows you where it sits and what surrounds it.</p>",
+      "blocks": [
+        {
+          "type": "VIDHI",
+          "title": "The seven kandas",
+          "steps": [
+            { "number": 1, "title": "Bala Kanda · बालकाण्ड", "description": "Ram's birth and childhood, the breaking of Shiva's bow, the marriage to Sita." },
+            { "number": 2, "title": "Ayodhya Kanda · अयोध्याकाण्ड", "description": "The exile. Dasharatha's promise, Kaikeyi's demand, the departure for the forest, Bharat's refusal of the throne." },
+            { "number": 3, "title": "Aranya Kanda · अरण्यकाण्ड", "description": "The forest years. Shurpanakha, the golden deer, the abduction of Sita, Jatayu." },
+            { "number": 4, "title": "Kishkindha Kanda · किष्किन्धाकाण्ड", "description": "The alliance with the vanaras. Sugriva, Vali, and the decision to send Hanuman south." },
+            { "number": 5, "title": "Sundarkand · सुन्दरकाण्ड", "description": "Hanuman alone. The leap to Lanka, the search, finding Sita, the burning of Lanka, the return.", "note": "Most recited of the seven — many households keep it as a weekly practice on its own.", "highlight": true },
+            { "number": 6, "title": "Lanka Kanda · लंकाकाण्ड", "description": "The war. The bridge, the battle, Ravana, the return to Ayodhya." },
+            { "number": 7, "title": "Uttar Kanda · उत्तरकाण्ड", "description": "After the return. Ram's reign, and Tulsidas's closing teachings." }
+          ]
+        },
+        {
+          "type": "PROSE",
+          "title": "Why Sundarkand is the one people recite",
+          "text": "Every other kanda is about Ram. Sundarkand is about a devotee — sent on an errand nobody was sure could be completed, with no army, no certainty and no way back if it went wrong.\n\nIt is also the only kanda that ends entirely in success. Nothing is lost in it. The exile is not reversed, the war has not started, and for the length of one section a difficult thing is attempted and simply works. That is a reasonable thing to want to read aloud on a Tuesday evening."
+        },
+        {
+          "type": "PROSE",
+          "title": "Where to start",
+          "text": "You do not need to read the first four kandas before Sundarkand. Most households that recite it weekly have never read the Uttar Kanda at all.\n\nIf you want the story in order, start at Bala Kanda and read at your own pace. If you want to begin the practice, start at Sundarkand."
+        },
+        {
+          "type": "QA",
+          "title": "Common worries — answered",
+          "myths": [
+            { "question": "Should I read the whole thing first?", "answer": "No. Starting at Sundarkand is the normal way in, and it is how most households begin." },
+            { "question": "Is the Ramcharitmanas the same as the Ramayana?", "answer": "It is a retelling. Valmiki's Ramayana is the older Sanskrit epic; Tulsidas wrote the Ramcharitmanas in Awadhi in the sixteenth century so that people without Sanskrit could read it. Both are read; they are different books." },
+            { "question": "Which edition should I buy?", "answer": "The Gita Press Gorakhpur edition is the standard one and is inexpensive. Any edition with a transliteration you can read is fine." },
+            { "question": "My Hindi is not strong enough for Awadhi.", "answer": "Almost nobody's is. Every common edition prints a Hindi paraphrase alongside the verse, and many print a transliteration too. Read the verse aloud and the meaning beside it." }
+          ]
+        }
+      ]
+    },
+    "hi": {
+      "title": "रामचरितमानस: सातों काण्ड सरल भाषा में",
+      "heroSubtitle": "हर काण्ड में क्या है, हर एक क्यों महत्वपूर्ण है, और सुन्दरकाण्ड कहाँ आता है।",
+      "deck": "यात्रा से पहले का नक्शा — तुलसीदास के रामचरितमानस के सातों काण्ड, क्रम में, बिना किसी पूर्व ज्ञान की आवश्यकता के।",
+      "introHtml": "<p>रामचरितमानस तुलसीदास द्वारा अवधी में रचित रामायण की पुनर्कथा है, जो सात काण्डों में विभाजित है। प्रत्येक काण्ड राम की कथा के एक चरण को दर्शाता है।</p><p>यदि आप सुन्दरकाण्ड से आरंभ कर रहे हैं — जैसा अधिकांश लोग करते हैं — तो यह आपको बताता है कि यह कहाँ स्थित है और इसके आस-पास क्या है।</p>",
+      "blocks": [
+        {
+          "type": "VIDHI",
+          "title": "सातों काण्ड",
+          "steps": [
+            { "number": 1, "title": "बालकाण्ड", "description": "राम का जन्म और बचपन, शिव धनुष का टूटना, सीता से विवाह।" },
+            { "number": 2, "title": "अयोध्याकाण्ड", "description": "वनवास। दशरथ का वचन, कैकेयी की माँग, वन गमन, भरत का सिंहासन अस्वीकार करना।" },
+            { "number": 3, "title": "अरण्यकाण्ड", "description": "वनवास के वर्ष। शूर्पणखा, स्वर्ण मृग, सीता हरण, जटायु।" },
+            { "number": 4, "title": "किष्किन्धाकाण्ड", "description": "वानरों से मित्रता। सुग्रीव, वालि, और हनुमान को दक्षिण भेजने का निर्णय।" },
+            { "number": 5, "title": "सुन्दरकाण्ड", "description": "हनुमान अकेले। लंका की छलांग, खोज, सीता से भेंट, लंका दहन, वापसी।", "note": "सातों में सबसे अधिक पठित — कई घर इसे साप्ताहिक रूप से अकेले भी करते हैं।", "highlight": true },
+            { "number": 6, "title": "लंकाकाण्ड", "description": "युद्ध। सेतु, युद्ध, रावण, अयोध्या वापसी।" },
+            { "number": 7, "title": "उत्तरकाण्ड", "description": "वापसी के बाद। राम का राज्य, और तुलसीदास की अंतिम शिक्षाएँ।" }
+          ]
+        },
+        {
+          "type": "PROSE",
+          "title": "सुन्दरकाण्ड ही सबसे अधिक क्यों पढ़ा जाता है",
+          "text": "बाकी सभी काण्ड राम के बारे में हैं। सुन्दरकाण्ड एक भक्त के बारे में है — एक ऐसे कार्य पर भेजा गया जिसके पूरा होने का किसी को भरोसा नहीं था, बिना सेना, बिना निश्चितता, और असफल होने पर लौटने का कोई रास्ता नहीं।\n\nयह एकमात्र काण्ड भी है जो पूर्णतः सफलता में समाप्त होता है। इसमें कुछ भी नहीं खोता। वनवास समाप्त नहीं हुआ है, युद्ध आरंभ नहीं हुआ है, और एक खंड की लंबाई तक एक कठिन कार्य किया जाता है और वह सफल हो जाता है। यही कारण है कि इसे मंगलवार की शाम पढ़ना उचित लगता है।"
+        },
+        {
+          "type": "PROSE",
+          "title": "कहाँ से आरंभ करें",
+          "text": "सुन्दरकाण्ड से पहले पहले चार काण्ड पढ़ना आवश्यक नहीं है। जो परिवार इसे साप्ताहिक रूप से पढ़ते हैं, उनमें से अधिकांश ने उत्तरकाण्ड कभी पढ़ा ही नहीं है।\n\nयदि आप कथा को क्रम में पढ़ना चाहते हैं, तो बालकाण्ड से आरंभ करें और अपनी गति से पढ़ें। यदि आप अभ्यास आरंभ करना चाहते हैं, तो सुन्दरकाण्ड से आरंभ करें।"
+        },
+        {
+          "type": "QA",
+          "title": "सामान्य शंकाएँ — उत्तर सहित",
+          "myths": [
+            { "question": "क्या मुझे पहले पूरा ग्रंथ पढ़ना चाहिए?", "answer": "नहीं। सुन्दरकाण्ड से आरंभ करना सामान्य और प्रचलित तरीका है, और अधिकांश परिवार इसी तरह आरंभ करते हैं।" },
+            { "question": "क्या रामचरितमानस और रामायण एक ही हैं?", "answer": "यह एक पुनर्कथा है। वाल्मीकि की रामायण पुरानी संस्कृत महाकाव्य है; तुलसीदास ने सोलहवीं शताब्दी में अवधी में रामचरितमानस लिखा ताकि संस्कृत न जानने वाले लोग भी इसे पढ़ सकें। दोनों पढ़े जाते हैं; ये अलग-अलग ग्रंथ हैं।" },
+            { "question": "मुझे कौन-सा संस्करण खरीदना चाहिए?", "answer": "गीता प्रेस गोरखपुर संस्करण मानक है और सस्ता भी। कोई भी संस्करण जिसमें आप पढ़ सकें ऐसा लिप्यंतरण हो, उपयुक्त है।" },
+            { "question": "मेरी हिंदी अवधी के लिए पर्याप्त नहीं है।", "answer": "लगभग किसी की भी नहीं है। हर सामान्य संस्करण में छंद के साथ हिंदी भावार्थ छपा होता है, और कई में लिप्यंतरण भी। छंद को ज़ोर से पढ़ें और साथ में अर्थ देखें।" }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -42,6 +42,14 @@ public class Article {
     /** deity gradient key from the design system, e.g. "h-shiva" */
     private String hueClass;
 
+    /**
+     * Presiding deity, lowercase slug — "shiva", "vishnu", "devi", "ganesha",
+     * "surya", "hanuman". Drives the deity facet on /all-articles. Null is
+     * legitimate: Panchang and most Dharmic Concepts belong to no one deity.
+     */
+    @Indexed
+    private String deity;
+
     private Integer readMinutes;
 
     /** the date this observance falls on (seasonal articles); drives countdowns + sorting */
@@ -59,6 +67,9 @@ public class Article {
     private Boolean isFeatured = false;
     private Integer heroOrder;
     private List<String> relatedSlugs;
+
+    /** Cross-links a Ritual Guide and its Beginner's Guide, either direction. */
+    private String companionSlug;
 
     private Instant publishedAt;
 
@@ -101,6 +112,8 @@ public class Article {
     public void setWaImageId(String waImageId) { this.waImageId = waImageId; }
     public String getHueClass() { return hueClass; }
     public void setHueClass(String hueClass) { this.hueClass = hueClass; }
+    public String getDeity() { return deity; }
+    public void setDeity(String deity) { this.deity = deity; }
     public Integer getReadMinutes() { return readMinutes; }
     public void setReadMinutes(Integer readMinutes) { this.readMinutes = readMinutes; }
     public LocalDate getObservanceDate() { return observanceDate; }
@@ -121,6 +134,8 @@ public class Article {
     public void setHeroOrder(Integer heroOrder) { this.heroOrder = heroOrder; }
     public List<String> getRelatedSlugs() { return relatedSlugs; }
     public void setRelatedSlugs(List<String> relatedSlugs) { this.relatedSlugs = relatedSlugs; }
+    public String getCompanionSlug() { return companionSlug; }
+    public void setCompanionSlug(String companionSlug) { this.companionSlug = companionSlug; }
     public Instant getPublishedAt() { return publishedAt; }
     public void setPublishedAt(Instant publishedAt) { this.publishedAt = publishedAt; }
     public Instant getCreatedAt() { return createdAt; }

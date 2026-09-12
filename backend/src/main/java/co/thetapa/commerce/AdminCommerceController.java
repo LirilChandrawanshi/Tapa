@@ -75,7 +75,8 @@ public class AdminCommerceController {
         Order.Status.PENDING_PAYMENT, List.of(Order.Status.CANCELLED),
         Order.Status.CONFIRMED, List.of(Order.Status.PACKING, Order.Status.CANCELLED),
         Order.Status.PACKING, List.of(Order.Status.DISPATCHED, Order.Status.CANCELLED),
-        Order.Status.DISPATCHED, List.of(Order.Status.DELIVERED),
+        Order.Status.DISPATCHED, List.of(Order.Status.DELIVERED, Order.Status.DELAYED),
+        Order.Status.DELAYED, List.of(Order.Status.DELIVERED, Order.Status.CANCELLED),
         Order.Status.CANCELLED, List.of(Order.Status.REFUND_INITIATED),
         Order.Status.REFUND_INITIATED, List.of(Order.Status.REFUNDED)
     );
@@ -88,7 +89,8 @@ public class AdminCommerceController {
             : orders.findByStatusOrderByCreatedAtDesc(status));
     }
 
-    public record StatusChange(Order.Status status, String trackingId, String courier, String note) {
+    public record StatusChange(Order.Status status, String trackingId, String courier, String note,
+                               java.time.LocalDate revisedDeliveryDate) {
     }
 
     @PostMapping("/orders/{orderNumber}/status")
@@ -114,11 +116,20 @@ public class AdminCommerceController {
             }
             case DELIVERED -> order.setStatusNote("Delivered");
             case PACKING -> order.setStatusNote("Being packed");
+            case DELAYED -> {
+                order.setRevisedDeliveryDate(body.revisedDeliveryDate());
+                order.setStatusNote(body.revisedDeliveryDate() == null
+                    ? "Running late — new delivery date to follow"
+                    : "Running late — now expected by " + body.revisedDeliveryDate());
+                notifyDelay(order);
+            }
             case CANCELLED -> {
                 boolean stockWasReserved = previous != Order.Status.PENDING_PAYMENT;
                 order.setCancelledAt(Instant.now());
                 order.setRefundPaise(order.getTotalPaise());
-                order.setStatusNote("Cancelled · full refund initiated");
+                order.setStatusNote(previous == Order.Status.DELAYED
+                    ? "Refused at the door · full refund initiated"
+                    : "Cancelled · full refund initiated");
                 if (stockWasReserved) {
                     stock.restoreAll(order.getItems());
                 }
@@ -150,6 +161,21 @@ public class AdminCommerceController {
             // notification failure never blocks the dispatch itself
             org.slf4j.LoggerFactory.getLogger(AdminCommerceController.class)
                 .warn("dispatch notification failed for {}: {}", order.getOrderNumber(), e.getMessage());
+        }
+    }
+
+    /** Delay notification — sent proactively, before the buyer works it out themselves. */
+    private void notifyDelay(Order order) {
+        try {
+            whatsApp.sendText(order.getPhone().replace("+", ""),
+                "Your order " + order.getOrderNumber() + " is running a little late — now expected by "
+                    + (order.getRevisedDeliveryDate() == null ? "a revised date we'll confirm shortly"
+                    : order.getRevisedDeliveryDate())
+                    + ". You can keep the order or refuse it at the door — details here: "
+                    + "https://thetapaco.com/orders/track?on=" + order.getOrderNumber());
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(AdminCommerceController.class)
+                .warn("delay notification failed for {}: {}", order.getOrderNumber(), e.getMessage());
         }
     }
 

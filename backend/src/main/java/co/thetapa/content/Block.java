@@ -19,6 +19,8 @@ public record Block(
     Mantra mantra,                // MANTRA
     Sankalpa sankalpa,            // SANKALPA
     List<FastingForm> fasting,    // FASTING (Nirjala/Sajal/Phalahar cards)
+    List<KathaBeat> beats,        // KATHA — structured story beats, optional (flat `text` still renders when absent)
+    Dpb dpb,                      // section-level classification (concept template's per-section tag row)
     Map<String, String> meta      // anything block-specific (quote attribution, image ids…)
 ) {
 
@@ -27,7 +29,12 @@ public record Block(
         MANTRA, FASTING, KATHA, MYTHS, QA, PROSE
     }
 
-    public record VidhiStep(int number, String title, String description, String note, Dpb dpb, String mantraChip) {
+    public record VidhiStep(int number, String title, String description, String note, Dpb dpb, String mantraChip,
+                             Boolean highlight) {
+    }
+
+    /** One beat of a KATHA block's structured story (mock: 4-up "story beats" grid). */
+    public record KathaBeat(String title, String description) {
     }
 
     public record SamagriItem(String name, String note, boolean optional) {

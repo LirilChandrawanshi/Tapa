@@ -18,7 +18,7 @@ import java.util.List;
 public class Order {
 
     public enum Status {
-        PENDING_PAYMENT, CONFIRMED, PACKING, DISPATCHED, DELIVERED,
+        PENDING_PAYMENT, CONFIRMED, PACKING, DISPATCHED, DELAYED, DELIVERED,
         CANCELLED, REFUND_INITIATED, REFUNDED
     }
 
@@ -60,6 +60,10 @@ public class Order {
     private Long refundPaise;
     /** buyer-picked cancellation reason (optional, never required) */
     private String cancelReason;
+    /** set when a dispatched order is running late; overrides expectedDelivery in copy */
+    private LocalDate revisedDeliveryDate;
+    /** buyer chose "I will refuse the delivery" on a DELAYED order — awaits the return */
+    private boolean refusalRequested = false;
 
     @CreatedDate
     private Instant createdAt;
@@ -120,6 +124,10 @@ public class Order {
     public void setRefundPaise(Long refundPaise) { this.refundPaise = refundPaise; }
     public String getCancelReason() { return cancelReason; }
     public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
+    public LocalDate getRevisedDeliveryDate() { return revisedDeliveryDate; }
+    public void setRevisedDeliveryDate(LocalDate revisedDeliveryDate) { this.revisedDeliveryDate = revisedDeliveryDate; }
+    public boolean isRefusalRequested() { return refusalRequested; }
+    public void setRefusalRequested(boolean refusalRequested) { this.refusalRequested = refusalRequested; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

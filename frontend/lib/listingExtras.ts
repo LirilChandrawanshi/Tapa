@@ -290,10 +290,11 @@ export async function fetchAllArticlesSafe(
 ): Promise<Article[]> {
   const pageSize = 50;
   const items: Article[] = [];
-  let page = 1;
+  // Backend pagination is 0-indexed (Spring's PageRequest.of(page, ...)).
+  let page = 0;
   let totalPages = 1;
 
-  while (items.length < cap && page <= totalPages) {
+  while (items.length < cap && page < totalPages) {
     try {
       const res = await fetchArticles({ ...params, page, size: pageSize });
       items.push(...res.items);

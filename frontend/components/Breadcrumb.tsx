@@ -1,15 +1,26 @@
 import Link from "next/link";
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 
 export interface Crumb {
   label: string;
   href?: string;
 }
 
-export function Breadcrumb({ items }: { items: readonly Crumb[] }) {
+export function Breadcrumb({
+  items,
+  actions,
+}: {
+  items: readonly Crumb[];
+  /**
+   * Right-aligned controls in the crumb bar — the PLP spec puts the language
+   * toggle, Save and Share here on every detail template.
+   */
+  actions?: ReactNode;
+}) {
   return (
     <nav aria-label="Breadcrumb" className="border-b border-border bg-card">
-      <ol className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-2 px-4 py-[10px] text-[13px] text-sub md:px-10">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-[10px] md:px-10">
+      <ol className="flex flex-wrap items-center gap-2 text-[13px] text-sub">
         {items.map((item, i) => {
           const isLast = i === items.length - 1;
           return (
@@ -33,6 +44,10 @@ export function Breadcrumb({ items }: { items: readonly Crumb[] }) {
           );
         })}
       </ol>
+      {actions && (
+        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+      )}
+      </div>
     </nav>
   );
 }

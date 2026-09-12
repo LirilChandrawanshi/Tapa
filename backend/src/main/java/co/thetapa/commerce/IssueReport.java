@@ -6,12 +6,14 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * "Report a problem" on a delivered/dispatched kit order (launch-blocking
- * aftercare). No photo upload yet — photoNote records that we'll request
- * photos on WhatsApp instead. Resolution (item-level replacement or refund)
- * is the buyer's choice, handled by support within one working day.
+ * aftercare). Up to four photos may be attached (media asset ids). Resolution
+ * is item-level replacement first; a coupon code is issued only when the
+ * item can't be replaced — never a cash refund on a damage claim.
  */
 @Document("issue_reports")
 public class IssueReport {
@@ -19,6 +21,8 @@ public class IssueReport {
     public enum Reason { BOX_DAMAGED, ITEM_BROKEN, ITEM_MISSING, WRONG_ITEM, OTHER }
 
     public enum Status { NEW, IN_REVIEW, RESOLVED }
+
+    public enum Resolution { REPLACEMENT, COUPON }
 
     @Id
     private String id;
@@ -32,11 +36,16 @@ public class IssueReport {
     private Reason reason;
     private String details;
 
-    /** no upload path yet — plain-words note that photos come via WhatsApp */
-    private String photoNote = "We'll request photos on WhatsApp if they help resolve this faster.";
+    /** media asset ids — up to four, uploaded after the report is created */
+    private List<String> photoIds = new ArrayList<>();
 
     @Indexed
     private Status status = Status.NEW;
+
+    /** set by support on resolve: replacement first, coupon only if the item can't be replaced */
+    private Resolution resolution;
+    /** generated only when resolution == COUPON */
+    private String couponCode;
 
     @CreatedDate
     private Instant createdAt;
@@ -51,10 +60,14 @@ public class IssueReport {
     public void setReason(Reason reason) { this.reason = reason; }
     public String getDetails() { return details; }
     public void setDetails(String details) { this.details = details; }
-    public String getPhotoNote() { return photoNote; }
-    public void setPhotoNote(String photoNote) { this.photoNote = photoNote; }
+    public List<String> getPhotoIds() { return photoIds; }
+    public void setPhotoIds(List<String> photoIds) { this.photoIds = photoIds; }
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
+    public Resolution getResolution() { return resolution; }
+    public void setResolution(Resolution resolution) { this.resolution = resolution; }
+    public String getCouponCode() { return couponCode; }
+    public void setCouponCode(String couponCode) { this.couponCode = couponCode; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

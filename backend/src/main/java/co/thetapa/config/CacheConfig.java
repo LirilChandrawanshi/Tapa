@@ -22,6 +22,8 @@ public class CacheConfig {
             .expireAfterWrite(Duration.ofMinutes(5)).maximumSize(10).build());
         manager.registerCustomCache("taxonomy", Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofHours(1)).maximumSize(5).build());
+        manager.registerCustomCache("feed", Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofMinutes(5)).maximumSize(10).build());
         return manager;
     }
 }

@@ -15,6 +15,40 @@ import {
   type OrderView,
 } from "@/lib/shop";
 
+/** A pre-booked (dated) order vs a standard all-year one — different confirmations. */
+function isDated(order: OrderView): boolean {
+  return Boolean(
+    order.festivalDate || order.items.some((i) => i.orderByDate || i.festivalDate),
+  );
+}
+
+function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "long",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "Asia/Kolkata",
+  }).format(d);
+}
+
+function StepDot({ state }: { state: "done" | "now" | "upcoming" }) {
+  return (
+    <span
+      aria-hidden
+      className={`mt-[3px] size-[10px] shrink-0 rounded-full ${
+        state === "done"
+          ? "bg-dharma-fg"
+          : state === "now"
+            ? "bg-cta ring-[3px] ring-bhranti-bg"
+            : "border border-border bg-bg"
+      }`}
+    />
+  );
+}
+
 type State =
   | { kind: "loading" }
   | { kind: "missing" }
@@ -69,16 +103,29 @@ export function ConfirmedView() {
   const { order } = state;
   const first = order.items[0];
   const festival = order.festivalDate ?? order.items.find((i) => i.festivalDate)?.festivalDate;
-
-  const nextSteps = [
-    "We'll message you the moment it's dispatched, with tracking.",
-    "The kit arrives with the printed ritual card inside — lay it out before you begin.",
-    festival
-      ? `A reminder lands before ${formatDateLong(festival)}, with the free guide attached.`
-      : "The free guide stays on the knowledge layer whenever you need it.",
-  ];
+  const dated = isDated(order);
+  const earliestOrderBy = order.items
+    .map((i) => i.orderByDate)
+    .filter((d): d is string => Boolean(d))
+    .sort()[0];
 
   const trackHref = `/orders/track?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(phone)}`;
+  // The order only carries the product slug, not the linked guide's article slug — browse is the safe link.
+  const guideHref = "/ritual-guides";
+
+  const cancelLine = order.cancellableUntil ? (
+    <p className="mt-3 border-t border-border-light pt-3 text-[12px] text-sub">
+      Cancel free until{" "}
+      {new Intl.DateTimeFormat("en-IN", {
+        day: "numeric",
+        month: "long",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: "Asia/Kolkata",
+      }).format(new Date(order.cancellableUntil))}
+      . Stated here so it never has to be hunted for.
+    </p>
+  ) : null;
 
   return (
     <div className="mx-auto max-w-[620px]">
@@ -90,7 +137,7 @@ export function ConfirmedView() {
           ✓
         </p>
         <h1 className="mb-1 text-2xl font-bold tracking-[-0.4px] text-ink">
-          Order placed ✓
+          {dated ? "Pre-booking confirmed" : "Order confirmed"}
         </h1>
         {first && (
           <p className="text-[15px] text-body">
@@ -108,34 +155,114 @@ export function ConfirmedView() {
         )}
       </div>
 
-      <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
-        <p className="mb-3 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
-          What happens next
-        </p>
-        <ol className="space-y-[10px]">
-          {nextSteps.map((step, i) => (
-            <li key={step} className="flex gap-3 text-[13px] leading-relaxed text-body">
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-bg text-[10.5px] font-bold text-gold">
-                {i + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ol>
-        {order.cancellableUntil && (
-          <p className="mt-3 border-t border-border-light pt-3 text-[12px] text-sub">
-            Cancel free until{" "}
-            {new Intl.DateTimeFormat("en-IN", {
-              day: "numeric",
-              month: "long",
-              hour: "numeric",
-              minute: "2-digit",
-              timeZone: "Asia/Kolkata",
-            }).format(new Date(order.cancellableUntil))}
-            . Stated here so it never has to be hunted for.
+      {/* Dated orders get the full wait-carrying timeline; standard orders get a short summary (#Flow-9/10) */}
+      {dated ? (
+        <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
+          <p className="mb-3 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
+            What happens next
           </p>
-        )}
-      </div>
+          <ol className="space-y-3">
+            <li className="flex gap-3 text-[13px] leading-relaxed">
+              <StepDot state="done" />
+              <span>
+                <b className="block text-ink">Payment received</b>
+                <span className="text-sub">{formatDateTime(order.createdAt)}</span>
+              </span>
+            </li>
+            <li className="flex gap-3 text-[13px] leading-relaxed">
+              <StepDot state="now" />
+              <span>
+                <b className="block text-ink">Packing begins</b>
+                <span className="text-sub">
+                  {earliestOrderBy
+                    ? `${formatDateLong(earliestOrderBy)} — after the cut-off closes`
+                    : "Once the cut-off closes"}
+                </span>
+              </span>
+            </li>
+            <li className="flex gap-3 text-[13px] leading-relaxed">
+              <StepDot state="upcoming" />
+              <span>
+                <b className="block text-ink">Dispatched</b>
+                <span className="text-sub">Tracking sent on WhatsApp</span>
+              </span>
+            </li>
+            <li className="flex gap-3 text-[13px] leading-relaxed">
+              <StepDot state="upcoming" />
+              <span>
+                <b className="block text-ink">Delivered</b>
+                <span className="text-sub">
+                  {order.expectedDelivery
+                    ? `By ${formatDateMedium(order.expectedDelivery)}${festival ? " — before the puja" : ""}`
+                    : "Date to follow"}
+                </span>
+              </span>
+            </li>
+          </ol>
+          {cancelLine}
+        </div>
+      ) : (
+        <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
+          <dl className="space-y-[7px] text-[13px]">
+            {order.items.map((item) => (
+              <div key={item.productSlug} className="flex justify-between gap-3">
+                <dt className="text-body">
+                  {item.title}
+                  {item.qty > 1 && <span className="text-sub"> × {item.qty}</span>}
+                </dt>
+                <dd className="font-semibold whitespace-nowrap text-ink">
+                  {formatPaise(item.unitPricePaise * item.qty)}
+                </dd>
+              </div>
+            ))}
+            <div className="flex justify-between border-t border-border-light pt-2">
+              <dt className="text-sub">Payment</dt>
+              <dd className="font-semibold text-ink">Paid</dd>
+            </div>
+            {order.expectedDelivery && (
+              <div className="flex justify-between">
+                <dt className="text-sub">Arriving</dt>
+                <dd className="font-semibold text-ink">
+                  {formatDateMedium(order.expectedDelivery)}
+                </dd>
+              </div>
+            )}
+          </dl>
+          {cancelLine}
+        </div>
+      )}
+
+      {dated ? (
+        <div className="mb-4 grid gap-2 sm:grid-cols-2">
+          <Link
+            href={guideHref}
+            className="rounded-[10px] bg-ink px-5 py-[11px] text-center text-[13.5px] font-bold text-white"
+          >
+            Read the guide ›
+          </Link>
+          <Link
+            href={trackHref}
+            className="rounded-[10px] border border-border bg-card px-5 py-[11px] text-center text-[13.5px] font-bold text-body"
+          >
+            Track this order ›
+          </Link>
+        </div>
+      ) : (
+        <div className="mb-4 grid gap-2 sm:grid-cols-2">
+          <Link
+            href={trackHref}
+            className="rounded-[10px] bg-ink px-5 py-[11px] text-center text-[13.5px] font-bold text-white"
+          >
+            Track this order ›
+          </Link>
+          <Link
+            href={guideHref}
+            className="rounded-[10px] border border-border bg-card px-5 py-[11px] text-center text-[13.5px] font-bold text-body"
+          >
+            Read the guide ›
+          </Link>
+        </div>
+      )}
 
       {/* Keep-this-order card — one inline OTP, never a wall (#164/#185). */}
       {signedIn === false && (
@@ -190,12 +317,6 @@ export function ConfirmedView() {
       )}
 
       <WhatsAppNudge copy="Get dispatch and delivery updates for this order on WhatsApp." />
-
-      <p className="text-center">
-        <Link href={trackHref} className="text-[13.5px] font-bold text-cta">
-          Track this order ›
-        </Link>
-      </p>
     </div>
   );
 }

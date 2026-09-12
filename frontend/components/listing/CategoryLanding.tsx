@@ -20,11 +20,14 @@ export async function CategoryLanding({
   variant,
   eyebrow,
   description,
+  heroImage,
 }: {
   sectionKey: NavSectionKey;
   variant: CategoryHeroVariant;
   eyebrow: string;
   description: string;
+  /** Optional hero photograph; falls back to the variant's CSS layers. */
+  heroImage?: string;
 }) {
   const section = getSection(sectionKey);
   const now = new Date().toISOString();
@@ -48,6 +51,7 @@ export async function CategoryLanding({
     <div>
       <CategoryHero
         variant={variant}
+        image={heroImage}
         eyebrow={eyebrow}
         title={section.label}
         description={description}
