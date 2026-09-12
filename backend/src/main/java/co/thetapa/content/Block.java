@@ -20,13 +20,32 @@ public record Block(
     Sankalpa sankalpa,            // SANKALPA
     List<FastingForm> fasting,    // FASTING (Nirjala/Sajal/Phalahar cards)
     List<KathaBeat> beats,        // KATHA — structured story beats, optional (flat `text` still renders when absent)
+    DvpSplit dvp,                 // DHARMA_VS_PRATHA — the two named columns
     Dpb dpb,                      // section-level classification (concept template's per-section tag row)
     Map<String, String> meta      // anything block-specific (quote attribution, image ids…)
 ) {
 
     public enum BlockType {
         INTRO, ORIGIN, SIGNIFICANCE_QUOTE, SANKALPA, SAMAGRI, VIDHI,
-        MANTRA, FASTING, KATHA, MYTHS, QA, PROSE
+        MANTRA, FASTING, KATHA, DHARMA_VS_PRATHA, MYTHS, QA, PROSE
+    }
+
+    /**
+     * The "Dharma vs Pratha" section: two named columns, each with its own
+     * classification and score. Modelled as a first-class shape rather than
+     * left to PROSE, because the split is the PRD's central editorial claim —
+     * what scripture states, versus what custom added — and prose cannot
+     * carry the two badges or keep the two lists from blurring into one.
+     */
+    public record DvpSplit(
+        String lead,                // one line above the two columns
+        String dharmaHeading,       // e.g. "Named in text"
+        List<String> dharmaPoints,
+        Dpb dharmaDpb,              // the DHARMA badge + score for this column
+        String prathaHeading,       // e.g. "Cultural, not text"
+        List<String> prathaPoints,
+        Dpb prathaDpb               // the PRATHA badge + score
+    ) {
     }
 
     public record VidhiStep(int number, String title, String description, String note, Dpb dpb, String mantraChip,

@@ -2,11 +2,16 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ContentCard } from "@/components/ContentCard";
 import { DpbBadge } from "@/components/DpbBadge";
+import {
+  DvpSplitCard,
+  IntelligenceCardBlock,
+} from "@/components/article/DvpSplitCard";
 import { AudioPlayer } from "@/components/media/AudioPlayer";
 import { SmartImage } from "@/components/media/SmartImage";
 import { Pill } from "@/components/Pill";
 import { SectionHeader } from "@/components/SectionHeader";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
+import { fetchIntelligenceCards } from "@/lib/api";
 import { getFlags } from "@/lib/flags";
 import { ActionBar } from "./ActionBar";
 import { ArticleAnalytics } from "./ArticleAnalytics";
@@ -82,8 +87,15 @@ export async function ArticleView({
   const nudgeContext =
     article.type === "DHARMIC_CONCEPT" ? "article-concept" : "article-vrat";
 
-  const [observance, related, corrections, flags, panchangDay, companion] =
-    await Promise.all([
+  const [
+    observance,
+    related,
+    corrections,
+    flags,
+    panchangDay,
+    companion,
+    intelligenceCards,
+  ] = await Promise.all([
       article.linkedObservanceSlug
         ? fetchObservanceSafe(article.linkedObservanceSlug)
         : Promise.resolve(null),
@@ -98,6 +110,9 @@ export async function ArticleView({
       article.companionSlug
         ? fetchArticleSafe(article.companionSlug).then((r) => r.article)
         : Promise.resolve(null),
+          article.intelligenceCardSlugs?.length
+        ? fetchIntelligenceCards(article.intelligenceCardSlugs).catch(() => [])
+        : Promise.resolve([]),
     ]);
 
   // A ritual guide's companion is its Beginner's Guide (quiet main-column banner);
@@ -217,6 +232,11 @@ export async function ArticleView({
       case "FASTING":
         body = <FastingCards block={block} />;
         break;
+      case "DHARMA_VS_PRATHA":
+        // The editorial method's central section — a real two-column split,
+        // never prose, so neither column can be read as the other.
+        body = block.dvp ? <DvpSplitCard dvp={block.dvp} /> : null;
+        break;
       case "MYTHS":
         body = <MythCards block={block} />;
         break;
@@ -330,31 +350,9 @@ export async function ArticleView({
       />
       <ArticleAnalytics slug={article.slug} type={article.type} />
 
-      {/* breadcrumb + lang + save/share (all breakpoints) */}
+      {/* save/share bar — the crumb trail was dropped site-wide */}
       <div className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-4 py-[7px] md:px-10">
-          <nav
-            aria-label="Breadcrumb"
-            className="min-w-0 overflow-hidden text-[13px] text-ellipsis whitespace-nowrap text-sub"
-          >
-            <Link href="/" className="hover:text-cta">
-              Home
-            </Link>
-            {" › "}
-            <Link href={sectionHref} className="hover:text-cta">
-              {sectionLabel}
-            </Link>
-            {subLabel && (
-              <>
-                {" › "}
-                <Link href={subHref} className="hover:text-cta">
-                  {subLabel}
-                </Link>
-              </>
-            )}
-            {" › "}
-            <b className="font-medium text-body">{en.title}</b>
-          </nav>
+        <div className="mx-auto flex max-w-[1280px] items-center justify-end gap-3 px-4 py-[7px] md:px-10">
           {/* Language lives in the top nav — one global control. It writes the
               same cookie and fires the same LANG_EVENT, so a second toggle here
               was a duplicate of the one already in the header. */}
@@ -660,6 +658,16 @@ export async function ArticleView({
             {/* corrections log (#71/#134) — only when something was fixed */}
             {corrections.length > 0 && (
               <CorrectionsLog corrections={corrections} />
+            )}
+
+            {/* shared intelligence cards — the rule that outlives this one
+                date, maintained once and referenced here (#grains in spec) */}
+            {intelligenceCards.length > 0 && (
+              <div className="mt-8 space-y-4">
+                {intelligenceCards.map((card) => (
+                  <IntelligenceCardBlock key={card.slug} card={card} />
+                ))}
+              </div>
             )}
 
             {/* related — grouped by what they are (#66) */}

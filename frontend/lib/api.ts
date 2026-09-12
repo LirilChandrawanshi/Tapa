@@ -2,6 +2,7 @@ import type {
   Article,
   DayPayload,
   GlossaryTerm,
+  IntelligenceCard,
   Paged,
   UpcomingObservance,
 } from "./types";
@@ -45,6 +46,17 @@ async function get<T>(
 }
 
 /** Content */
+/**
+ * The shared intelligence cards an article references, in the order it asked
+ * for them. Cached under its own tag so correcting a card purges every guide
+ * that carries it without touching the articles themselves.
+ */
+export const fetchIntelligenceCards = (slugs: string[]) =>
+  get<IntelligenceCard[]>(
+    `/intelligence-cards?slugs=${slugs.map(encodeURIComponent).join(",")}`,
+    { revalidate: 3600, tags: ["intelligence-cards"] },
+  );
+
 export const fetchArticle = (slug: string) =>
   get<Article>(`/articles/${slug}`, {
     revalidate: 3600,

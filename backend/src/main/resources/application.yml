@@ -21,6 +21,11 @@ management:
         include: health,info
 
 tapa:
+  admin:
+    # Comma-separated. These phones always carry ADMIN (see AdminBootstrap).
+    # Local additions belong in backend/config/application.yml (gitignored),
+    # not here — this default is the shared dev number only.
+    phones: ${TAPA_ADMIN_PHONES:+919876543210}
   security:
     cookie-domain: ${TAPA_COOKIE_DOMAIN:}
   jwt:

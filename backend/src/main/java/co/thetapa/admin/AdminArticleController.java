@@ -1,6 +1,8 @@
 package co.thetapa.admin;
 
 import co.thetapa.common.ApiResponse;
+import co.thetapa.content.ArticleTemplate;
+import co.thetapa.content.ArticleType;
 import co.thetapa.common.NotFoundException;
 import co.thetapa.content.Article;
 import co.thetapa.content.ArticleRepository;
@@ -95,6 +97,42 @@ public class AdminArticleController {
             events.publishEvent(new ArticleService.ArticlePublishedEvent(saved.getSlug()));
         }
         return ApiResponse.ok(saved);
+    }
+
+    /**
+     * The section recipe and this article's current gaps. The CMS draws its
+     * checklist from here rather than keeping its own copy, so the editor and
+     * the publish gate can never disagree about what "ready" means.
+     */
+    @GetMapping("/{slug}/completeness")
+    public ApiResponse<Map<String, Object>> completeness(@PathVariable String slug) {
+        Article article = find(slug);
+        var recipe = ArticleTemplate.of(article.getType());
+        return ApiResponse.ok(Map.of(
+            "type", String.valueOf(article.getType()),
+            "required", recipe.required().stream().map(Enum::name).toList(),
+            "recommended", recipe.recommended().stream().map(Enum::name).toList(),
+            "missingRequired", ArticleTemplate.missingSections(article).stream().map(Enum::name).toList(),
+            "missingRecommended", ArticleTemplate.missingRecommended(article).stream().map(Enum::name).toList()
+        ));
+    }
+
+    /** The recipe alone, for scaffolding a new article before it exists. */
+    @GetMapping("/templates/{type}")
+    public ApiResponse<Map<String, Object>> template(@PathVariable String type) {
+        ArticleType parsed;
+        try {
+            parsed = ArticleType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unknown article type: " + type);
+        }
+        var recipe = ArticleTemplate.of(parsed);
+        return ApiResponse.ok(Map.of(
+            "type", parsed.name(),
+            "required", recipe.required().stream().map(Enum::name).toList(),
+            "recommended", recipe.recommended().stream().map(Enum::name).toList(),
+            "scaffold", recipe.scaffold().stream().map(Enum::name).toList()
+        ));
     }
 
     @PostMapping("/{slug}/submit-review")

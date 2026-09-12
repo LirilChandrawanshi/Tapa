@@ -71,6 +71,13 @@ public class Article {
     /** Cross-links a Ritual Guide and its Beginner's Guide, either direction. */
     private String companionSlug;
 
+    /**
+     * Shared intelligence cards this article shows, by slug. A reference
+     * rather than inline copy so one correction reaches every guide that
+     * carries the card.
+     */
+    private List<String> intelligenceCardSlugs;
+
     private Instant publishedAt;
 
     @CreatedDate
@@ -102,6 +109,8 @@ public class Article {
     public void setCategory(String category) { this.category = category; }
     public String getSubCategory() { return subCategory; }
     public void setSubCategory(String subCategory) { this.subCategory = subCategory; }
+    public List<String> getIntelligenceCardSlugs() { return intelligenceCardSlugs; }
+    public void setIntelligenceCardSlugs(List<String> intelligenceCardSlugs) { this.intelligenceCardSlugs = intelligenceCardSlugs; }
     public Map<String, ArticleContent> getLang() { return lang; }
     public void setLang(Map<String, ArticleContent> lang) { this.lang = lang; }
     public Dpb getDpb() { return dpb; }

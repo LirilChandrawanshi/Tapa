@@ -21,7 +21,9 @@ export function CitySelect({ className = "" }: { className?: string }) {
         aria-label="City the panchang is calculated for"
         defaultValue="delhi-ncr"
         onChange={() => track("panchang_city_changed", { city: "delhi-ncr" })}
-        className="cursor-pointer bg-transparent text-[12px] font-bold text-mid outline-none"
+        // min-h-11 so the most important control on a panchang page is
+        // actually tappable on a phone; the label above keeps it compact.
+        className="min-h-11 cursor-pointer bg-transparent py-1 text-[12px] font-bold text-mid outline-none md:min-h-0 md:py-0"
       >
         <option value="delhi-ncr">{CITY_LABEL}</option>
         <option disabled>Mumbai — soon</option>

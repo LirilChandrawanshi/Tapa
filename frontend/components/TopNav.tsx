@@ -159,11 +159,14 @@ export function TopNav({
             type="button"
             aria-label="Open menu"
             onClick={() => setDrawerOpen(true)}
-            className="flex w-9 flex-col gap-[4.5px] px-[7px] lg:hidden"
+            // The bars are 2px each, so the button was only 15px tall — the
+            // primary navigation control on a phone, well under the 44px
+            // touch guideline. Centre the same bars inside a real target.
+            className="-ml-[7px] flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-[4.5px] px-[7px] lg:hidden"
           >
-            <span className="h-[2px] rounded-full bg-ink" />
-            <span className="h-[2px] w-[68%] rounded-full bg-ink" />
-            <span className="h-[2px] rounded-full bg-ink" />
+            <span className="h-[2px] w-full rounded-full bg-ink" />
+            <span className="h-[2px] w-[68%] self-start rounded-full bg-ink" />
+            <span className="h-[2px] w-full rounded-full bg-ink" />
           </button>
 
           {/* shrink-0: the inner <a> is shrink-0, so without it here the wrapper

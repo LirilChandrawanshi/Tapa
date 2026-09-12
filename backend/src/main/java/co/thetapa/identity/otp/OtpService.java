@@ -38,14 +38,24 @@ public class OtpService {
     public RequestResult request(String phone) {
         String normalized = normalize(phone);
 
-        var latest = sessions.findTopByPhoneOrderByCreatedAtDesc(normalized);
-        if (latest.isPresent() && Instant.now().isBefore(latest.get().getResendAvailableAt())) {
-            long wait = Duration.between(Instant.now(), latest.get().getResendAvailableAt()).getSeconds();
-            throw new OtpThrottledException("Resend available in " + wait + "s", wait);
-        }
-        if (sessions.countByPhoneAndCreatedAtAfter(normalized, Instant.now().minus(Duration.ofHours(1)))
-            >= RATE_LIMIT_PER_HOUR) {
-            throw new OtpThrottledException("Too many OTP requests. Try again later.", 3600);
+        // Dev only. The console provider already prints the code to the log and
+        // honours the 000000 master code below, so the resend timer and the
+        // hourly cap protect nothing here and only obstruct testing.
+        //
+        // Gated on the same condition as the master code, deliberately: both
+        // die the instant a real SMS provider bean exists, so production keeps
+        // the PRD's 28s resend and 5-per-hour cap untouched. Neither is ever a
+        // config flag, because a config flag can be switched on in production.
+        if (!isDevProvider()) {
+            var latest = sessions.findTopByPhoneOrderByCreatedAtDesc(normalized);
+            if (latest.isPresent() && Instant.now().isBefore(latest.get().getResendAvailableAt())) {
+                long wait = Duration.between(Instant.now(), latest.get().getResendAvailableAt()).getSeconds();
+                throw new OtpThrottledException("Resend available in " + wait + "s", wait);
+            }
+            if (sessions.countByPhoneAndCreatedAtAfter(normalized, Instant.now().minus(Duration.ofHours(1)))
+                >= RATE_LIMIT_PER_HOUR) {
+                throw new OtpThrottledException("Too many OTP requests. Try again later.", 3600);
+            }
         }
 
         String code = "%06d".formatted(random.nextInt(1_000_000));
@@ -57,7 +67,8 @@ public class OtpService {
         sessions.save(session);
 
         smsProvider.sendOtp(normalized, code);
-        return new RequestResult(resendSeconds);
+        // Zero here means the UI's resend countdown starts already elapsed.
+        return new RequestResult(isDevProvider() ? 0 : resendSeconds);
     }
 
     /**
@@ -67,10 +78,19 @@ public class OtpService {
      */
     private static final String DEV_MASTER_CODE = "000000";
 
+    /**
+     * True only while no real SMS provider is wired. This is an instanceof
+     * check rather than a property so it cannot be turned on in production by
+     * editing configuration.
+     */
+    private boolean isDevProvider() {
+        return smsProvider instanceof ConsoleSmsProvider;
+    }
+
     /** Returns the normalized phone on success; throws otherwise. */
     public String verify(String phone, String code) {
         String normalized = normalize(phone);
-        if (smsProvider instanceof ConsoleSmsProvider && DEV_MASTER_CODE.equals(code)) {
+        if (isDevProvider() && DEV_MASTER_CODE.equals(code)) {
             sessions.deleteByPhone(normalized);
             return normalized;
         }

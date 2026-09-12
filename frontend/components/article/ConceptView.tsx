@@ -316,31 +316,9 @@ export async function ConceptView({
       />
       <ArticleAnalytics slug={article.slug} type={article.type} />
 
-      {/* breadcrumb + lang + save/share */}
+      {/* save/share bar — the crumb trail was dropped site-wide */}
       <div className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-4 py-[7px] md:px-10">
-          <nav
-            aria-label="Breadcrumb"
-            className="min-w-0 overflow-hidden text-[13px] text-ellipsis whitespace-nowrap text-sub"
-          >
-            <Link href="/" className="hover:text-cta">
-              Home
-            </Link>
-            {" › "}
-            <Link href={sectionHref} className="hover:text-cta">
-              {sectionLabel}
-            </Link>
-            {subLabel && (
-              <>
-                {" › "}
-                <Link href={subHref} className="hover:text-cta">
-                  {subLabel}
-                </Link>
-              </>
-            )}
-            {" › "}
-            <b className="font-medium text-body">{en.title}</b>
-          </nav>
+        <div className="mx-auto flex max-w-[1280px] items-center justify-end gap-3 px-4 py-[7px] md:px-10">
           {/* Language lives in the top nav — see the note in ArticleView. */}
           <div className="flex shrink-0 items-center gap-2">
             <SaveShareButtons slug={article.slug} title={en.title} />

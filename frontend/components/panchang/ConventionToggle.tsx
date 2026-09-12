@@ -58,7 +58,7 @@ export function ConventionToggle({ className = "" }: { className?: string }) {
       type="button"
       aria-pressed={conv === key}
       onClick={() => choose(key)}
-      className={`rounded-[7px] px-[10px] py-[4px] text-[11.5px] font-bold transition-colors ${
+      className={`min-h-10 rounded-[7px] px-[12px] py-[4px] text-[11.5px] font-bold transition-colors md:min-h-0 ${
         conv === key
           ? "bg-data-fg text-white"
           : "text-mid hover:bg-data-bg hover:text-data-fg"

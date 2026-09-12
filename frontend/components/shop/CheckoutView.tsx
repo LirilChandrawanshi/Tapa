@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   checkPincode,
@@ -53,15 +53,39 @@ const FIELDS: {
   label: string;
   inputMode?: "numeric" | "text";
   maxLength?: number;
+  /** Mirrors CheckoutService: everything but `line2` is mandatory. */
+  required?: boolean;
+  autoComplete?: string;
 }[] = [
-  { key: "name", label: "Your name" },
-  { key: "phone", label: "Mobile number", inputMode: "numeric", maxLength: 10 },
-  { key: "line1", label: "House, Flat, Building" },
-  { key: "line2", label: "Area, Colony, Street" },
-  { key: "city", label: "City" },
-  { key: "state", label: "State" },
-  { key: "pincode", label: "Pincode", inputMode: "numeric", maxLength: 6 },
+  { key: "name", label: "Your name", required: true, autoComplete: "name" },
+  {
+    key: "phone",
+    label: "Mobile number",
+    inputMode: "numeric",
+    maxLength: 10,
+    required: true,
+    autoComplete: "tel-national",
+  },
+  {
+    key: "line1",
+    label: "House, Flat, Building",
+    required: true,
+    autoComplete: "address-line1",
+  },
+  { key: "line2", label: "Area, Colony, Street", autoComplete: "address-line2" },
+  { key: "city", label: "City", required: true, autoComplete: "address-level2" },
+  { key: "state", label: "State", required: true, autoComplete: "address-level1" },
+  {
+    key: "pincode",
+    label: "Pincode",
+    inputMode: "numeric",
+    maxLength: 6,
+    required: true,
+    autoComplete: "postal-code",
+  },
 ];
+
+type FieldErrors = Partial<Record<keyof AddressForm, string>>;
 
 const PAYMENT_METHODS: { value: PaymentMethod; title: string; sub: string }[] =
   [
@@ -115,6 +139,17 @@ export function CheckoutView() {
   const [selectedSavedId, setSelectedSavedId] = useState<string | null>(null);
   const [saveToBook, setSaveToBook] = useState(false);
 
+  // ── required-field validation ──
+  // Pay sits below the fold on both m-web and desktop, so a buyer who taps it
+  // with an empty form never sees an error that renders in place. Everything
+  // below exists to move them back up to the first field that needs them.
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const addressRef = useRef<HTMLElement>(null);
+  const issuesRef = useRef<HTMLDivElement>(null);
+  const inputRefs = useRef<Partial<Record<keyof AddressForm, HTMLInputElement | null>>>(
+    {},
+  );
+
   const loadAccount = async () => {
     const meRes = await getMe();
     setAuthChecked(true);
@@ -162,6 +197,14 @@ export function CheckoutView() {
     };
   }, [address.pincode]);
 
+  // The server validates again (prices, stock, cut-offs) and its verdict can
+  // name things no client check can. Bring the buyer to it rather than leaving
+  // it to render silently under the fold.
+  useEffect(() => {
+    if (phase.kind !== "invalid") return;
+    issuesRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [phase]);
+
   const resolved = useMemo(() => {
     if (!lines || !products) return null;
     return lines
@@ -203,6 +246,7 @@ export function CheckoutView() {
       : (savedAddresses.find((a) => a.id === selectedSavedId) ?? null);
   const effectiveAddress =
     selectedSaved && me ? fromSaved(selectedSaved, me.phone) : address;
+  const manualEntry = selectedSaved === null;
 
   // earliest pre-book cut-off in the cart — the failure banner promises the hold
   const earliestOrderBy = resolved
@@ -231,7 +275,65 @@ export function CheckoutView() {
     );
   };
 
+  /**
+   * Mirrors CheckoutService's address rules so the buyer is told what is
+   * missing before a network round-trip — and before any payment sheet opens.
+   */
+  const validateAddress = (a: AddressForm): FieldErrors => {
+    const errs: FieldErrors = {};
+    for (const f of FIELDS) {
+      if (!f.required) continue;
+      const value = a[f.key].trim();
+      if (!value) {
+        errs[f.key] = `${f.label} is required.`;
+        continue;
+      }
+      if (f.key === "phone" && !/^\d{10}$/.test(value)) {
+        errs.phone = "Enter a valid 10-digit mobile number.";
+      }
+      if (f.key === "pincode" && !/^\d{6}$/.test(value)) {
+        errs.pincode = "Enter a valid 6-digit pincode.";
+      }
+    }
+    // An unserviceable pincode is a field problem, not a payment problem —
+    // the server would reject it anyway, so say so at the field.
+    if (!errs.pincode && pin.kind === "result" && !pin.info.serviceable) {
+      errs.pincode = "We do not deliver to this pincode yet.";
+    }
+    return errs;
+  };
+
+  /**
+   * Scroll the first offending field into the middle of the viewport and focus
+   * it. `preventScroll` keeps the browser's own focus-scroll from fighting the
+   * smooth one, which on m-web otherwise lands the field under the keyboard.
+   */
+  const focusFirstError = (errs: FieldErrors) => {
+    const first = FIELDS.find((f) => errs[f.key]);
+    if (!first) return;
+    // one frame so the messages have painted before the viewport moves to them
+    requestAnimationFrame(() => {
+      const el = inputRefs.current[first.key];
+      (el ?? addressRef.current)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      el?.focus({ preventScroll: true });
+    });
+  };
+
   const onPay = async () => {
+    // Saved addresses were already validated when they entered the book.
+    if (manualEntry) {
+      const errs = validateAddress(address);
+      if (Object.keys(errs).length > 0) {
+        setFieldErrors(errs);
+        setPhase({ kind: "form" });
+        focusFirstError(errs);
+        return;
+      }
+    }
+    setFieldErrors({});
     setPhase({ kind: "paying" });
     const payloadAddress = {
       ...effectiveAddress,
@@ -268,7 +370,7 @@ export function CheckoutView() {
 
   const busy = phase.kind === "paying";
   const showFork = authChecked && me === null && !guestMode;
-  const manualEntry = selectedSaved === null;
+  const errorCount = Object.keys(fieldErrors).length;
 
   const summaryRows = (
     <>
@@ -338,10 +440,28 @@ export function CheckoutView() {
         )}
 
         {/* ── (a) Contact & Delivery address — never "Shipping address" ── */}
-        <section className="rounded-[14px] border border-border bg-card p-[18px]">
+        <section
+          ref={addressRef}
+          className="scroll-mt-24 rounded-[14px] border border-border bg-card p-[18px]"
+        >
           <h2 className="mb-4 text-[15px] font-bold text-ink">
             Contact &amp; Delivery address
           </h2>
+
+          {/* Counts what is missing without repeating every message — the
+              fields themselves carry the detail. role=alert so a screen reader
+              hears it at the same moment the viewport jumps. */}
+          {errorCount > 0 && (
+            <div
+              role="alert"
+              className="mb-4 rounded-[10px] border border-bhranti-bd bg-bhranti-bg px-[13px] py-[10px] text-[12.5px] font-semibold text-cta"
+            >
+              {errorCount === 1
+                ? "One detail is still needed before you can pay."
+                : `${errorCount} details are still needed before you can pay.`}{" "}
+              Nothing has been charged.
+            </div>
+          )}
 
           {/* saved addresses as radio cards, for signed-in buyers */}
           {me && savedAddresses.length > 0 && (
@@ -404,32 +524,64 @@ export function CheckoutView() {
           {manualEntry && (
             <>
               <div className="grid gap-3 sm:grid-cols-2">
-                {FIELDS.map((f) => (
-                  <label
-                    key={f.key}
-                    className={`block ${f.key === "line1" || f.key === "line2" ? "sm:col-span-2" : ""}`}
-                  >
-                    <span className="mb-1 block text-[10.5px] font-bold tracking-[0.6px] text-sub uppercase">
-                      {f.label}
-                    </span>
-                    <input
-                      type="text"
-                      inputMode={f.inputMode}
-                      maxLength={f.maxLength}
-                      value={address[f.key]}
-                      onChange={(e) =>
-                        setAddress((a) => ({
-                          ...a,
-                          [f.key]:
+                {FIELDS.map((f) => {
+                  const err = fieldErrors[f.key];
+                  return (
+                    <label
+                      key={f.key}
+                      className={`block scroll-mt-24 ${f.key === "line1" || f.key === "line2" ? "sm:col-span-2" : ""}`}
+                    >
+                      <span className="mb-1 block text-[10.5px] font-bold tracking-[0.6px] text-sub uppercase">
+                        {f.label}
+                        {f.required && (
+                          <span aria-hidden className="ml-[3px] text-cta">
+                            *
+                          </span>
+                        )}
+                      </span>
+                      <input
+                        ref={(el) => {
+                          inputRefs.current[f.key] = el;
+                        }}
+                        type="text"
+                        inputMode={f.inputMode}
+                        maxLength={f.maxLength}
+                        autoComplete={f.autoComplete}
+                        aria-required={f.required}
+                        aria-invalid={err ? true : undefined}
+                        aria-describedby={err ? `err-${f.key}` : undefined}
+                        value={address[f.key]}
+                        onChange={(e) => {
+                          const next =
                             f.inputMode === "numeric"
                               ? e.target.value.replace(/\D/g, "")
-                              : e.target.value,
-                        }))
-                      }
-                      className="w-full rounded-[9px] border border-border bg-bg px-[13px] py-[10px] text-[13.5px] text-ink outline-none focus:border-cta"
-                    />
-                  </label>
-                ))}
+                              : e.target.value;
+                          setAddress((a) => ({ ...a, [f.key]: next }));
+                          // Clear as they type — an error that outlives its
+                          // cause just nags.
+                          setFieldErrors((prev) => {
+                            if (!prev[f.key]) return prev;
+                            const { [f.key]: _gone, ...rest } = prev;
+                            return rest;
+                          });
+                        }}
+                        className={`w-full rounded-[9px] border bg-bg px-[13px] py-[10px] text-[13.5px] text-ink outline-none ${
+                          err
+                            ? "border-cta ring-1 ring-cta/40 focus:border-cta"
+                            : "border-border focus:border-cta"
+                        }`}
+                      />
+                      {err && (
+                        <span
+                          id={`err-${f.key}`}
+                          className="mt-1 block text-[11.5px] font-semibold text-cta"
+                        >
+                          {err}
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
               </div>
               {pin.kind === "checking" && (
                 <p className="mt-2 text-[12.5px] text-sub">Checking your pincode…</p>
@@ -508,7 +660,11 @@ export function CheckoutView() {
         </details>
 
         {phase.kind === "invalid" && (
-          <div className="rounded-[12px] border border-pratha-bd bg-pratha-bg px-4 py-3">
+          <div
+            ref={issuesRef}
+            role="alert"
+            className="scroll-mt-24 rounded-[12px] border border-pratha-bd bg-pratha-bg px-4 py-3"
+          >
             <p className="mb-1 text-[13px] font-bold text-pratha-fg">
               Nothing has been charged. A couple of details need another look:
             </p>

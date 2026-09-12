@@ -387,3 +387,40 @@ body {
     transition-delay: var(--reveal-delay, 0ms);
   }
 }
+
+/* ------------------------------------------------------------------
+ * Vrat katha dialog.
+ *
+ * A native <dialog> gets no transition for free, and `display` toggling
+ * makes the CSS-only route fiddly, so the panel and its backdrop each
+ * animate once on open. Both end at their natural state via `both` fill,
+ * and the reduced-motion kill switch above already neutralises them.
+ * ---------------------------------------------------------------- */
+
+@keyframes tapa-sheet-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tapa-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.katha-panel {
+  animation: tapa-sheet-up 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.katha-dialog[open]::backdrop {
+  animation: tapa-scrim-in 0.22s ease-out both;
+}

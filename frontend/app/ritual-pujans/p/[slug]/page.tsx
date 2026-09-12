@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { PhaseClosed } from "@/components/PhaseClosed";
 import { getFlags } from "@/lib/flags";
 import Link from "next/link";
-import { Breadcrumb } from "@/components/Breadcrumb";
 import { ContentCard } from "@/components/ContentCard";
 import { WhatsAppNudge } from "@/components/WhatsAppNudge";
 import { BuyBox } from "@/components/shop/BuyBox";
@@ -238,15 +237,6 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Breadcrumb
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Ritual Pujans", href: "/ritual-pujans" },
-          { label: catLabel, href: `/ritual-pujans/${p.category}` },
-          { label: p.title },
-        ]}
-      />
-
       <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-10">
         {/* ── Top fold: visual + buy column ── */}
         <div className="mb-11 grid items-start gap-7 md:grid-cols-[0.95fr_1.05fr] md:gap-10">

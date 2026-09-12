@@ -44,6 +44,16 @@ public class DpbValidator {
                 .forEach(b -> errors.add("Samagri checklist may hold at most 8 items (PRD)."));
         }
 
+        // Structural completeness, per article type. A guide missing its vidhi
+        // or its Dharma-vs-Pratha split is not a guide yet, whatever its tags
+        // say — so the same gate that enforces sourcing enforces shape.
+        var missing = ArticleTemplate.missingSections(article);
+        if (!missing.isEmpty()) {
+            errors.add("Missing required section" + (missing.size() == 1 ? "" : "s")
+                + " for a " + article.getType() + ": "
+                + missing.stream().map(Enum::name).reduce((a, b) -> a + ", " + b).orElse(""));
+        }
+
         if (article.getCircleTeaser() != null && article.getCircleTeaser().length() > 100) {
             errors.add("circle_teaser must be at most 100 characters (WhatsApp T2 spec).");
         }

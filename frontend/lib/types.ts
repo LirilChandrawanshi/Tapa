@@ -22,6 +22,7 @@ export type BlockType =
   | "MANTRA"
   | "FASTING"
   | "KATHA"
+  | "DHARMA_VS_PRATHA"
   | "MYTHS"
   | "QA"
   | "PROSE";
@@ -87,9 +88,42 @@ export interface Block {
   fasting?: FastingForm[];
   /** KATHA — structured story beats; flat `text` still renders when absent. */
   beats?: KathaBeat[];
+  /** DHARMA_VS_PRATHA — the two named columns. */
+  dvp?: DvpSplit;
   /** Section-level classification — the concept template's per-section tag row. */
   dpb?: Dpb;
   meta?: Record<string, string>;
+}
+
+/**
+ * The "Dharma vs Pratha" split: what the text states, beside what custom
+ * added. Each column carries its own classification, because the whole claim
+ * of the section is that the two are different.
+ */
+export interface DvpSplit {
+  lead?: string;
+  dharmaHeading?: string;
+  dharmaPoints?: string[];
+  dharmaDpb?: Dpb;
+  prathaHeading?: string;
+  prathaPoints?: string[];
+  prathaDpb?: Dpb;
+}
+
+/**
+ * A rule that generalises past one article — "what counts as a grain" is the
+ * same answer on all twenty-four Ekadashi guides. Stored once and referenced,
+ * never copied into each guide.
+ */
+export interface IntelligenceCard {
+  slug: string;
+  label?: string;
+  headline?: string;
+  body?: string;
+  points?: string[];
+  readMoreSlug?: string;
+  readMoreLabel?: string;
+  dpb?: Dpb;
 }
 
 export interface ArticleContent {
@@ -117,6 +151,8 @@ export interface Article {
   observanceDate?: string;
   linkedObservanceSlug?: string;
   relatedSlugs?: string[];
+  /** Shared intelligence cards this article shows, by slug. */
+  intelligenceCardSlugs?: string[];
   /** Cross-links a Ritual Guide and its Beginner's Guide, either direction. */
   companionSlug?: string;
   isFeatured?: boolean;
