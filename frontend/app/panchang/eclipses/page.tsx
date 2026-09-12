@@ -131,6 +131,7 @@ export default async function EclipsesPage() {
 
       <ControlBar>
         <TimingDataTag />
+        <ControlSep />
         <CitySelect />
         <ControlSep />
         <ConventionToggle />

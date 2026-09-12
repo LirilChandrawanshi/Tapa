@@ -12,7 +12,10 @@ import java.util.List;
 
 /**
  * A kit order. TK- prefix is locked (TP-/TM- reserved for purohit/mandali).
- * All money in integer paise. Full prepayment — no COD until Komal confirms.
+ * All money in integer paise. Prepayment is the default; cash on delivery is
+ * opt-in and gated per pincode plus an order-value cap — see {@link CodPolicy}.
+ * A COD order never passes through PENDING_PAYMENT: it is CONFIRMED at
+ * placement and the cash is collected at the door.
  */
 @Document("orders")
 public class Order {
@@ -42,9 +45,13 @@ public class Order {
 
     private Address address;
 
-    private String paymentMethod;    // upi | card | netbanking
-    private String paymentProvider;  // mock | razorpay
-    private String paymentRef;       // gateway order/payment id
+    private String paymentMethod;    // upi | card | netbanking | cod
+    private String paymentProvider;  // mock | razorpay | cod
+    private String paymentRef;       // gateway order/payment id; null for COD
+    /** COD handling fee already included in totalPaise. Zero on prepaid orders. */
+    private long codFeePaise;
+    /** Set when a COD order reaches DELIVERED — i.e. the cash was taken. */
+    private Instant codCollectedAt;
 
     private Status status = Status.PENDING_PAYMENT;
     private String statusNote;       // plain-words line shown to the buyer
@@ -102,6 +109,13 @@ public class Order {
     public void setPaymentProvider(String paymentProvider) { this.paymentProvider = paymentProvider; }
     public String getPaymentRef() { return paymentRef; }
     public void setPaymentRef(String paymentRef) { this.paymentRef = paymentRef; }
+    public long getCodFeePaise() { return codFeePaise; }
+    public void setCodFeePaise(long codFeePaise) { this.codFeePaise = codFeePaise; }
+    public Instant getCodCollectedAt() { return codCollectedAt; }
+    public void setCodCollectedAt(Instant codCollectedAt) { this.codCollectedAt = codCollectedAt; }
+
+    /** True when nothing has been charged up front — the money is due at the door. */
+    public boolean isCod() { return CodPolicy.isCod(paymentMethod); }
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
     public String getStatusNote() { return statusNote; }

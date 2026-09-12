@@ -22,7 +22,6 @@ import {
 } from "./ConceptActions";
 import { LangSection } from "./LangSection";
 import { LangSwap } from "./LangSwap";
-import { SaveShareButtons } from "./SaveShareButtons";
 import {
   anchorId,
   articleHref,
@@ -316,16 +315,6 @@ export async function ConceptView({
       />
       <ArticleAnalytics slug={article.slug} type={article.type} />
 
-      {/* save/share bar — the crumb trail was dropped site-wide */}
-      <div className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-end gap-3 px-4 py-[7px] md:px-10">
-          {/* Language lives in the top nav — see the note in ArticleView. */}
-          <div className="flex shrink-0 items-center gap-2">
-            <SaveShareButtons slug={article.slug} title={en.title} />
-          </div>
-        </div>
-      </div>
-
       {/* hero — the image carries the page, the copy sits in its dark half */}
       <header className="relative flex min-h-[300px] items-center overflow-hidden md:h-[380px]">
         {article.heroImageId ? (
@@ -391,7 +380,11 @@ export async function ConceptView({
 
       {/* trust chips + audio */}
       <div id="audio" className="scroll-mt-24 border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-[10px] px-4 py-[11px] md:h-14 md:flex-row md:items-center md:gap-5 md:px-10 md:py-0">
+        {/* min-h, not a fixed h-14: the audio player is a two-row stack (caption
+            over capsule, ~69px) and a hard 56px row let it spill 6px up into the
+            hero, which clipped the top of "Listen to this concept". ArticleView's
+            equivalent bar has always been padding-sized — this matches it. */}
+        <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-[10px] px-4 py-[11px] md:min-h-14 md:flex-row md:items-center md:gap-5 md:px-10">
           <div className="flex flex-wrap items-center gap-4">
             {(
               [

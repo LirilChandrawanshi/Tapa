@@ -22,6 +22,8 @@ export interface HomeCard {
   observanceDate?: string | null;
   dpbTag?: DpbTag | null;
   dpbScore?: number | null;
+  /** Whether the guide actually has an audio recording to jump to. */
+  hasAudio?: boolean;
 }
 
 export interface HomeCounts {
@@ -35,13 +37,85 @@ export interface HomeFlags {
   purohit_tab_visible: boolean;
 }
 
+/**
+ * A homepage band whose copy is edited in the CMS. `fields` holds the flat
+ * slots, `items` the repeatable rows. Layout and colour stay in the component.
+ */
+export interface HomeSection {
+  key: string;
+  label?: string;
+  published?: boolean;
+  fields?: Record<string, string>;
+  items?: Record<string, string>[];
+}
+
+/** Published bands keyed by section id. Unpublished bands are simply absent. */
+export type HomeSections = Record<string, HomeSection | undefined>;
+
+/** Where an editor-placed band sits on the page. */
+export type PromoPlacement =
+  | "AFTER_HERO"
+  | "AFTER_CALENDAR"
+  | "BEFORE_CIRCLE"
+  | "PAGE_END";
+
+/**
+ * A banner, offer or product push placed from the CMS. Product fields are
+ * resolved server-side from the linked product, so a price shown here is
+ * always the price Products holds.
+ */
+export interface HomePromo {
+  id: string;
+  eyebrow?: string | null;
+  title?: string | null;
+  body?: string | null;
+  badge?: string | null;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
+  style?: "BOLD" | "SUBTLE";
+  placement?: PromoPlacement;
+  productTitle?: string | null;
+  productPricePaise?: number | null;
+  productMrpPaise?: number | null;
+  productAvailability?: string | null;
+  productHueClass?: string | null;
+}
+
+/** Live promos grouped by slot. Absent slots simply have nothing in them. */
+export type HomePromos = Partial<Record<PromoPlacement, HomePromo[]>>;
+
 export interface HomePayload {
   hero: HomeCard[];
   panchangToday: DayPayload | null;
   nextObservances: UpcomingObservance[];
   guidesRail: HomeCard[];
   counts: HomeCounts;
+  sections: HomeSections;
+  promos: HomePromos;
   flags: HomeFlags;
+}
+
+/**
+ * Reads one copy slot, falling back to the value the component ships with.
+ * Every band keeps its literals, so a downed API or an empty collection still
+ * renders the page it rendered before any of this existed.
+ */
+export function sectionText(
+  section: HomeSection | undefined,
+  key: string,
+  fallback: string,
+): string {
+  const v = section?.fields?.[key];
+  return v === undefined || v === "" ? fallback : v;
+}
+
+/** Repeatable rows for a band, or the component's own defaults when unset. */
+export function sectionItems<T extends Record<string, string>>(
+  section: HomeSection | undefined,
+  fallback: readonly T[],
+): readonly (T | Record<string, string>)[] {
+  const items = section?.items;
+  return items && items.length > 0 ? items : fallback;
 }
 
 const API_BASE = process.env.API_BASE_URL ?? "http://localhost:8080";
@@ -109,6 +183,8 @@ export async function fetchHomeSafe(): Promise<HomePayload | null> {
             ? countsRaw.glossaryTerms
             : undefined,
       },
+      sections: asSections(record.sections),
+      promos: asPromos(record.promos),
       flags: {
         kits_launched:
           typeof flagsRaw.kits_launched === "boolean"
@@ -123,6 +199,42 @@ export async function fetchHomeSafe(): Promise<HomePayload | null> {
   } catch {
     return null;
   }
+}
+
+/** Shapes the payload's `sections` map, dropping anything malformed. */
+function asSections(raw: unknown): HomeSections {
+  if (typeof raw !== "object" || raw === null) return {};
+  const out: HomeSections = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof value !== "object" || value === null) continue;
+    const v = value as Record<string, unknown>;
+    out[key] = {
+      key,
+      label: typeof v.label === "string" ? v.label : undefined,
+      published: typeof v.published === "boolean" ? v.published : true,
+      fields:
+        typeof v.fields === "object" && v.fields !== null
+          ? (v.fields as Record<string, string>)
+          : {},
+      items: Array.isArray(v.items) ? (v.items as Record<string, string>[]) : [],
+    };
+  }
+  return out;
+}
+
+/** Shapes the payload's `promos` map, dropping anything malformed. */
+function asPromos(raw: unknown): HomePromos {
+  if (typeof raw !== "object" || raw === null) return {};
+  const out: HomePromos = {};
+  for (const [slot, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!Array.isArray(value)) continue;
+    const rows = value.filter(
+      (v): v is HomePromo =>
+        typeof v === "object" && v !== null && typeof (v as HomePromo).id === "string",
+    );
+    if (rows.length > 0) out[slot as PromoPlacement] = rows;
+  }
+  return out;
 }
 
 /* ── pure helpers ─────────────────────────────────────────────── */

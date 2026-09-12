@@ -10,10 +10,27 @@ import type { ReactNode } from "react";
 export function ControlBar({ children }: { children: ReactNode }) {
   return (
     <div className="sticky top-[107px] z-30 border-b border-border bg-card/95 backdrop-blur lg:top-[109px]">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 md:px-10">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-[11px] md:px-10">
         {children}
       </div>
     </div>
+  );
+}
+
+/**
+ * Shared height for every control in the strip. The three groups used to be
+ * 28, 36 and 40px tall against three different backgrounds, which is what made
+ * the row read as clutter rather than a toolbar. Mobile keeps a 44px tap
+ * target; the desktop row settles on one line.
+ */
+export const CONTROL_H = "min-h-11 md:min-h-0 md:h-8";
+
+/** Uppercase micro-label that sits outside its control, never inside it. */
+export function ControlLabel({ children }: { children: ReactNode }) {
+  return (
+    <span className="text-[9.5px] font-bold tracking-[0.7px] text-sub uppercase">
+      {children}
+    </span>
   );
 }
 

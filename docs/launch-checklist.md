@@ -11,7 +11,7 @@ business/ops input, not code. The site runs fully gated until the flags flip.
 - [ ] **COD**: currently absent per spec; confirm before any change.
 
 ## Accounts & keys (ops)
-- [ ] **Razorpay** keys → implement `razorpayPaymentProvider` bean (mock provider steps aside automatically).
+- [ ] **Razorpay** — the provider, webhook and audit trail are implemented and proven locally (`docs/razorpay-poc.md`). What remains: test keys in `backend/config/application.yml`, a webhook pointed at the ngrok URL, and one live sandbox payment. With no key set the mock provider stays bound.
 - [ ] **SMS provider** (MSG91/Twilio/Gupshup) → `productionSmsProvider` bean; this also kills the dev OTP 000000 automatically.
 - [ ] **WhatsApp BSP** (Gupshup/Interakt) + business number + Meta approval for the 3 Circle UTILITY templates (en + hi_IN) → `productionWhatsAppProvider` bean; replace the placeholder number in `frontend/lib/staticExtras.ts`.
 - [ ] **Mixpanel + GA4** IDs → add their scripts; `lib/analytics.ts` fan-out is already wired.

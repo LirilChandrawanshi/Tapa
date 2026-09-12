@@ -39,8 +39,27 @@ tapa:
     max-attempts: 5
   media:
     root: ${TAPA_MEDIA_ROOT:../media}
+  razorpay:
+    # Blank = gateway off; MockPaymentProvider handles checkout (see
+    # PaymentProviderConfig). Put real test keys in backend/config/application.yml
+    # (gitignored) or the env — never here.
+    key-id: ${TAPA_RAZORPAY_KEY_ID:}
+    key-secret: ${TAPA_RAZORPAY_KEY_SECRET:}
+    # The secret you type into the Razorpay Dashboard when creating the webhook.
+    webhook-secret: ${TAPA_RAZORPAY_WEBHOOK_SECRET:}
+    # Overridable so the POC can point the Orders API at a local stand-in.
+    base-url: ${TAPA_RAZORPAY_BASE_URL:https://api.razorpay.com}
   cors:
     allowed-origins: ${TAPA_CORS_ORIGINS:http://localhost:*}
+  commerce:
+    cod:
+      # Cash on delivery is OFF until the business signs it off. Turning it on
+      # is only the first gate — each pincode must also carry codAllowed=true
+      # (admin-managed) before COD appears at checkout.
+      enabled: ${TAPA_COD_ENABLED:false}
+      max-order-paise: ${TAPA_COD_MAX_PAISE:500000}     # ₹5,000
+      fee-paise: ${TAPA_COD_FEE_PAISE:0}
+      allow-prebook: ${TAPA_COD_ALLOW_PREBOOK:false}
 
 logging:
   level:

@@ -36,7 +36,6 @@ import { LangSwap } from "./LangSwap";
 import { MantraChip } from "./MantraChip";
 import { ModeSelector } from "./ModeSelector";
 import { SamagriChecklist } from "./SamagriChecklist";
-import { SaveShareButtons } from "./SaveShareButtons";
 import {
   anchorId,
   articleHref,
@@ -349,18 +348,6 @@ export async function ArticleView({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ArticleAnalytics slug={article.slug} type={article.type} />
-
-      {/* save/share bar — the crumb trail was dropped site-wide */}
-      <div className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-end gap-3 px-4 py-[7px] md:px-10">
-          {/* Language lives in the top nav — one global control. It writes the
-              same cookie and fires the same LANG_EVENT, so a second toggle here
-              was a duplicate of the one already in the header. */}
-          <div className="flex shrink-0 items-center gap-2">
-            <SaveShareButtons slug={article.slug} title={en.title} />
-          </div>
-        </div>
-      </div>
 
       {/* hero — ONE band (mock `.hero` + `.hero-bg` + `.hero-ov`). When a hero
           asset exists it becomes the background and the editorial chrome sits

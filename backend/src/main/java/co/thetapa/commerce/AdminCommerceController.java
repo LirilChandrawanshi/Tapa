@@ -114,7 +114,14 @@ public class AdminCommerceController {
                 order.setStatusNote("Dispatched · expected by " + order.getExpectedDelivery());
                 notifyDispatch(order);
             }
-            case DELIVERED -> order.setStatusNote("Delivered");
+            case DELIVERED -> {
+                if (order.isCod()) {
+                    order.setCodCollectedAt(Instant.now());
+                    order.setStatusNote("Delivered · cash collected");
+                } else {
+                    order.setStatusNote("Delivered");
+                }
+            }
             case PACKING -> order.setStatusNote("Being packed");
             case DELAYED -> {
                 order.setRevisedDeliveryDate(body.revisedDeliveryDate());
@@ -126,10 +133,17 @@ public class AdminCommerceController {
             case CANCELLED -> {
                 boolean stockWasReserved = previous != Order.Status.PENDING_PAYMENT;
                 order.setCancelledAt(Instant.now());
-                order.setRefundPaise(order.getTotalPaise());
-                order.setStatusNote(previous == Order.Status.DELAYED
-                    ? "Refused at the door · full refund initiated"
-                    : "Cancelled · full refund initiated");
+                if (order.isCod()) {
+                    // no money ever moved; a refund line here would be wrong
+                    order.setStatusNote(previous == Order.Status.DELAYED
+                        ? "Refused at the door · nothing was charged"
+                        : "Cancelled · nothing was charged");
+                } else {
+                    order.setRefundPaise(order.getTotalPaise());
+                    order.setStatusNote(previous == Order.Status.DELAYED
+                        ? "Refused at the door · full refund initiated"
+                        : "Cancelled · full refund initiated");
+                }
                 if (stockWasReserved) {
                     stock.restoreAll(order.getItems());
                 }

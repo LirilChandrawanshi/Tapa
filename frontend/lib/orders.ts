@@ -64,7 +64,7 @@ export interface OrderView {
   createdAt?: string | null;
   /** ISO instant — set once the order is cancelled. */
   cancelledAt?: string | null;
-  /** "upi" | "card" | "netbanking" — how the order was paid. */
+  /** "upi" | "card" | "netbanking" | "cod" — how the order was paid. */
   paymentMethod?: string | null;
   /** Refund amount in paise (full refund policy — equals totalPaise). */
   refundPaise?: number | null;

@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { SectionHeader } from "@/components/SectionHeader";
+import {
+  sectionItems,
+  sectionText,
+  type HomeSection,
+} from "@/lib/homeExtras";
 
 const BEGINNERS_HREF = "/ritual-guides/beginners-guides";
 
@@ -23,24 +28,31 @@ const STEPS = [
 
 /**
  * Beginner's rail (#26) — three numbered starting points into the
- * Beginner's Guides shelf. Static by design: no tags, no citations,
- * no Sanskrit to look up.
+ * Beginner's Guides shelf. No tags, no citations, no Sanskrit to look up.
+ * Copy and the three steps are CMS-editable (`beginners-rail`).
  */
-export function BeginnersRail() {
+export function BeginnersRail({ section }: { section?: HomeSection }) {
+  const href = sectionText(section, "href", BEGINNERS_HREF);
+  const steps = sectionItems(section, STEPS);
+  const cardCta = sectionText(section, "cardCta", "Begin ›");
   return (
     <section className="mx-auto max-w-[1280px] px-4 pt-10 md:px-10">
       <SectionHeader
-        eyebrow="New to all this?"
-        title="Start here — no Sanskrit required"
-        description="Written for the first time you do anything: no tags, no citations, no words to look up. The sourced versions are one tap away when you want them."
-        viewAllHref={BEGINNERS_HREF}
-        viewAllLabel="All beginner's guides"
+        eyebrow={sectionText(section, "eyebrow", "New to all this?")}
+        title={sectionText(section, "title", "Start here — no Sanskrit required")}
+        description={sectionText(
+          section,
+          "description",
+          "Written for the first time you do anything: no tags, no citations, no words to look up. The sourced versions are one tap away when you want them.",
+        )}
+        viewAllHref={href}
+        viewAllLabel={sectionText(section, "viewAllLabel", "All beginner's guides")}
       />
       <div className="grid gap-4 md:grid-cols-3">
-        {STEPS.map((step) => (
+        {steps.map((step) => (
           <Link
             key={step.n}
-            href={BEGINNERS_HREF}
+            href={href}
             className="group rounded-[15px] border border-border bg-card px-[19px] py-5 transition-colors hover:border-cta"
           >
             <p
@@ -55,9 +67,7 @@ export function BeginnersRail() {
             <p className="text-[12.5px] leading-relaxed text-sub">
               {step.copy}
             </p>
-            <p className="mt-3 text-[12px] font-bold text-cta">
-              Begin ›
-            </p>
+            <p className="mt-3 text-[12px] font-bold text-cta">{cardCta}</p>
           </Link>
         ))}
       </div>

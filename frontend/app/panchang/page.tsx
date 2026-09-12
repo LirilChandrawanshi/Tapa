@@ -265,6 +265,7 @@ export default async function PanchangPage() {
       {/* Control strip: marker, city, convention, PDF */}
       <ControlBar>
         <TimingDataTag />
+        <ControlSep />
         <CitySelect />
         <ControlSep />
         <ConventionToggle />

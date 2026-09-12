@@ -54,7 +54,14 @@ export interface Product {
 export interface PincodeInfo {
   serviceable: boolean;
   etaDays?: number;
+  /** Already the AND of the master switch and this pincode's own flag. */
   codAllowed?: boolean;
+  /** Largest order the courier will collect cash for, in paise. */
+  codMaxPaise?: number;
+  /** Cash-handling fee added to a COD total, in paise. Usually 0. */
+  codFeePaise?: number;
+  /** Whether dated pre-book kits may go COD (normally false). */
+  codOnPrebook?: boolean;
   area?: string;
 }
 
@@ -98,7 +105,7 @@ export interface OrderView {
   refusalRequested?: boolean;
 }
 
-export type PaymentMethod = "upi" | "card" | "netbanking";
+export type PaymentMethod = "upi" | "card" | "netbanking" | "cod";
 
 export interface CheckoutPayload {
   items: { productSlug: string; qty: number }[];
@@ -107,10 +114,49 @@ export interface CheckoutPayload {
   phone: string;
 }
 
+/** Dev/mock intent — the client confirms it itself, no gateway involved. */
+export interface MockPayment {
+  provider: "mock";
+  confirmUrl: string;
+  providerRef: string;
+}
+
+/** Everything checkout.js needs to open Razorpay's modal. */
+export interface RazorpayPayment {
+  provider: "razorpay";
+  keyId: string;
+  razorpayOrderId: string;
+  amountPaise: number;
+  currency: string;
+  orderNumber: string;
+  preferredMethod: PaymentMethod;
+  testMode: boolean;
+  verifyUrl: string;
+}
+
+/**
+ * A prepaid checkout returns a gateway intent; a COD checkout returns what is
+ * owed at the door and no providerRef — the order is already CONFIRMED.
+ */
+export type CheckoutPayment =
+  | RazorpayPayment
+  | MockPayment
+  | { method: "cod"; amountDuePaise: number };
+
+export function isCodPayment(
+  p: CheckoutPayment,
+): p is { method: "cod"; amountDuePaise: number } {
+  return "method" in p && p.method === "cod";
+}
+
+export function isRazorpayPayment(p: CheckoutPayment): p is RazorpayPayment {
+  return "provider" in p && p.provider === "razorpay";
+}
+
 export interface CheckoutResult {
   orderNumber: string;
   totalPaise: number;
-  payment: { provider: string; confirmUrl: string; providerRef: string };
+  payment: CheckoutPayment;
 }
 
 /* ─────────────────────────── API plumbing ───────────────────────── */
@@ -205,6 +251,21 @@ export const confirmMockPayment = (providerRef: string) =>
     method: "POST",
     body: { providerRef },
   });
+
+/** Razorpay's checkout.js success handler hands us exactly these three. */
+export interface RazorpayHandlerResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+/**
+ * The fast path to a confirmation screen. The webhook is what actually decides
+ * the order's fate, so a failure here is not a failed payment — it only means
+ * we could not show the good news synchronously.
+ */
+export const verifyRazorpayPayment = (r: RazorpayHandlerResponse) =>
+  call<OrderView>("/payments/razorpay/verify", { method: "POST", body: r });
 
 export const fetchOrder = (orderNumber: string, phone: string) =>
   call<OrderView>(
@@ -394,7 +455,14 @@ export type ShopEventName =
   | "cart_viewed"
   | "checkout_started"
   | "payment_completed"
-  | "payment_failed";
+  | "payment_failed"
+  /** Captured at the gateway, but our synchronous verify call did not land —
+      the webhook still settles the order. */
+  | "payment_verify_failed"
+  /** COD order placed — confirmed at once, so there is no payment_completed. */
+  | "order_placed_cod"
+  /** Razorpay returned a signature the server would not verify. */
+  | "payment_verify_failed";
 
 /**
  * Shop funnel events fan out through the shared track() pipeline.

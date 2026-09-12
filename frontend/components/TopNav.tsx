@@ -262,10 +262,7 @@ export function TopNav({
               <HeartIcon />
             </Link>
             {flags.kits_launched && <CartBadge />}
-            <UserMenu
-              variant="desktop"
-              showCreateAccount={!flags.kits_launched}
-            />
+            <UserMenu variant="desktop" />
           </div>
 
           {openKey && (

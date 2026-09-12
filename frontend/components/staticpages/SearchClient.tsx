@@ -134,7 +134,9 @@ export function SearchClient() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Search rituals, festivals, mantras…"
               aria-label="Search rituals, festivals, mantras"
-              className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-sub"
+              // WebKit draws its own clear button on type="search"; this field
+              // already has a styled one, so suppress the duplicate.
+              className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-sub [&::-webkit-search-cancel-button]:appearance-none"
             />
             {input && (
               <button
@@ -190,7 +192,7 @@ export function SearchClient() {
           )}
         </div>
 
-        <aside className="flex flex-col gap-4 md:sticky md:top-4 md:self-start">
+        <aside className="flex flex-col gap-4 md:sticky md:top-[88px] md:max-h-[calc(100vh-104px)] md:self-start md:overflow-y-auto md:overscroll-contain">
           {shown && shown.relatedSearches.length > 0 && (
             <div className="rounded-[15px] border border-border bg-card p-[18px]">
               <p className="mb-[10px] text-[10px] font-bold tracking-[0.8px] text-gold uppercase">

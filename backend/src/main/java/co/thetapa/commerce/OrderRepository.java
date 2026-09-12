@@ -9,6 +9,9 @@ public interface OrderRepository extends MongoRepository<Order, String> {
 
     Optional<Order> findByOrderNumber(String orderNumber);
 
+    /** Gateway order id — the join key every webhook arrives carrying. */
+    Optional<Order> findByPaymentRef(String paymentRef);
+
     List<Order> findByUserIdOrderByCreatedAtDesc(String userId);
 
     List<Order> findByPhoneOrderByCreatedAtDesc(String phone);

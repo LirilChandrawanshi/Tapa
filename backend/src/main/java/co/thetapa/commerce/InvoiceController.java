@@ -99,7 +99,7 @@ public class InvoiceController {
               <div class="muted">Tax invoice · %s</div>
               <div class="muted">GSTIN: [to be assigned] · Prices inclusive of all taxes</div>
             </div>
-            <div><b>Order:</b> %s &nbsp;·&nbsp; <b>Placed:</b> %s &nbsp;·&nbsp; <b>Paid via:</b> %s (prepaid in full)</div>
+            <div><b>Order:</b> %s &nbsp;·&nbsp; <b>Placed:</b> %s &nbsp;·&nbsp; <b>%s</b> %s</div>
             <div style="margin-top:6px"><b>Billed &amp; delivered to:</b> %s · %s<br>%s%s, %s, %s — %s</div>
             <table>
               <tr><th>Item</th><th class="n">Qty</th><th class="n">Unit price</th><th class="n">Amount</th></tr>
@@ -108,7 +108,8 @@ public class InvoiceController {
             <table class="totals">
               <tr><td></td><td class="n" style="width:110px">Subtotal</td><td class="n" style="width:110px">%s</td></tr>
               <tr><td></td><td class="n">Delivery</td><td class="n">%s</td></tr>
-              <tr class="grand"><td></td><td class="n">Total paid</td><td class="n">%s</td></tr>
+              %s
+              <tr class="grand"><td></td><td class="n">%s</td><td class="n">%s</td></tr>
             </table>
             <div class="foot">
               All amounts are inclusive of GST. This is a computer-generated invoice — no signature required.<br>
@@ -117,13 +118,22 @@ public class InvoiceController {
             </body></html>
             """.formatted(
             esc(order.getOrderNumber()), esc(order.getOrderNumber()), esc(placed),
-            esc(order.getPaymentMethod() == null ? "online payment" : label(order.getPaymentMethod())),
+            order.isCod() ? "Payment:" : "Paid via:",
+            esc(order.getPaymentMethod() == null ? "online payment (prepaid in full)"
+                : order.isCod()
+                    ? "Cash on delivery" + (order.getCodCollectedAt() == null
+                        ? " (payable on delivery)" : " (collected)")
+                    : label(order.getPaymentMethod()) + " (prepaid in full)"),
             esc(a.name()), esc(a.phone()), esc(a.line1()),
             a.line2() == null || a.line2().isBlank() ? "" : ", " + esc(a.line2()),
             esc(a.city()), esc(a.state()), esc(a.pincode()),
             rows.toString(),
             rupees(order.getSubtotalPaise()),
             order.getDeliveryPaise() == 0 ? "Free" : rupees(order.getDeliveryPaise()),
+            order.getCodFeePaise() == 0 ? ""
+                : "<tr><td></td><td class=\"n\">Cash-handling fee</td><td class=\"n\">"
+                    + rupees(order.getCodFeePaise()) + "</td></tr>",
+            order.isCod() && order.getCodCollectedAt() == null ? "Total due on delivery" : "Total paid",
             rupees(order.getTotalPaise()));
     }
 
@@ -132,6 +142,7 @@ public class InvoiceController {
             case "upi" -> "UPI";
             case "card" -> "Card";
             case "netbanking" -> "Net banking";
+            case CodPolicy.METHOD -> "Cash on delivery";
             default -> method;
         };
     }

@@ -11,6 +11,7 @@ import { JourneyStepper } from "@/components/home/JourneyStepper";
 import { KitsShelf } from "@/components/home/KitsShelf";
 import { LaunchBar } from "@/components/home/LaunchBar";
 import { PanchangCard } from "@/components/home/PanchangCard";
+import { PromoSlot } from "@/components/home/PromoBand";
 import { PurohitStrip } from "@/components/home/PurohitStrip";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { fetchHomeSafe } from "@/lib/homeExtras";
@@ -43,6 +44,16 @@ export default async function Home() {
   const heroCard = hero[0] ?? null;
   const nextObservances = home?.nextObservances ?? [];
   const kitsLaunched = home?.flags.kits_launched ?? false;
+  // Band copy from the CMS. Two distinct cases, and they must not be confused:
+  // a band the editor unpublished is hidden outright, while a band that simply
+  // is not in the payload (API down, never seeded) still renders through the
+  // component's own literals — so the page degrades to its old self, not to a
+  // hole. `shows` answers the first question, `sections[...]` feeds the second.
+  const sections = home?.sections ?? {};
+  const shows = (key: string) => sections[key]?.published !== false;
+  // Editor-placed banners / offers. Every slot renders nothing when empty, so
+  // a homepage with no promos is byte-for-byte the homepage without them.
+  const promos = home?.promos ?? {};
 
   const panchangSlot = (
     <PanchangCard
@@ -58,44 +69,62 @@ export default async function Home() {
     // `.footer { margin-top: 56px }`.
     <main className="pb-14">
       {/* 3 — LAUNCH BAR */}
-      <LaunchBar />
+      {shows("launch-bar") && <LaunchBar section={sections["launch-bar"]} />}
 
       {/* 4 — HERO (+ inline panchang card) */}
       {hero.length > 0 ? (
-        <HomeHero cards={hero} today={now} panchangSlot={panchangSlot} />
+        <HomeHero
+          cards={hero}
+          today={now}
+          panchangSlot={panchangSlot}
+          section={sections["hero-chrome"]}
+        />
       ) : (
-        <HomeHeroFallback today={now} panchangSlot={panchangSlot} />
+        <HomeHeroFallback
+          today={now}
+          panchangSlot={panchangSlot}
+          section={sections["hero-chrome"]}
+        />
       )}
+
+      <PromoSlot promos={promos} at="AFTER_HERO" />
 
       {/* 5 — NEXT FOUR WEEKS */}
       <CalendarShelf observances={nextObservances} />
+
+      <PromoSlot promos={promos} at="AFTER_CALENDAR" />
 
       {/* 6 — THREE WAYS IN */}
       <CategoryTiles counts={home?.counts ?? {}} kitsLaunched={kitsLaunched} />
 
       {/* 7 — DHARMIC CONCEPTS SPOTLIGHT */}
-      <CategorySpotlight />
+      {shows("category-spotlight") && <CategorySpotlight section={sections["category-spotlight"]} />}
 
       {/* 8 — CORRECTIONS, NOT WARNINGS */}
       <CorrectionsBand />
 
       {/* 9 — NEW TO THIS? */}
-      <BeginnersRail />
+      {shows("beginners-rail") && <BeginnersRail section={sections["beginners-rail"]} />}
 
       {/* 10 — HOW WE DECIDE WHAT IS TRUE */}
-      <div className="mx-auto max-w-[1280px] px-4 pt-10 md:px-10">
-        <MethodBand />
-      </div>
+      {shows("method-band") && (
+        <div className="mx-auto max-w-[1280px] px-4 pt-10 md:px-10">
+          <MethodBand section={sections["method-band"]} />
+        </div>
+      )}
+
+      <PromoSlot promos={promos} at="BEFORE_CIRCLE" />
 
       {/* 11 — THE TAPA CIRCLE */}
-      <CircleBand />
+      {shows("circle-band") && <CircleBand section={sections["circle-band"]} />}
 
       {/* — sections not in the Phase 1 mock, kept and appended — */}
       <TrustStrip />
       <KitsShelf kitsLaunched={kitsLaunched} />
       <JourneyStepper heroCard={heroCard} />
       <GuidesRail cards={home?.guidesRail ?? []} now={now} />
-      <PurohitStrip />
+      {shows("purohit-strip") && <PurohitStrip section={sections["purohit-strip"]} />}
+      <PromoSlot promos={promos} at="PAGE_END" />
     </main>
   );
 }

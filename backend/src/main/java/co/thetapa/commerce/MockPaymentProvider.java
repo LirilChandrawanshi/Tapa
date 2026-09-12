@@ -2,14 +2,14 @@ package co.thetapa.commerce;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
-
 import java.util.Map;
 import java.util.UUID;
 
-@Component
-@ConditionalOnMissingBean(name = "razorpayPaymentProvider")
+/**
+ * Dev fallback. Instantiated by {@link PaymentProviderConfig} when no Razorpay
+ * key is configured — not component-scanned, so the choice of gateway is made
+ * in exactly one place.
+ */
 public class MockPaymentProvider implements PaymentProvider {
 
     private static final Logger log = LoggerFactory.getLogger(MockPaymentProvider.class);

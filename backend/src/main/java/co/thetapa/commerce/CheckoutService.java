@@ -34,11 +34,13 @@ public class CheckoutService {
     private final MongoTemplate mongo;
     private final StockService stock;
     private final co.thetapa.flags.FeatureFlagService flags;
+    private final CodPolicy codPolicy;
 
     public CheckoutService(ProductRepository products, OrderRepository orders,
                            PincodeRepository pincodes, PaymentProvider paymentProvider,
                            MongoTemplate mongo, StockService stock,
-                           co.thetapa.flags.FeatureFlagService flags) {
+                           co.thetapa.flags.FeatureFlagService flags,
+                           CodPolicy codPolicy) {
         this.products = products;
         this.orders = orders;
         this.pincodes = pincodes;
@@ -46,6 +48,7 @@ public class CheckoutService {
         this.mongo = mongo;
         this.stock = stock;
         this.flags = flags;
+        this.codPolicy = codPolicy;
     }
 
     public record CartLine(String productSlug, int qty) {
@@ -70,8 +73,9 @@ public class CheckoutService {
         if (request.items() == null || request.items().isEmpty()) {
             throw new ValidationFailedException(List.of("Your cart is empty."));
         }
-        if (!List.of("upi", "card", "netbanking").contains(request.paymentMethod())) {
-            errors.add("Choose a payment method."); // COD deliberately absent (PRD)
+        boolean cod = CodPolicy.isCod(request.paymentMethod());
+        if (!List.of("upi", "card", "netbanking", CodPolicy.METHOD).contains(request.paymentMethod())) {
+            errors.add("Choose a payment method.");
         }
         Order.Address address = request.address();
         if (address == null || isBlank(address.name()) || isBlank(address.line1())
@@ -84,12 +88,14 @@ public class CheckoutService {
 
         // pincode gate
         Integer etaDays = null;
+        PincodeServiceability pinRecord = null;
         if (address != null && address.pincode() != null) {
             var pin = pincodes.findByPincode(address.pincode());
             if (pin.isEmpty() || !pin.get().isServiceable()) {
                 errors.add("We do not deliver to " + address.pincode() + " yet.");
             } else {
-                etaDays = pin.get().getEtaDays();
+                pinRecord = pin.get();
+                etaDays = pinRecord.getEtaDays();
             }
         }
 
@@ -126,11 +132,26 @@ public class CheckoutService {
             minCancellationHours = Math.min(minCancellationHours, product.getCancellationHours());
         }
 
+        // dated kits deliver 3 days before the occasion; live kits by pincode ETA
+        LocalDate festival = lines.stream().map(Order.Line::festivalDate)
+            .filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null);
+
+        // COD gate — evaluated only once the basket and pincode are known, and
+        // only when nothing else is already wrong (so the buyer sees the real
+        // blocker rather than a COD message about an undeliverable address).
+        if (cod && errors.isEmpty()) {
+            String reason = codPolicy.rejectionReason(subtotal, festival != null, pinRecord);
+            if (reason != null) {
+                errors.add(reason);
+            }
+        }
+
         if (!errors.isEmpty()) {
             throw new ValidationFailedException(errors);
         }
 
         long delivery = subtotal >= DEFAULT_FREE_ABOVE_PAISE ? 0 : DEFAULT_DELIVERY_PAISE;
+        long codFee = cod ? codPolicy.feePaise() : 0;
 
         Order order = new Order();
         order.setOrderNumber(nextOrderNumber());
@@ -139,22 +160,44 @@ public class CheckoutService {
         order.setItems(lines);
         order.setSubtotalPaise(subtotal);
         order.setDeliveryPaise(delivery);
-        order.setTotalPaise(subtotal + delivery);
+        order.setCodFeePaise(codFee);
+        order.setTotalPaise(subtotal + delivery + codFee);
         order.setAddress(address);
         order.setPaymentMethod(request.paymentMethod());
-        order.setPaymentProvider(paymentProvider.name());
-        order.setStatus(Order.Status.PENDING_PAYMENT);
-        order.setStatusNote("Waiting for payment.");
         order.setCancellableUntil(Instant.now().plus(Duration.ofHours(minCancellationHours)));
-
-        // dated kits deliver 3 days before the occasion; live kits by pincode ETA
-        LocalDate festival = lines.stream().map(Order.Line::festivalDate)
-            .filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null);
         order.setFestivalDate(festival);
         order.setExpectedDelivery(festival != null
             ? festival.minusDays(3)
             : today.plusDays(etaDays == null ? 3 : etaDays));
 
+        if (cod) {
+            // No gateway, so there is no capture callback to reserve stock on.
+            // Placement is the only moment inventory can move for a COD order —
+            // reserve first, and only mint the order if the reservation held.
+            String failedSlug = stock.reserveAll(lines);
+            if (failedSlug != null) {
+                throw new ValidationFailedException(List.of(
+                    "Someone just took the last of one of these. Please review your cart."));
+            }
+            order.setPaymentProvider(CodPolicy.METHOD);
+            order.setStatus(Order.Status.CONFIRMED);
+            order.setStatusNote(festival != null
+                ? "Pre-booked · pay " + CodPolicy.rupees(order.getTotalPaise()) + " on delivery"
+                : "Confirmed · pay " + CodPolicy.rupees(order.getTotalPaise()) + " on delivery");
+            try {
+                orders.save(order);
+            } catch (RuntimeException e) {
+                stock.restoreAll(lines);   // never hold inventory for an order that does not exist
+                throw e;
+            }
+            return new CheckoutResult(order, Map.of(
+                "method", CodPolicy.METHOD,
+                "amountDuePaise", order.getTotalPaise()));
+        }
+
+        order.setPaymentProvider(paymentProvider.name());
+        order.setStatus(Order.Status.PENDING_PAYMENT);
+        order.setStatusNote("Waiting for payment.");
         var intent = paymentProvider.createIntent(order.getOrderNumber(), order.getTotalPaise(),
             request.paymentMethod());
         order.setPaymentRef(intent.providerRef());
@@ -218,8 +261,13 @@ public class CheckoutService {
             || order.getStatus() == Order.Status.PACKING;
         order.setStatus(Order.Status.CANCELLED);
         order.setCancelledAt(Instant.now());
-        order.setRefundPaise(order.getTotalPaise());
-        order.setStatusNote("Cancelled · full refund initiated");
+        if (order.isCod()) {
+            // nothing was ever charged — promising a refund would be a lie
+            order.setStatusNote("Cancelled · nothing was charged");
+        } else {
+            order.setRefundPaise(order.getTotalPaise());
+            order.setStatusNote("Cancelled · full refund initiated");
+        }
         if (reason != null && !reason.isBlank()) {
             order.setCancelReason(reason.trim());
         }
@@ -246,7 +294,9 @@ public class CheckoutService {
             throw new ValidationFailedException(List.of("This order isn't out for delivery yet."));
         }
         order.setRefusalRequested(true);
-        order.setStatusNote("You asked to refuse this delivery — we'll start the refund once it's back with us.");
+        order.setStatusNote(order.isCod()
+            ? "You asked to refuse this delivery — nothing is owed; we'll close the order once it's back with us."
+            : "You asked to refuse this delivery — we'll start the refund once it's back with us.");
         return orders.save(order);
     }
 

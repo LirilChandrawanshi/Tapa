@@ -7,7 +7,7 @@ import { SOURCE_LINE } from "@/lib/panchangExtras";
 export function TimingDataTag({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-[5px] border border-data-bd bg-data-bg px-[9px] py-[3px] text-[9.5px] font-bold tracking-[0.6px] text-data-fg uppercase ${className}`}
+      className={`inline-flex items-center gap-1 rounded-[6px] border border-data-bd bg-data-bg px-[9px] py-[4px] text-[9.5px] font-bold tracking-[0.6px] text-data-fg uppercase ${className}`}
     >
       ☾ Timing data · No tag, no score
     </span>

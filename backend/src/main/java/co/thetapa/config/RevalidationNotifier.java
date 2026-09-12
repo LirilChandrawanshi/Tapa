@@ -68,10 +68,20 @@ public class RevalidationNotifier {
         notifyFrontend(List.of("flags", "home", "articles"));
     }
 
+    /** Homepage band copy edited in the CMS — the page must pick it up now. */
     @Async
     @EventListener
-    public void onFeedChanged(co.thetapa.feed.FeedService.FeedChangedEvent event) {
-        notifyFrontend(List.of("feed", "home"));
+    public void onHomeSectionChanged(
+        co.thetapa.homesections.HomeSectionService.HomeSectionChangedEvent event) {
+        notifyFrontend(List.of("home"));
+    }
+
+    /** A banner or offer was placed, edited or pulled — refresh the homepage. */
+    @Async
+    @EventListener
+    public void onHomePromoChanged(
+        co.thetapa.homesections.HomePromoService.HomePromoChangedEvent event) {
+        notifyFrontend(List.of("home"));
     }
 
     @Async

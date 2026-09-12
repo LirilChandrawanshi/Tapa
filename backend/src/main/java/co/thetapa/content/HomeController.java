@@ -41,10 +41,16 @@ public class HomeController {
         private final PanchangService panchang;
         private final FeatureFlagService flags;
         private final GlossaryRepository glossary;
+        private final co.thetapa.homesections.HomeSectionService homeSections;
+        private final co.thetapa.homesections.HomePromoService homePromos;
 
         public HomeService(ArticleService articles, ArticleRepository articleRepo,
                            PanchangService panchang, FeatureFlagService flags,
-                           GlossaryRepository glossary) {
+                           GlossaryRepository glossary,
+                           co.thetapa.homesections.HomeSectionService homeSections,
+                           co.thetapa.homesections.HomePromoService homePromos) {
+            this.homeSections = homeSections;
+            this.homePromos = homePromos;
             this.articles = articles;
             this.articleRepo = articleRepo;
             this.panchang = panchang;
@@ -69,6 +75,10 @@ public class HomeController {
                 "dharmicConcepts", articles.publishedCount("dharmic-concepts"),
                 "glossaryTerms", glossary.count()
             ));
+            // 3/7/9/10/11. CMS-editable band copy, keyed by section
+            payload.put("sections", homeSections.publicMap());
+            // editor-placed banners / offers / product pushes, keyed by slot
+            payload.put("promos", homePromos.liveByPlacement());
             // 2/6/9. phase gates
             payload.put("flags", flags.all());
             return payload;
@@ -87,6 +97,9 @@ public class HomeController {
             card.put("observanceDate", a.getObservanceDate());
             card.put("dpbTag", a.getDpb() == null ? null : a.getDpb().classification());
             card.put("dpbScore", a.getDpb() == null ? null : a.getDpb().confidenceScore());
+            // the hero's "Listen instead" button is pointless without one
+            card.put("hasAudio", en.audioGuideMediaId() != null
+                && !en.audioGuideMediaId().isBlank());
             return card;
         }
     }

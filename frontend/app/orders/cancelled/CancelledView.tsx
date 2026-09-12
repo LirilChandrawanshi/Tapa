@@ -127,6 +127,8 @@ export function CancelledView() {
     order.status === "CANCELLED" ||
     order.status === "REFUND_INITIATED" ||
     order.status === "REFUNDED";
+  // A COD order was never charged, so there is no refund to promise or track.
+  const isCod = order.paymentMethod === "cod";
   const amount = formatPaise(order.refundPaise ?? order.totalPaise);
   const method = METHOD_LABEL[order.paymentMethod ?? ""] ?? "your original payment method";
   const refundHref = `/orders/refund?on=${encodeURIComponent(order.orderNumber)}&phone=${encodeURIComponent(phone)}`;
@@ -158,14 +160,25 @@ export function CancelledView() {
           ✓
         </p>
         <h1 className="mb-1 text-2xl font-bold tracking-[-0.4px] text-ink">
-          Cancelled — refund on its way
+          {isCod ? "Cancelled — nothing was charged" : "Cancelled — refund on its way"}
         </h1>
         <p className="text-[13px] text-sub">
           Order {order.orderNumber} · nothing more to do on your side
         </p>
       </div>
 
-      {/* refund facts */}
+      {/* refund facts — a COD order has none: no money ever left the buyer */}
+      {isCod ? (
+        <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
+          <p className="mb-3 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
+            Your payment
+          </p>
+          <p className="text-[13.5px] leading-relaxed text-body">
+            This was a cash-on-delivery order, so you were never charged. There
+            is no refund to wait for and nothing to track.
+          </p>
+        </div>
+      ) : (
       <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">
         <p className="mb-3 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
           Your refund
@@ -196,6 +209,7 @@ export function CancelledView() {
           Track this refund ›
         </Link>
       </div>
+      )}
 
       {/* the guide stays free */}
       <div className="mb-4 rounded-[14px] border border-border bg-card p-[18px]">

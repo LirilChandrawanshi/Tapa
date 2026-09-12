@@ -361,15 +361,9 @@ export function Footer({
             </span>
             <Link
               href="/sign-in"
-              className="flex-1 rounded-[20px] border-[1.5px] border-white/[0.22] px-5 py-[10px] text-center text-[13px] font-semibold whitespace-nowrap text-hero-text md:flex-none"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/sign-in"
               className="flex-1 rounded-[20px] bg-cta px-[22px] py-[11px] text-center text-[13px] font-bold whitespace-nowrap text-white md:flex-none"
             >
-              Create account
+              Sign in
             </Link>
           </div>
         </div>

@@ -13,11 +13,16 @@ import {
   formatPaise,
   readCart,
   shopTrack,
+  isRazorpayPayment,
   submitCheckout,
+  verifyRazorpayPayment,
   type CartLine,
+  type CheckoutPayment,
+  type RazorpayHandlerResponse,
   type PaymentMethod,
   type PincodeInfo,
   type Product,
+  isCodPayment,
 } from "@/lib/shop";
 import { getMe, type Me } from "@/lib/auth";
 import {
@@ -26,6 +31,7 @@ import {
   type SavedAddress,
 } from "@/lib/orders";
 import { OtpBottomSheet } from "@/components/auth/OtpBottomSheet";
+import { openRazorpayCheckout } from "@/lib/razorpay";
 
 interface AddressForm {
   name: string;
@@ -87,19 +93,20 @@ const FIELDS: {
 
 type FieldErrors = Partial<Record<keyof AddressForm, string>>;
 
-const PAYMENT_METHODS: { value: PaymentMethod; title: string; sub: string }[] =
+const PREPAID_METHODS: { value: PaymentMethod; title: string; sub: string }[] =
   [
     { value: "upi", title: "UPI", sub: "GPay, PhonePe, Paytm, any UPI app" },
     { value: "card", title: "Credit or debit card", sub: "Visa, Mastercard, RuPay, Amex" },
     { value: "netbanking", title: "Net banking", sub: "All major banks" },
   ];
-// No cash on delivery, on anything — dated and all-year alike.
+// Cash on delivery is appended only when the checked pincode carries it and the
+// basket clears the cap — the server re-checks all of it (CodPolicy).
 
 type Phase =
   | { kind: "form" }
   | { kind: "paying" }
   | { kind: "invalid"; issues: string[] }
-  | { kind: "payment_failed"; providerRef: string; orderNumber: string };
+  | { kind: "payment_failed"; providerRef: string; orderNumber: string; reason?: string };
 
 function etaIso(etaDays: number): string {
   return new Date(Date.now() + etaDays * 86_400_000).toISOString();
@@ -144,6 +151,9 @@ export function CheckoutView() {
   // with an empty form never sees an error that renders in place. Everything
   // below exists to move them back up to the first field that needs them.
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  // The intent from the last successful /checkout call. Retrying a failed
+  // payment re-opens *this* intent rather than placing a second order.
+  const [lastPayment, setLastPayment] = useState<CheckoutPayment | null>(null);
   const addressRef = useRef<HTMLElement>(null);
   const issuesRef = useRef<HTMLDivElement>(null);
   const inputRefs = useRef<Partial<Record<keyof AddressForm, HTMLInputElement | null>>>(
@@ -215,6 +225,33 @@ export function CheckoutView() {
       .filter((l): l is CartLine & { product: Product } => l !== null);
   }, [lines, products]);
 
+  // Derived above the early returns on purpose. The COD guard below is a hook,
+  // and a hook placed after `if (!resolved) return …` runs on the loaded render
+  // but not the loading one — React aborts the whole page with "rendered more
+  // hooks than during the previous render". Everything it needs tolerates a
+  // null cart.
+  const subtotal = useMemo(
+    () => (resolved ?? []).reduce((n, l) => n + l.product.pricePaise * l.qty, 0),
+    [resolved],
+  );
+
+  // COD is offered only once the pincode has been checked and said yes, the
+  // basket is under the cap, and nothing in it is a dated pre-book. The server
+  // enforces the same three rules — this only decides whether to show the row.
+  const pinInfo = pin.kind === "result" ? pin.info : null;
+  const hasPrebook = (resolved ?? []).some((l) => l.product.festivalDate);
+  const codOffered =
+    !!pinInfo?.serviceable &&
+    !!pinInfo?.codAllowed &&
+    subtotal <= (pinInfo?.codMaxPaise ?? 0) &&
+    (!hasPrebook || !!pinInfo?.codOnPrebook);
+
+  // Changing the pincode (or the cart) can withdraw COD after it was picked —
+  // fall back to UPI rather than submitting a method the server will refuse.
+  useEffect(() => {
+    if (method === "cod" && !codOffered) setMethod("upi");
+  }, [method, codOffered]);
+
   if (lines !== null && lines.length === 0 && phase.kind === "form") {
     return (
       <div className="mx-auto max-w-[420px] py-14 text-center">
@@ -236,9 +273,9 @@ export function CheckoutView() {
     return <p className="py-14 text-center text-[13.5px] text-sub">Preparing checkout…</p>;
   }
 
-  const subtotal = resolved.reduce((n, l) => n + l.product.pricePaise * l.qty, 0);
   const delivery = deliveryPaiseFor(subtotal);
-  const total = subtotal + delivery;
+  const codFee = method === "cod" && codOffered ? (pinInfo?.codFeePaise ?? 0) : 0;
+  const total = subtotal + delivery + codFee;
 
   const selectedSaved =
     selectedSavedId === null
@@ -254,25 +291,100 @@ export function CheckoutView() {
     .filter((d): d is string => Boolean(d))
     .sort()[0];
 
-  const finishPayment = async (providerRef: string, orderNumber: string) => {
-    // ── In production the Razorpay modal opens here with payment.providerRef;
-    //    its success handler then calls the confirm endpoint. In the dev/mock
-    //    flow we confirm immediately. ──
+  const onCaptured = (orderNumber: string, totalPaise: number) => {
+    shopTrack("payment_completed", { order_number: orderNumber, total_paise: totalPaise, method });
+    clearCart();
+    router.push(
+      `/orders/confirmed?on=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(effectiveAddress.phone.trim())}`,
+    );
+  };
+
+  /** Dev/mock gateway: nothing to open, the intent confirms itself. */
+  const finishMockPayment = async (providerRef: string, orderNumber: string) => {
     const confirmed = await confirmMockPayment(providerRef);
     if (!confirmed.ok) {
       shopTrack("payment_failed", { order_number: orderNumber });
       setPhase({ kind: "payment_failed", providerRef, orderNumber });
       return;
     }
-    shopTrack("payment_completed", {
-      order_number: confirmed.data.orderNumber,
-      total_paise: confirmed.data.totalPaise,
-      method,
+    onCaptured(confirmed.data.orderNumber, confirmed.data.totalPaise);
+  };
+
+  /**
+   * Razorpay Standard Checkout. Card and UPI credentials are entered inside
+   * Razorpay's own iframe — nothing sensitive reaches this component, which is
+   * the whole reason to use the hosted modal rather than collecting fields.
+   *
+   * The handler callback below is the *optimistic* path. The order is really
+   * settled by the payment.captured webhook, which arrives even when the buyer
+   * kills the tab on the way back from their UPI app — so a failure here is
+   * reported as "we could not confirm yet", never as "your payment failed".
+   */
+  const startRazorpayPayment = async (
+    payment: Extract<CheckoutPayment, { provider: "razorpay" }>,
+    orderNumber: string,
+  ) => {
+    const onSuccess = async (response: RazorpayHandlerResponse) => {
+      setPhase({ kind: "paying" });
+      const verified = await verifyRazorpayPayment(response);
+      if (!verified.ok) {
+        shopTrack("payment_verify_failed", { order_number: orderNumber });
+        setPhase({
+          kind: "invalid",
+          issues: [
+            "Your payment went through but we could not confirm it on this screen. " +
+              "It will settle on its own within a minute — track it with order " +
+              `${orderNumber} and your phone number. Nothing has been charged twice.`,
+          ],
+        });
+        return;
+      }
+      onCaptured(verified.data.orderNumber, verified.data.totalPaise);
+    };
+
+    const opened = await openRazorpayCheckout({
+      payment,
+      buyerName: effectiveAddress.name.trim(),
+      buyerPhone: effectiveAddress.phone.trim(),
+      onSuccess: (r) => void onSuccess(r),
+      onDismiss: () => setPhase({ kind: "form" }),
+      onFailed: (description) => {
+        shopTrack("payment_failed", { order_number: orderNumber });
+        setPhase({
+          kind: "payment_failed",
+          providerRef: payment.razorpayOrderId,
+          orderNumber,
+          reason: description,
+        });
+      },
     });
-    clearCart();
-    router.push(
-      `/orders/confirmed?on=${encodeURIComponent(confirmed.data.orderNumber)}&phone=${encodeURIComponent(effectiveAddress.phone.trim())}`,
-    );
+
+    if (!opened) {
+      setPhase({
+        kind: "invalid",
+        issues: [
+          "The payment window could not load — this is usually an ad blocker or a " +
+            "dropped connection. Nothing has been charged. Try again, and your cart " +
+            "is exactly as you left it.",
+        ],
+      });
+    }
+  };
+
+  /**
+   * Re-open the *same* intent. Razorpay keeps an unpaid order id payable, so a
+   * retry must not mint a second Tapa order — that is how a buyer ends up with
+   * two pre-bookings for one festival.
+   */
+  const retryPayment = async () => {
+    if (phase.kind !== "payment_failed") return;
+    const orderNumber = phase.orderNumber;
+    if (lastPayment && isRazorpayPayment(lastPayment)) {
+      setPhase({ kind: "form" });
+      await startRazorpayPayment(lastPayment, orderNumber);
+      return;
+    }
+    await finishMockPayment(phase.providerRef, orderNumber);
   };
 
   /**
@@ -365,7 +477,26 @@ export function CheckoutView() {
         pincode: payloadAddress.pincode.trim(),
       });
     }
-    await finishPayment(r.data.payment.providerRef, r.data.orderNumber);
+    // A COD order is already CONFIRMED server-side — there is no intent to
+    // capture, so go straight to the confirmation page.
+    if (isCodPayment(r.data.payment)) {
+      shopTrack("order_placed_cod", {
+        order_number: r.data.orderNumber,
+        total_paise: r.data.totalPaise,
+        method,
+      });
+      clearCart();
+      router.push(
+        `/orders/confirmed?on=${encodeURIComponent(r.data.orderNumber)}&phone=${encodeURIComponent(payloadAddress.phone)}`,
+      );
+      return;
+    }
+    setLastPayment(r.data.payment);
+    if (isRazorpayPayment(r.data.payment)) {
+      await startRazorpayPayment(r.data.payment, r.data.orderNumber);
+      return;
+    }
+    await finishMockPayment(r.data.payment.providerRef, r.data.orderNumber);
   };
 
   const busy = phase.kind === "paying";
@@ -398,12 +529,21 @@ export function CheckoutView() {
             {delivery === 0 ? "Free" : formatPaise(delivery)}
           </dd>
         </div>
+        {codFee > 0 && (
+          <div className="flex justify-between">
+            <dt className="text-sub">Cash-handling fee</dt>
+            <dd className="font-semibold text-ink">{formatPaise(codFee)}</dd>
+          </div>
+        )}
         <div className="flex justify-between border-t border-border pt-2 text-[14.5px] font-bold text-ink">
-          <dt>Total</dt>
+          <dt>{method === "cod" ? "Due on delivery" : "Total"}</dt>
           <dd>{formatPaise(total)}</dd>
         </div>
       </dl>
-      <p className="mt-1 text-[11.5px] text-sub">Inclusive of all taxes</p>
+      <p className="mt-1 text-[11.5px] text-sub">
+        Inclusive of all taxes
+        {method === "cod" && " · keep the exact amount ready for the courier"}
+      </p>
     </>
   );
 
@@ -614,11 +754,25 @@ export function CheckoutView() {
           )}
         </section>
 
-        {/* ── (b) Payment method — prepaid only, no COD row anywhere ── */}
+        {/* ── (b) Payment method — prepaid always; COD only where it is carried ── */}
         <section className="rounded-[14px] border border-border bg-card p-[18px]">
           <h2 className="mb-4 text-[15px] font-bold text-ink">Payment method</h2>
           <div className="space-y-2">
-            {PAYMENT_METHODS.map((m) => {
+            {[
+              ...PREPAID_METHODS,
+              ...(codOffered
+                ? [
+                    {
+                      value: "cod" as PaymentMethod,
+                      title: "Cash on delivery",
+                      sub:
+                        (pinInfo?.codFeePaise ?? 0) > 0
+                          ? `Pay the courier at your door · ${formatPaise(pinInfo?.codFeePaise ?? 0)} handling fee`
+                          : "Pay the courier at your door",
+                    },
+                  ]
+                : []),
+            ].map((m) => {
               const on = method === m.value;
               return (
                 <label
@@ -646,8 +800,9 @@ export function CheckoutView() {
             })}
           </div>
           <p className="mt-3 text-[11.5px] text-sub">
-            Prepaid only. Pre-booked items cancel free within 72 hours,
-            in-stock items within 24 — stated again on your confirmation.
+            {codOffered
+              ? "Pre-booked items cancel free within 72 hours, in-stock items within 24 — stated again on your confirmation."
+              : "Prepaid only. Pre-booked items cancel free within 72 hours, in-stock items within 24 — stated again on your confirmation."}
           </p>
         </section>
 
@@ -682,6 +837,9 @@ export function CheckoutView() {
               Your payment couldn&apos;t be completed. You haven&apos;t been
               charged.
             </p>
+            {phase.reason && (
+              <p className="mb-1 text-[12.5px] text-body">{phase.reason}</p>
+            )}
             <p className="mb-1 text-[12.5px] text-sub">
               Your cart is intact.
               {earliestOrderBy
@@ -695,9 +853,7 @@ export function CheckoutView() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() =>
-                  void finishPayment(phase.providerRef, phase.orderNumber)
-                }
+                onClick={() => void retryPayment()}
                 className="rounded-[9px] bg-ink px-5 py-[9px] text-[12.5px] font-bold text-white"
               >
                 Retry payment — {formatPaise(total)}
@@ -732,8 +888,11 @@ export function CheckoutView() {
         )}
       </div>
 
-      {/* ── (c) Order summary — inline right on desktop ── */}
-      <aside className="hidden rounded-[14px] border border-border bg-card p-[18px] md:sticky md:top-4 md:block">
+      {/* ── (c) Order summary — inline right on desktop.
+          Sticks below the 72px nav, not under it (top-4 tucked the
+          heading and first lines behind the header), and scrolls itself
+          once a long cart makes it taller than the viewport. ── */}
+      <aside className="hidden rounded-[14px] border border-border bg-card p-[18px] md:sticky md:top-[88px] md:block md:max-h-[calc(100vh-104px)] md:overflow-y-auto md:overscroll-contain">
         <h2 className="mb-3 text-[15px] font-bold text-ink">Order summary</h2>
         {summaryRows}
       </aside>

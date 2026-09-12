@@ -27,18 +27,13 @@ const MENU_LINKS = [
 ] as const;
 
 /**
- * The nav's auth affordance. Signed out → the Sign in button; signed in → an
- * initials avatar with the account menu (per the Header spec). Refreshes on
+ * The nav's auth affordance. Signed out → a single Sign in button; signed in →
+ * an initials avatar with the account menu (per the Header spec). There is no
+ * separate "Create account": phone-OTP sign-in creates the account on first
+ * use, so a second button would just be a second door to /sign-in. Refreshes on
  * mount, window focus and the AUTH_EVENT fired by sign-in/sign-out.
  */
-export function UserMenu({
-  variant,
-  showCreateAccount = true,
-}: {
-  variant: "desktop" | "drawer";
-  /** Desktop only — phase 2 drops "Create account" in favour of the cart. */
-  showCreateAccount?: boolean;
-}) {
+export function UserMenu({ variant }: { variant: "desktop" | "drawer" }) {
   const [me, setMe] = useState<Me | null>(null);
   const [checked, setChecked] = useState(false);
   const [open, setOpen] = useState(false);
@@ -100,12 +95,6 @@ export function UserMenu({
             href="/sign-in"
             className="block w-full rounded-xl bg-cta py-[14px] text-center text-[14.5px] font-bold text-white"
           >
-            Create account
-          </Link>
-          <Link
-            href="/sign-in"
-            className="block w-full rounded-xl border-[1.5px] border-border py-[14px] text-center text-[14.5px] font-bold text-body"
-          >
             Sign in
           </Link>
         </div>
@@ -138,18 +127,10 @@ export function UserMenu({
       <div className="hidden items-center gap-[9px] lg:flex">
         <Link
           href="/sign-in"
-          className="rounded-[10px] border-[1.5px] border-border px-[17px] py-[10px] text-[13.5px] font-semibold whitespace-nowrap text-body"
+          className="rounded-[10px] bg-cta px-[19px] py-[11px] text-[13.5px] font-bold whitespace-nowrap text-white"
         >
           Sign in
         </Link>
-        {showCreateAccount && (
-          <Link
-            href="/sign-in"
-            className="rounded-[10px] bg-cta px-[19px] py-[11px] text-[13.5px] font-bold whitespace-nowrap text-white"
-          >
-            Create account
-          </Link>
-        )}
       </div>
     );
   }

@@ -185,7 +185,7 @@ export function CartView() {
         <p className="mt-3 text-[12.5px] text-sub">✓ {TRUST_LINE}</p>
       </div>
 
-      <aside className="rounded-[14px] border border-border bg-card p-[18px] md:sticky md:top-4">
+      <aside className="rounded-[14px] border border-border bg-card p-[18px] md:sticky md:top-[88px] md:max-h-[calc(100vh-104px)] md:overflow-y-auto md:overscroll-contain">
         <h2 className="mb-3 text-[15px] font-bold text-ink">Order summary</h2>
         <dl className="space-y-[9px] text-[13.5px]">
           <div className="flex justify-between">

@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import { CALENDAR_PDF_HREF, CITY_LABEL } from "@/lib/panchangExtras";
+import { CONTROL_H, ControlLabel } from "@/components/panchang/ControlBar";
 
 /**
  * City selector — a single live option today (Delhi-NCR) with the coming
@@ -11,19 +12,15 @@ import { CALENDAR_PDF_HREF, CITY_LABEL } from "@/lib/panchangExtras";
  */
 export function CitySelect({ className = "" }: { className?: string }) {
   return (
-    <label
-      className={`flex items-center gap-2 rounded-[9px] border border-border bg-bg px-3 py-[6px] text-[12px] font-bold text-mid ${className}`}
-    >
-      <span className="text-[9.5px] font-bold tracking-[0.7px] text-sub uppercase">
-        Calculated for
-      </span>
+    <label className={`flex items-center gap-2 ${className}`}>
+      <ControlLabel>Calculated for</ControlLabel>
       <select
         aria-label="City the panchang is calculated for"
         defaultValue="delhi-ncr"
         onChange={() => track("panchang_city_changed", { city: "delhi-ncr" })}
         // min-h-11 so the most important control on a panchang page is
-        // actually tappable on a phone; the label above keeps it compact.
-        className="min-h-11 cursor-pointer bg-transparent py-1 text-[12px] font-bold text-mid outline-none md:min-h-0 md:py-0"
+        // actually tappable on a phone; the label beside it keeps it compact.
+        className={`${CONTROL_H} cursor-pointer rounded-[8px] border border-border bg-card px-2.5 text-[12px] font-bold text-mid outline-none focus-visible:border-gold`}
       >
         <option value="delhi-ncr">{CITY_LABEL}</option>
         <option disabled>Mumbai — soon</option>

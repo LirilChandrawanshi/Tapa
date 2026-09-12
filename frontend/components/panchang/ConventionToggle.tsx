@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fmtShort, weekday } from "@/lib/panchangExtras";
+import { CONTROL_H, ControlLabel } from "@/components/panchang/ControlBar";
 
 /**
  * Purnimanta / Amanta month-reckoning toggle (#80).
@@ -58,7 +59,7 @@ export function ConventionToggle({ className = "" }: { className?: string }) {
       type="button"
       aria-pressed={conv === key}
       onClick={() => choose(key)}
-      className={`min-h-10 rounded-[7px] px-[12px] py-[4px] text-[11.5px] font-bold transition-colors md:min-h-0 ${
+      className={`flex items-center rounded-[6px] px-[11px] text-[11.5px] font-bold transition-colors ${
         conv === key
           ? "bg-data-fg text-white"
           : "text-mid hover:bg-data-bg hover:text-data-fg"
@@ -70,19 +71,17 @@ export function ConventionToggle({ className = "" }: { className?: string }) {
 
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      <span className="text-[9.5px] font-bold tracking-[0.7px] text-sub uppercase">
-        Convention
-      </span>
+      <ControlLabel>Convention</ControlLabel>
       <div
         role="group"
         aria-label="Month reckoning convention"
-        className="flex gap-[3px] rounded-[9px] border border-border bg-bg p-[3px]"
+        className={`${CONTROL_H} flex items-center gap-[3px] rounded-[8px] border border-border bg-card p-[3px]`}
       >
         {seg("purnimanta", "Purnimanta")}
         {seg("amanta", "Amanta")}
       </div>
       {conv === "amanta" && (
-        <span className="text-[10.5px] text-sub italic">
+        <span className="hidden text-[10.5px] text-sub italic xl:inline">
           Amanta view — dates shift for month-boundary observances
         </span>
       )}

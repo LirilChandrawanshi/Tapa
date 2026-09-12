@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DpbBadge } from "@/components/DpbBadge";
 import { HomeHeroBackdrop } from "@/components/home/HeroBackdrop";
 import { fetchArticle } from "@/lib/api";
@@ -10,7 +10,13 @@ import {
   hueFromClass,
   formatObservanceDate,
 } from "@/lib/articleExtras";
-import { badgeTagOf, cardHref, type HomeCard } from "@/lib/homeExtras";
+import {
+  badgeTagOf,
+  cardHref,
+  sectionText,
+  type HomeCard,
+  type HomeSection,
+} from "@/lib/homeExtras";
 import {
   fetchProducts,
   formatDateLong,
@@ -21,6 +27,104 @@ import {
 
 const TRUST_LINE =
   "Sourced from named scripture · every claim tagged · nothing driven by fear";
+
+/**
+ * The eyebrow used to read "Today's Ritual · {article date}" for whatever was
+ * featured, so a guide for a date six weeks gone still announced itself as
+ * today's. The label now follows the date instead of contradicting it, and a
+ * date that has passed is dropped rather than shown under a false heading.
+ */
+function heroEyebrow(
+  section: HomeSection | undefined,
+  observanceDate: string | null | undefined,
+  today: string,
+): string {
+  const todayLabel = sectionText(section, "todayLabel", "Today\u2019s Ritual");
+  const upcomingLabel = sectionText(section, "upcomingLabel", "Coming up");
+  const featuredLabel = sectionText(section, "featuredLabel", "Featured guide");
+
+  if (!observanceDate) {
+    return `${todayLabel} \u00b7 ${formatObservanceDate(today)}`;
+  }
+  const date = observanceDate.slice(0, 10);
+  if (date === today) {
+    return `${todayLabel} \u00b7 ${formatObservanceDate(observanceDate)}`;
+  }
+  if (date > today) {
+    return `${upcomingLabel} \u00b7 ${formatObservanceDate(observanceDate)}`;
+  }
+  // Past occasion — the guide is still worth featuring, the date is not.
+  return featuredLabel;
+}
+
+/** How far a drag must travel horizontally before it counts as a slide change. */
+const SWIPE_PX = 48;
+
+/**
+ * Swipe / drag / arrow-key navigation for the hero carousel.
+ *
+ * Pointer events cover touch, pen and mouse in one path. Two guards keep the
+ * gesture from fighting the page: the drag must be more horizontal than
+ * vertical, so a thumb scrolling the page never flips a slide (with
+ * `touch-action: pan-y` leaving that scroll to the browser); and a drag that
+ * did move the carousel swallows the click it would otherwise finish with, so
+ * dragging across a CTA cannot navigate away mid-swipe.
+ */
+function useSlideSwipe(total: number, setIndex: (next: (i: number) => number) => void) {
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
+
+  if (total <= 1) {
+    return {};
+  }
+
+  const go = (delta: number) => setIndex((i) => (i + delta + total) % total);
+
+  return {
+    role: "region",
+    "aria-roledescription": "carousel",
+    "aria-label": "Featured rituals",
+    tabIndex: 0,
+    // vertical scrolling stays with the browser; we only claim horizontal
+    style: { touchAction: "pan-y" as const },
+    onPointerDown: (e: React.PointerEvent) => {
+      start.current = { x: e.clientX, y: e.clientY };
+      swiped.current = false;
+    },
+    onPointerUp: (e: React.PointerEvent) => {
+      const from = start.current;
+      start.current = null;
+      if (!from) return;
+      const dx = e.clientX - from.x;
+      const dy = e.clientY - from.y;
+      if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) <= Math.abs(dy)) return;
+      swiped.current = true;
+      go(dx < 0 ? 1 : -1);
+    },
+    onPointerCancel: () => {
+      start.current = null;
+    },
+    // Starting a drag on a link or an image hands the gesture to the browser's
+    // native drag-and-drop, which cancels our pointer stream mid-swipe. The
+    // hero is a carousel, not a drag source, so refuse it.
+    onDragStart: (e: React.DragEvent) => e.preventDefault(),
+    onClickCapture: (e: React.MouseEvent) => {
+      if (!swiped.current) return;
+      swiped.current = false;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go(1);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go(-1);
+      }
+    },
+  };
+}
 
 interface FeaturedKit {
   product: Product;
@@ -42,11 +146,14 @@ export function HomeHero({
   cards,
   today,
   panchangSlot,
+  section,
 }: {
   cards: HomeCard[];
   today: string;
   /** Server-rendered <PanchangCard> — kept out of this client component's own fetch. */
   panchangSlot?: ReactNode;
+  /** CMS copy for the hero's labels and buttons (`hero-chrome`). */
+  section?: HomeSection;
 }) {
   const [index, setIndex] = useState(0);
   const [kit, setKit] = useState<FeaturedKit | null>(null);
@@ -91,6 +198,7 @@ export function HomeHero({
   }, [today]);
 
   const total = cards.length + (kit ? 1 : 0);
+  const swipe = useSlideSwipe(total, setIndex);
   const safeIndex = Math.min(index, total - 1);
   const isKitSlide = kit !== null && safeIndex === cards.length;
   const card = isKitSlide ? null : cards[Math.min(safeIndex, cards.length - 1)];
@@ -132,7 +240,10 @@ export function HomeHero({
   if (isKitSlide && kit) {
     const p = kit.product;
     return (
-      <section className={`${p.hueClass} hero-scene relative overflow-hidden`}>
+      <section
+        {...swipe}
+        className={`${p.hueClass} hero-scene relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-eyebrow-dark/60`}
+      >
         <HomeHeroBackdrop />
         <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
           <div>
@@ -155,7 +266,7 @@ export function HomeHero({
               sourced and sealed, with the guide attached.
             </p>
             <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
-              {TRUST_LINE}
+              {sectionText(section, "trustLine", TRUST_LINE)}
             </p>
 
             <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
@@ -185,19 +296,18 @@ export function HomeHero({
   const article = card as HomeCard;
   const href = cardHref(article);
   const tag = badgeTagOf(article.dpbTag);
-  const dateLine = article.observanceDate
-    ? formatObservanceDate(article.observanceDate)
-    : formatObservanceDate(today);
+  const eyebrow = heroEyebrow(section, article.observanceDate, today);
 
   return (
     <section
-      className={`h-${hueFromClass(article.hueClass ?? undefined, "devi")} hero-scene relative overflow-hidden`}
+      {...swipe}
+      className={`h-${hueFromClass(article.hueClass ?? undefined, "devi")} hero-scene relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-eyebrow-dark/60`}
     >
       <HomeHeroBackdrop />
       <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
         <div>
           <p className="anim-rise mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
-            Today&rsquo;s Ritual · {dateLine}
+            {eyebrow}
           </p>
           {tag && (
             <DpbBadge
@@ -215,7 +325,7 @@ export function HomeHero({
             </p>
           )}
           <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
-            {TRUST_LINE}
+            {sectionText(section, "trustLine", TRUST_LINE)}
           </p>
 
           <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
@@ -223,20 +333,22 @@ export function HomeHero({
               href={href}
               className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
             >
-              ▶ Start today&rsquo;s vrat
+              {sectionText(section, "primaryCta", "\u25B6 Start today\u2019s vrat")}
             </Link>
             <Link
               href={href}
               className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
             >
-              📖 Read complete vidhi
+              {sectionText(section, "secondaryCta", "\u{1F4D6} Read complete vidhi")}
             </Link>
-            <Link
-              href={`${href}#audio`}
-              className="rounded-[10px] border border-white/30 px-5 py-[11px] text-[13px] font-bold text-hero-text/90 hover:bg-white/10"
-            >
-              🎧 Listen instead
-            </Link>
+            {article.hasAudio && (
+              <Link
+                href={`${href}#audio`}
+                className="rounded-[10px] border border-white/30 px-5 py-[11px] text-[13px] font-bold text-hero-text/90 hover:bg-white/10"
+              >
+                {sectionText(section, "audioCta", "\u{1F3A7} Listen instead")}
+              </Link>
+            )}
           </div>
 
           {dots}
@@ -254,9 +366,11 @@ export function HomeHero({
 export function HomeHeroFallback({
   today,
   panchangSlot,
+  section,
 }: {
   today: string;
   panchangSlot?: ReactNode;
+  section?: HomeSection;
 }) {
   return (
     <section className="hero-rg hero-scene relative overflow-hidden">
@@ -264,7 +378,7 @@ export function HomeHeroFallback({
       <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
         <div>
           <p className="anim-rise mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
-            Today&rsquo;s Ritual · {formatObservanceDate(today)}
+            {heroEyebrow(section, null, today)}
           </p>
           <h1 className="anim-rise-lcp max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
             Dharma does not demand fear. It demands devotion.
@@ -274,7 +388,7 @@ export function HomeHeroFallback({
             checked against a named text before it is featured here.
           </p>
           <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
-            {TRUST_LINE}
+            {sectionText(section, "trustLine", TRUST_LINE)}
           </p>
           <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
             <Link

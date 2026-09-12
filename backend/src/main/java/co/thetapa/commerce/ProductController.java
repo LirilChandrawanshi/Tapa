@@ -17,8 +17,11 @@ public class ProductController {
 
     private final ProductRepository products;
     private final PincodeRepository pincodes;
+    private final CodPolicy codPolicy;
 
-    public ProductController(ProductRepository products, PincodeRepository pincodes) {
+    public ProductController(ProductRepository products, PincodeRepository pincodes,
+                             CodPolicy codPolicy) {
+        this.codPolicy = codPolicy;
         this.products = products;
         this.pincodes = pincodes;
     }
@@ -45,11 +48,16 @@ public class ProductController {
         if (!pincode.matches("[1-9][0-9]{5}")) {
             throw new IllegalArgumentException("Enter a valid 6-digit pincode.");
         }
+        // codAllowed is the AND of the master switch and this pincode's own flag,
+        // so the client never has to know the policy — it just renders the answer.
         return ApiResponse.ok(pincodes.findByPincode(pincode)
             .map(p -> Map.<String, Object>of(
                 "serviceable", p.isServiceable(),
                 "etaDays", p.getEtaDays(),
-                "codAllowed", p.isCodAllowed(),
+                "codAllowed", codPolicy.isEnabled() && p.isCodAllowed(),
+                "codMaxPaise", codPolicy.maxOrderPaise(),
+                "codFeePaise", codPolicy.feePaise(),
+                "codOnPrebook", codPolicy.allowsPrebook(),
                 "area", p.getArea() == null ? "" : p.getArea()))
             .orElse(Map.of("serviceable", false)));
     }
