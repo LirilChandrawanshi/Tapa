@@ -1,5 +1,6 @@
 "use client";
 
+import { SLIDE_ROW } from "@/components/SlideRow";
 import { useMemo, useState } from "react";
 import { ObservanceRow, ObservanceTable } from "./ObservanceRow";
 import type { UpcomingObservance } from "@/lib/types";
@@ -49,7 +50,7 @@ export function ObservanceFilter({
 
   return (
     <>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className={`${SLIDE_ROW} mb-3 items-center gap-2`}>
         <span className="mr-1 text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
           Filter
         </span>

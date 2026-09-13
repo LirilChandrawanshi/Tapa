@@ -10,7 +10,19 @@ import type { ReactNode } from "react";
 export function ControlBar({ children }: { children: ReactNode }) {
   return (
     <div className="sticky top-[107px] z-30 border-b border-border bg-card/95 backdrop-blur lg:top-[109px]">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-[11px] md:px-10">
+      {/*
+       * One scrolling row on a phone, wrapping rows from `md`.
+       *
+       * Wrapping here cost 195px of an 844px screen, and because the bar is
+       * sticky that was 195px gone for the whole session — with the nav and
+       * subnav above it, 47% of the viewport was permanently chrome. A
+       * horizontal scroll keeps every control reachable in about a third of
+       * the height.
+       *
+       * `[&>*]:shrink-0` so the controls keep their natural width and scroll
+       * instead of compressing into slivers.
+       */}
+      <div className="mx-auto flex max-w-[1280px] items-center gap-x-3 overflow-x-auto px-4 py-[9px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 md:flex-wrap md:gap-y-2 md:overflow-x-visible md:px-10 md:py-[11px]">
         {children}
       </div>
     </div>

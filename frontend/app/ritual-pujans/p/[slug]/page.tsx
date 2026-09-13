@@ -237,7 +237,9 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-10">
+      {/* pb-24 leaves room for BuyBox's fixed mobile buy bar, which would
+          otherwise sit on top of the last section. */}
+      <div className="mx-auto max-w-[1080px] px-4 py-8 pb-24 md:px-10 md:pb-8">
         {/* ── Top fold: visual + buy column ── */}
         <div className="mb-11 grid items-start gap-7 md:grid-cols-[0.95fr_1.05fr] md:gap-10">
           <ProductGallery

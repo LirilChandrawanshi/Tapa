@@ -1,5 +1,6 @@
 "use client";
 
+import { SLIDE_ROW, SLIDE_ROW_INSET } from "@/components/SlideRow";
 import { useMemo, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -77,7 +78,7 @@ export function PujanShelves({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center gap-2">
+      <div className={`${SLIDE_ROW} mb-6 items-center gap-2`}>
         <span className="mr-1 text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
           Filter
         </span>

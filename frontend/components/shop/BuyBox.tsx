@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   addToCart,
   formatDateLong,
+  formatPaise,
   MAX_QTY,
   MIN_QTY,
   prebookClosed,
@@ -125,6 +126,11 @@ export function BuyBox({
   const [qty, setQty] = useState(MIN_QTY);
   const [added, setAdded] = useState(false);
 
+  // The buy row scrolls away within one swipe on a phone, which leaves the
+  // rest of the PDP with no way to buy. A sticky bar takes over once it does.
+  const buyRowRef = useRef<HTMLDivElement>(null);
+  const [buyRowGone, setBuyRowGone] = useState(false);
+
   useEffect(() => {
     shopTrack("kit_viewed", {
       slug: p.slug,
@@ -132,6 +138,21 @@ export function BuyBox({
       price_paise: p.pricePaise,
     });
   }, [p.slug, p.availability, p.pricePaise]);
+
+  useEffect(() => {
+    const el = buyRowRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        // Only once it has gone off the TOP. Scrolling up from below should
+        // not flash the bar on the way back to a row that is about to appear.
+        setBuyRowGone(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const closed = prebookClosed(p);
   const line = availabilityLine(p);
@@ -177,7 +198,18 @@ export function BuyBox({
 
       {buyable && (
         <>
-          <div className="flex flex-wrap items-stretch gap-3">
+          {/*
+            Was one wrapping flex row of three. On a phone the stepper and the
+            primary CTA filled the line and the secondary dropped underneath at
+            its own narrow width, which read as a broken layout rather than a
+            choice. A 2-column grid says it deliberately: stepper + primary on
+            the first row, secondary spanning the second. From sm up all three
+            sit on one line as before.
+          */}
+          <div
+            ref={buyRowRef}
+            className="grid grid-cols-[auto_1fr] items-stretch gap-3 sm:flex sm:flex-wrap"
+          >
             <div className="flex items-center rounded-[10px] border border-border bg-card">
               <button
                 type="button"
@@ -204,7 +236,7 @@ export function BuyBox({
             <button
               type="button"
               onClick={onAdd}
-              className="flex-1 rounded-[10px] bg-cta px-6 py-[11px] text-[14px] font-bold whitespace-nowrap text-white hover:opacity-90"
+              className="rounded-[10px] bg-cta px-6 py-[11px] text-[14px] font-bold whitespace-nowrap text-white hover:opacity-90 sm:flex-1"
             >
               {priceCtaLabel(p)}
             </button>
@@ -212,7 +244,7 @@ export function BuyBox({
               <button
                 type="button"
                 onClick={onAddToBag}
-                className={`rounded-[10px] border-[1.5px] px-5 py-[11px] text-[14px] font-bold whitespace-nowrap ${
+                className={`col-span-2 rounded-[10px] border-[1.5px] px-5 py-[11px] text-[14px] font-bold whitespace-nowrap sm:col-span-1 ${
                   added
                     ? "border-dharma-bd bg-dharma-bg text-dharma-fg"
                     : "border-cta bg-card text-cta hover:bg-cta/5"
@@ -224,7 +256,7 @@ export function BuyBox({
               <button
                 type="button"
                 onClick={onBuyNow}
-                className="rounded-[10px] border-[1.5px] border-cta bg-card px-5 py-[11px] text-[14px] font-bold whitespace-nowrap text-cta hover:bg-cta/5"
+                className="col-span-2 rounded-[10px] border-[1.5px] border-cta bg-card px-5 py-[11px] text-[14px] font-bold whitespace-nowrap text-cta hover:bg-cta/5 sm:col-span-1"
               >
                 Buy now
               </button>
@@ -233,6 +265,31 @@ export function BuyBox({
           <p className="mt-[11px] text-[12px] leading-relaxed text-sub">
             {termsLine(p)}
           </p>
+
+          {/*
+            Mobile buy bar. Same chrome as the article template's bottom CTA so
+            the two do not read as different systems. It shares `qty` with the
+            stepper above, so whatever the buyer picked is what this adds.
+          */}
+          {buyRowGone && (
+            <div className="fixed inset-x-0 bottom-0 z-[70] flex items-center gap-3 border-t border-border bg-white/95 px-[14px] pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] shadow-[0_-2px_16px_rgba(28,23,18,0.08)] backdrop-blur-[10px] md:hidden">
+              <div className="min-w-0 shrink-0">
+                <p className="text-[15px] leading-none font-bold text-ink">
+                  {formatPaise(p.pricePaise * qty)}
+                </p>
+                <p className="mt-[3px] text-[11px] whitespace-nowrap text-sub">
+                  {qty > 1 ? `${qty} kits · incl. taxes` : "Inclusive of taxes"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onAdd}
+                className="flex-1 rounded-[11px] bg-cta px-4 py-3 text-[13.5px] font-bold whitespace-nowrap text-white"
+              >
+                {p.availability === "PREBOOK" ? "Pre-book" : "Add to cart"}
+              </button>
+            </div>
+          )}
         </>
       )}
 

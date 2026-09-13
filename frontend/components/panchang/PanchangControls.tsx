@@ -60,9 +60,11 @@ export function PdfDownloadLink({
  */
 export function StickyDownloadBar() {
   return (
-    <div className="sticky bottom-0 z-40 mt-10 border-t border-border bg-card/95 py-3 backdrop-blur">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3 px-4 md:px-10">
-        <p className="text-[12.5px] text-mid">
+    <div className="sticky bottom-0 z-40 mt-10 border-t border-border bg-card/95 py-2 backdrop-blur md:py-3">
+      {/* One row on a phone. Wrapping made this 90px of permanent chrome at
+          the foot of an already crowded screen. */}
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-4 md:flex-wrap md:px-10">
+        <p className="min-w-0 truncate text-[12.5px] text-mid">
           <span aria-hidden>↓</span>{" "}
           <b className="text-ink">The full 2026 calendar, one PDF</b>
           <span className="hidden text-sub sm:inline">
@@ -72,9 +74,12 @@ export function StickyDownloadBar() {
         </p>
         <PdfDownloadLink
           surface="vrat-calendar-sticky"
-          className="shrink-0 rounded-[9px] bg-cta px-4 py-[7px] text-[12px] font-bold text-white hover:opacity-90"
+          className="shrink-0 rounded-[9px] bg-cta px-4 py-[9px] text-[12px] font-bold text-white hover:opacity-90 md:py-[7px]"
         >
-          Download 2026 calendar (PDF)
+          {/* The label already sits beside "the full 2026 calendar" — spelling
+              the year out again is what forced this bar onto two rows. */}
+          <span className="sm:hidden">Download</span>
+          <span className="hidden sm:inline">Download 2026 calendar (PDF)</span>
         </PdfDownloadLink>
       </div>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { SLIDE_ROW, SLIDE_ROW_INSET } from "@/components/SlideRow";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { GlossaryTerm } from "@/lib/types";
@@ -72,7 +73,7 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryTerm[] }) {
   return (
     <div>
       {/* filter bar */}
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-[15px] border border-border bg-card px-4 py-3">
+      <div className={`${SLIDE_ROW_INSET} mb-3 items-center gap-2 rounded-[15px] border border-border bg-card px-4 py-3`}>
         <span className="mr-1 text-[10px] font-bold tracking-[0.8px] text-sub uppercase">
           Filter
         </span>
@@ -115,7 +116,7 @@ export function GlossaryBrowser({ terms }: { terms: GlossaryTerm[] }) {
       </div>
 
       {/* alphabet jump bar */}
-      <div className="mb-5 flex flex-wrap gap-[3px] rounded-[13px] border border-border bg-card px-3 py-2">
+      <div className={`${SLIDE_ROW_INSET} mb-5 gap-[3px] rounded-[13px] border border-border bg-card px-3 py-2`}>
         {ALPHABET.map((letter) =>
           liveLetters.has(letter) ? (
             <a

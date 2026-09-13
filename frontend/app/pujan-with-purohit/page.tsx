@@ -66,8 +66,11 @@ function PujaRow({ puja, slots }: { puja: PujaType; slots: TimeSlot[] }) {
   return (
     <Link
       href={`/pujan-with-purohit/${puja.slug}`}
-      className="group flex items-center gap-4 rounded-[14px] border border-border bg-card p-4 transition-shadow hover:shadow-md md:p-5"
+      className="group flex flex-col gap-3 rounded-[14px] border border-border bg-card p-4 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:gap-4 md:p-5"
     >
+      {/* Icon and copy stay one unit; only the CTA drops to its own line
+          on a phone, where a nowrap button was squeezing the copy to ~89px. */}
+      <div className="flex min-w-0 flex-1 items-center gap-4">
       <div
         aria-hidden
         className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[12px] text-[20px] ${puja.hueClass}`}
@@ -99,7 +102,8 @@ function PujaRow({ puja, slots }: { puja: PujaType; slots: TimeSlot[] }) {
           </span>
         </p>
       </div>
-      <span className="shrink-0 whitespace-nowrap rounded-[10px] bg-cta px-4 py-[9px] text-[12.5px] font-bold text-white group-hover:opacity-90">
+      </div>
+      <span className="shrink-0 self-start rounded-[10px] bg-cta px-4 py-[10px] text-center text-[12.5px] font-bold whitespace-nowrap text-white group-hover:opacity-90 sm:self-auto">
         Book ›
       </span>
     </Link>

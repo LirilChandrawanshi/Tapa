@@ -44,7 +44,10 @@ export function CalendarShelf({ observances }: { observances: UpcomingObservance
                   {observance.tithiLabel ? ` · ${observance.tithiLabel}` : ""}
                 </p>
                 {observance.blurb && (
-                  <p className="flex-1 text-[12px] leading-relaxed text-sub">
+                  // Two-up on a phone leaves ~140px of copy, so an unclamped
+                  // blurb ran to four lines and the four cards ended up
+                  // ragged. Clamped there, full from `sm` where there is room.
+                  <p className="line-clamp-2 flex-1 text-[12px] leading-relaxed text-sub sm:line-clamp-none">
                     {observance.blurb}
                   </p>
                 )}

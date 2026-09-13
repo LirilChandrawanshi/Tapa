@@ -15,7 +15,8 @@ import {
 } from "@/lib/panchangExtras";
 import type { UpcomingObservance } from "@/lib/types";
 import { ConventionToggle } from "./ConventionToggle";
-import { ControlBar, ControlSep } from "./ControlBar";
+import { CONTROL_H,
+  ControlBar, ControlSep } from "./ControlBar";
 import { SourceStrip, TimingDataTag } from "./DataMeta";
 import { FilterChips } from "./FilterChips";
 import { MonthTabs, monthKeyOf } from "./MonthTabs";
@@ -106,13 +107,19 @@ export function FestivalGrid({
   return (
     <>
       <ControlBar>
-        <TimingDataTag />
+        {/* Hidden in the sticky bar on a phone: it is a statement, not a
+            control, and it pushed the city selector — the most important
+            control on the page — off the visible row. SourceStrip still
+            carries the provenance below. */}
+        <span className="hidden md:contents">
+          <TimingDataTag />
+        </span>
         <CitySelect />
         <ControlSep />
         <ConventionToggle />
         <PdfDownloadLink
           surface="festival-calendar-strip"
-          className="ml-auto rounded-[9px] border border-data-fg bg-data-fg px-[14px] py-[7px] text-[12px] font-bold text-white hover:opacity-90"
+          className={`${CONTROL_H} ml-auto inline-flex items-center rounded-[9px] border border-data-fg bg-data-fg px-[14px] text-[12px] font-bold text-white hover:opacity-90`}
         >
           ↓ Download PDF
         </PdfDownloadLink>

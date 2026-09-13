@@ -17,11 +17,12 @@ async function go(from, to, scrollTo, expect) {
   ok ? pass++ : fail++;
   console.log(`${L[from]} (y=${before}) → ${L[to]}: y=${after}, tabs at ${Math.round(navTop)}  ${ok ? "✓" : "✗"}`);
 }
-await go("/panchang/eclipses", "/panchang/festival-calendar", -1, "tabs");  // worst case
+await go("/panchang/eclipses", "/panchang/festival-calendar", -1, "tabs");
+await go("/panchang", "/panchang/festival-calendar", 4000, "tabs");
 await go("/panchang", "/panchang/vrat-calendar", 1200, "tabs");
 await go("/panchang/festival-calendar", "/panchang/eclipses", 2000, "tabs");
 await go("/panchang/vrat-calendar", "/panchang", 3000, "tabs");
 await go("/panchang/eclipses", "/panchang", -1, "tabs");
-await go("/panchang", "/panchang/eclipses", 0, "top");                      // at the hero — must not move
+await go("/panchang", "/panchang/eclipses", 0, "top");
 console.log(`\n${pass} passed, ${fail} failed`);
 await b.close();

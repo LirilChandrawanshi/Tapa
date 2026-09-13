@@ -1,4 +1,5 @@
 "use client";
+import { SLIDE_ROW } from "@/components/SlideRow";
 
 /** Generic chip row — controlled; parent owns the active key. */
 export function FilterChips<K extends string>({
@@ -17,7 +18,7 @@ export function FilterChips<K extends string>({
     <div
       role="group"
       aria-label="Filter observances"
-      className="flex flex-wrap gap-2"
+      className={`${SLIDE_ROW} gap-2`}
     >
       {options.map((opt) => {
         const on = opt.key === active;

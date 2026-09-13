@@ -370,9 +370,11 @@ export function TopNav({
               { label: "Scripture References", href: "/editorial-method" },
               { label: "Our Editorial Method", href: "/editorial-method" },
               { label: "Contact", href: "/about" },
+              // keyed by label, not href — Scripture References and Our
+              // Editorial Method are two entries into the same page
             ].map((link) => (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 onClick={() => setDrawerOpen(false)}
                 className="py-[9px] text-sm text-sub"

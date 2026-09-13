@@ -1,5 +1,6 @@
 "use client";
 
+import { SLIDE_ROW, SLIDE_ROW_INSET } from "@/components/SlideRow";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -170,7 +171,11 @@ export function SearchClient() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-7 md:grid-cols-[1fr_300px] md:px-10">
+      {/* [&>*]:min-w-0 — a grid item defaults to min-width:auto, so either
+          column grows to fit its widest content instead of staying in its
+          track. That let a chip row inside the sidebar stretch the aside to
+          509px on a 390px screen and push the whole page sideways. */}
+      <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-7 [&>*]:min-w-0 md:grid-cols-[1fr_300px] md:px-10">
         <div className="min-w-0">
           {status === "idle" && <IdleState popular={popular} onPick={runSearch} />}
           {status === "loading" && <LoadingSkeleton />}
@@ -216,7 +221,7 @@ export function SearchClient() {
               <p className="mb-[10px] text-[10px] font-bold tracking-[0.8px] text-gold uppercase">
                 Popular right now
               </p>
-              <div className="flex flex-wrap gap-[7px]">
+              <div className={`${SLIDE_ROW_INSET} gap-[7px]`}>
                 {popular.map((p) => (
                   <Link
                     key={p.label}

@@ -85,21 +85,28 @@ export function WhatsAppNudge({
     ? `/tapa-circle?from=${encodeURIComponent(pathname)}`
     : "/tapa-circle";
 
+  /*
+   * Stacks below `sm`. The icon and the shrink-0 nowrap CTA together eat
+   * ~200px, which left the copy about 92px on a phone — four words a line.
+   * The CTA goes full width there, which is also the easier tap.
+   */
   return (
-    <div className="my-5 flex items-center gap-[13px] rounded-[14px] border border-wa/30 border-l-[3px] border-l-wa bg-card px-[18px] py-[15px]">
+    <div className="my-5 flex flex-col gap-3 rounded-[14px] border border-wa/30 border-l-[3px] border-l-wa bg-card px-[18px] py-[15px] sm:flex-row sm:items-center sm:gap-[13px]">
+      <div className="flex min-w-0 flex-1 items-start gap-[13px] sm:items-center">
       <span aria-hidden className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-wa/10 text-lg">
         💬
       </span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0">
         <p className="text-[13.5px] font-bold text-ink">{headline}</p>
         <p className="mt-[2px] text-xs text-sub">
           Vrat and festival reminders on WhatsApp, with the guide attached.
         </p>
       </div>
+      </div>
       <Link
         href={joinHref}
         onClick={() => track("wa_nudge_clicked", { context, from: pathname })}
-        className="shrink-0 rounded-[10px] bg-wa px-4 py-[10px] text-[12.5px] font-bold whitespace-nowrap text-white"
+        className="shrink-0 rounded-[10px] bg-wa px-4 py-[11px] text-center text-[12.5px] font-bold whitespace-nowrap text-white"
       >
         Join the Tapa Circle ›
       </Link>

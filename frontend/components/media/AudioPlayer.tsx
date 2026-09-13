@@ -58,6 +58,18 @@ function Pause() {
   );
 }
 
+/** Used only by the waiting state, where there is no transport to show. */
+function Headphones() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+         strokeLinecap="round" aria-hidden className="size-[14px] shrink-0">
+      <path d="M4 14v-2a8 8 0 0 1 16 0v2" />
+      <path d="M4 14h2.5a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V14Z" />
+      <path d="M20 14h-2.5a1 1 0 0 0-1 1v3.5a1 1 0 0 0 1 1H19a1 1 0 0 0 1-1V14Z" />
+    </svg>
+  );
+}
+
 function VolumeOn() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className="h-[16px] w-[16px]">
@@ -222,6 +234,23 @@ export function AudioPlayer({
   const menuRow =
     "flex w-full items-center justify-between gap-3 rounded-[7px] px-2 py-[7px] text-[12.5px] text-body transition-colors hover:bg-bg disabled:cursor-not-allowed disabled:opacity-40";
 
+  /*
+   * No audio yet. The full transport was still being drawn here — a play
+   * button, a 0:00 / 0:00 readout and a seek bar that cannot move — which on a
+   * phone spends ~70px of the first fold pretending to be a control. One quiet
+   * line says the same thing and reads as a note rather than a broken player.
+   */
+  if (disabled) {
+    return (
+      <div className={className}>
+        <p className="flex items-center justify-center gap-[7px] rounded-full border border-dashed border-border bg-bg px-[13px] py-[7px] text-[11.5px] font-semibold text-sub md:justify-start">
+          <Headphones />
+          <span className="truncate">{label} — coming soon</span>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
       {activeId && (
@@ -242,11 +271,9 @@ export function AudioPlayer({
       {/* caption — keeps the label and the bilingual signal outside the capsule */}
       <p className="mb-[5px] truncate text-[11px] font-bold text-sub">
         {label}
-        {disabled
-          ? " — coming soon"
-          : fallbackLang
-            ? ` · ${fallbackLang === "en" ? "EN" : "हिं"} only`
-            : ` · ${lang === "en" ? "EN" : "हिं"}`}
+        {fallbackLang
+          ? ` · ${fallbackLang === "en" ? "EN" : "हिं"} only`
+          : ` · ${lang === "en" ? "EN" : "हिं"}`}
       </p>
 
       <div

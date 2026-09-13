@@ -491,10 +491,18 @@ export async function ArticleView({
             {dateTiles.length > 0 && (
               <div className="mb-6">
                 <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-                  {dateTiles.map((tile) => (
+                  {dateTiles.map((tile, i) => (
                     <div
                       key={tile.label}
                       className={`rounded-[13px] border px-[14px] py-[12px] ${
+                        // An odd tile count left the last one stranded at half
+                        // width on phones, with a hole beside it. Let it span
+                        // the row instead. At md the grid is 4-up and a short
+                        // final row reads as normal, so this is mobile-only.
+                        i === dateTiles.length - 1 && dateTiles.length % 2 === 1
+                          ? "col-span-2 md:col-span-1"
+                          : ""
+                      } ${
                         tile.label === "PARANA"
                           ? "border-dharma-bd bg-dharma-bg"
                           : "border-border bg-card"
