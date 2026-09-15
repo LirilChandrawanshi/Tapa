@@ -16,9 +16,12 @@ import java.util.Map;
 public class ArticleController {
 
     private final ArticleService service;
+    private final co.thetapa.imagery.DeityImageService imagery;
 
-    public ArticleController(ArticleService service) {
+    public ArticleController(ArticleService service,
+                             co.thetapa.imagery.DeityImageService imagery) {
         this.service = service;
+        this.imagery = imagery;
     }
 
     @GetMapping("/{slug}")
@@ -33,6 +36,7 @@ public class ArticleController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "24") int size) {
         Page<Article> result = service.listPublished(category, subCategory, page, size);
+        result.getContent().forEach(a -> a.setResolvedImageId(imagery.imageForArticle(a)));
         return ApiResponse.ok(Map.of(
             "items", result.getContent(),
             "page", result.getNumber(),
@@ -43,6 +47,8 @@ public class ArticleController {
 
     @GetMapping("/featured")
     public ApiResponse<List<Article>> featured() {
-        return ApiResponse.ok(service.featured());
+        List<Article> out = service.featured();
+        out.forEach(a -> a.setResolvedImageId(imagery.imageForArticle(a)));
+        return ApiResponse.ok(out);
     }
 }

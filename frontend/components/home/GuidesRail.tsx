@@ -30,6 +30,7 @@ export function GuidesRail({ cards, now }: { cards: HomeCard[]; now: string }) {
               >
                 <ContentCard
                   hue={hueFromClass(card.hueClass ?? undefined)}
+                  imageId={card.imageId}
                   href={cardHref(card)}
                   topLeft={
                     card.observanceDate ? (

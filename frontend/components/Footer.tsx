@@ -536,9 +536,6 @@ export function Footer({
                 the tapa company — © 2026 Komal Gupta. All rights reserved.
               </p>
             </div>
-            <span className="text-[11.5px] text-[#5C4E36]">
-              Made in Gurgaon
-            </span>
           </div>
         </div>
       </div>

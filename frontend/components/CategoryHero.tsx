@@ -32,6 +32,7 @@ export function CategoryHero({
   meta,
   side,
   image,
+  actions,
 }: {
   variant: CategoryHeroVariant;
   eyebrow: string;
@@ -42,11 +43,11 @@ export function CategoryHero({
   side?: ReactNode;
   /** Optional background photograph; replaces the SVG motif when set. */
   image?: string;
+  /** Share / Save controls, overlaid in the band's top-right corner. */
+  actions?: ReactNode;
 }) {
   return (
-    <section
-      className={`hero-${variant} hero-band relative overflow-hidden`}
-    >
+    <section className={`hero-${variant} hero-band relative overflow-hidden`}>
       {image && (
         <Image
           src={image}
@@ -63,6 +64,12 @@ export function CategoryHero({
       <div aria-hidden className="hero-key absolute inset-0" />
       <div aria-hidden className="hero-scrim absolute inset-0" />
       <div aria-hidden className="hero-grain absolute inset-0" />
+
+      {actions && (
+        <div className="absolute top-3 right-4 z-10 flex items-center gap-2 md:top-4 md:right-10">
+          {actions}
+        </div>
+      )}
 
       <div className="relative mx-auto grid w-full max-w-[1280px] items-center gap-6 px-4 md:grid-cols-[1.25fr_0.75fr] md:gap-11 md:px-10">
         <div>
@@ -208,10 +215,18 @@ function JuteWeave() {
   for (let i = -6; i < 26; i++) {
     const x = i * 20;
     lines.push(
-      <path key={`a${i}`} d={`M ${x} -10 L ${x + 78} 210`} strokeOpacity={0.5} />,
+      <path
+        key={`a${i}`}
+        d={`M ${x} -10 L ${x + 78} 210`}
+        strokeOpacity={0.5}
+      />,
     );
     lines.push(
-      <path key={`b${i}`} d={`M ${x} 210 L ${x + 78} -10`} strokeOpacity={0.28} />,
+      <path
+        key={`b${i}`}
+        d={`M ${x} 210 L ${x + 78} -10`}
+        strokeOpacity={0.28}
+      />,
     );
   }
   return <>{lines}</>;

@@ -18,6 +18,7 @@ export function PhaseClosed({
           title: "Pre-booking has not opened yet",
           body: "Samagri kits for every ritual guide — sourced, weighed and sealed, delivered before the date. Leave your number and we'll tell you the moment pre-booking opens. Until then, every guide is free.",
           context: "kits" as const,
+          note: "One WhatsApp message when pre-booking opens. Nothing else.",
         }
       : section === "mandali"
         ? {
@@ -26,12 +27,14 @@ export function PhaseClosed({
             body: "Live devotional singers for your home or temple gathering — Sundarkand, Mata Ki Chowki, Shyam Darbaar and more. Leave your number and we'll message you first when booking opens.",
             // rides the purohit notify list — the closest live context the API accepts
             context: "purohit" as const,
+            note: "One WhatsApp message when Mandali booking opens. Nothing else.",
           }
         : {
             eyebrow: "PUJAN WITH PUROHIT",
             title: "Purohit booking opens soon",
             body: "Vetted purohits who perform the full vidhi and explain it as they go — samagri included. Leave your number and we'll call you first when booking opens.",
             context: "purohit" as const,
+            note: "One WhatsApp message when purohit booking opens. Nothing else.",
           };
 
   return (
@@ -47,7 +50,7 @@ export function PhaseClosed({
           {copy.body}
         </p>
         <div className="mx-auto mt-6 max-w-[360px]">
-          <NotifyMe context={copy.context} />
+          <NotifyMe context={copy.context} note={copy.note} />
         </div>
         <Link
           href="/ritual-guides"

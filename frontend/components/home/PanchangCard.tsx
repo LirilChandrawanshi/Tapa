@@ -96,10 +96,17 @@ export function PanchangCard({
             this tithi.{next.tithiLabel ? ` ${next.tithiLabel}.` : ""}
           </span>
           <Link
-            href={next.articleSlug ? guideHref(next.articleSlug) : "/panchang"}
+            // same rule as the calendar shelf: the guide when one exists,
+            // otherwise the occasion's own page — never a link that promises
+            // a guide and lands on the panchang index
+            href={
+              next.articleSlug
+                ? guideHref(next.articleSlug)
+                : `/panchang/o/${next.slug}`
+            }
             className="shrink-0 text-[12px] font-bold whitespace-nowrap text-eyebrow-dark hover:text-hero-text"
           >
-            Open guide ›
+            {next.articleSlug ? "Open guide ›" : "See the timings ›"}
           </Link>
         </div>
       ) : (

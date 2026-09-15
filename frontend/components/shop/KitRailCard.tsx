@@ -107,9 +107,14 @@ export function KitRailCard({ product: p }: { product: Product }) {
           )}
 
           {p.availability === "COMING_SOON" && (
-            <div className="rounded-[11px] bg-ink p-[10px]">
-              <NotifyMe context="kits" />
-            </div>
+            <NotifyMe
+              context="kits"
+              variant="compact"
+              tone="light"
+              articleSlug={p.slug}
+              doneCopy="You're on the list"
+              note="One WhatsApp message when pre-booking opens."
+            />
           )}
 
           {p.availability === "SOLD_OUT" && (

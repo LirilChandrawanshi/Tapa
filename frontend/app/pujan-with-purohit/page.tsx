@@ -204,7 +204,10 @@ export default async function PujanWithPurohitPage() {
             <p className="mb-2 text-[11px] font-bold tracking-[0.6px] text-hero-text/60 uppercase">
               Or get one message when more pujas open
             </p>
-            <NotifyMe context="purohit" />
+            <NotifyMe
+              context="purohit"
+              note="One WhatsApp message when more pujas open. Nothing else."
+            />
           </div>
         </div>
 

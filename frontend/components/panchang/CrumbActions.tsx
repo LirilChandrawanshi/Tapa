@@ -1,12 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { LangToggle } from "@/components/LangToggle";
+import {
+  ACTION_BTN,
+  type ActionTone,
+  actionSkin,
+} from "@/components/article/actionTone";
 import { SaveShareButtons } from "@/components/article/SaveShareButtons";
 import { track } from "@/lib/analytics";
 
 /**
- * Breadcrumb-row controls for a panchang detail page: EN/हिं, Save, Share.
+ * Save + Share controls for a panchang detail page.
+ *
+ * No language toggle here — the top nav already carries one, and a second
+ * EN/हिं pair a row below it read as a duplicate control.
  *
  * Save writes against a ritual guide, so it only appears when the observance
  * links to one — a bare date has nothing to save. Everything else gets a
@@ -15,26 +22,28 @@ import { track } from "@/lib/analytics";
 export function CrumbActions({
   title,
   articleSlug,
-  showLang = true,
+  tone = "bar",
 }: {
   title: string;
   /** Ritual-guide slug, when this observance has one. */
   articleSlug?: string;
-  showLang?: boolean;
+  /** `hero` restyles the buttons for the dark hero they overlay. */
+  tone?: ActionTone;
 }) {
-  return (
-    <>
-      {showLang && <LangToggle />}
-      {articleSlug ? (
-        <SaveShareButtons slug={articleSlug} title={title} />
-      ) : (
-        <ShareButton title={title} />
-      )}
-    </>
+  return articleSlug ? (
+    <SaveShareButtons slug={articleSlug} title={title} tone={tone} />
+  ) : (
+    <ShareButton title={title} tone={tone} />
   );
 }
 
-export function ShareButton({ title }: { title: string }) {
+export function ShareButton({
+  title,
+  tone = "bar",
+}: {
+  title: string;
+  tone?: ActionTone;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function onShare() {
@@ -58,7 +67,7 @@ export function ShareButton({ title }: { title: string }) {
     <button
       type="button"
       onClick={() => void onShare()}
-      className="flex h-[35px] items-center gap-[6px] rounded-lg border-[1.5px] border-border bg-card px-[14px] text-[13px] text-body hover:border-cta"
+      className={`${ACTION_BTN} ${actionSkin(tone)}`}
     >
       <span aria-hidden>↗</span> {copied ? "Copied" : "Share"}
     </button>

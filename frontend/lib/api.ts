@@ -116,7 +116,12 @@ export const fetchFestivals = () =>
   });
 
 export const fetchFestival = (slug: string) =>
-  get<{ observance: UpcomingObservance["observance"]; countdownDays: number }>(
+  get<{
+    observance: UpcomingObservance["observance"];
+    countdownDays: number;
+    /** Resolved server-side: override → linked guide → deity set → null. */
+    imageId?: string | null;
+  }>(
     `/panchang/festival/${slug}`,
     { revalidate: 900, tags: ["panchang"] },
   );

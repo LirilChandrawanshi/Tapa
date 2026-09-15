@@ -1,6 +1,47 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SectionHeader } from "@/components/SectionHeader";
 import type { HomeCounts } from "@/lib/homeExtras";
+
+/**
+ * The banner each tile wears: the pillar's own photograph over its hue, the
+ * same image the category's landing hero uses, so the tile and the page it
+ * opens read as one place. The gradient stays underneath as the fallback, and
+ * a bottom scrim keeps the card's top edge from clashing with whatever the
+ * photograph does there.
+ *
+ * No glyph: each image already says lamp, moon, leaf or basket better than an
+ * emoji can, and a flat OS emoji on a painted illustration reads as a sticker.
+ */
+function TileBanner({
+  hue,
+  image,
+  dimmed = false,
+}: {
+  hue: string;
+  image: string;
+  dimmed?: boolean;
+}) {
+  return (
+    <div
+      className={`${hue} relative h-[96px] overflow-hidden ${dimmed ? "opacity-60" : ""}`}
+    >
+      <Image
+        src={image}
+        alt=""
+        aria-hidden
+        fill
+        sizes="(max-width: 1024px) 50vw, 25vw"
+        className="pointer-events-none object-cover object-center opacity-70 transition-transform duration-500 group-hover:scale-[1.06]"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent"
+      />
+
+    </div>
+  );
+}
 
 /**
  * Section 11 — EXPLORE BY CATEGORY. The four pillars as tiles (2×2 mobile,
@@ -17,8 +58,8 @@ export function CategoryTiles({
 }) {
   const tiles = [
     {
-      icon: "🪔",
       hue: "hero-rg",
+      image: "/brand/ritual-guides.jpg",
       title: "Ritual Guides",
       note: "The complete vidhi for every festival and vrat, sourced and tagged.",
       stat:
@@ -29,8 +70,8 @@ export function CategoryTiles({
       cta: "Browse guides ›",
     },
     {
-      icon: "☀",
       hue: "hero-pa",
+      image: "/brand/calender.png",
       title: "Panchang",
       note: "Today's tithi and sunrise, and every vrat date of the year.",
       stat: "2026 calendar",
@@ -38,8 +79,8 @@ export function CategoryTiles({
       cta: "Open Panchang ›",
     },
     {
-      icon: "🌿",
       hue: "hero-dc",
+      image: "/brand/dharmic.png",
       title: "Dharmic Concepts",
       note: "Why bilva and not tulsi — the story behind the object in your hand.",
       stat: [
@@ -65,11 +106,7 @@ export function CategoryTiles({
             href={t.href}
             className="group flex flex-col overflow-hidden rounded-[15px] border border-border bg-card transition-colors hover:border-cta"
           >
-            <div className={`${t.hue} flex h-[84px] items-end p-4`}>
-              <span aria-hidden className="text-[22px]">
-                {t.icon}
-              </span>
-            </div>
+            <TileBanner hue={t.hue} image={t.image} />
             <div className="flex flex-1 flex-col p-5">
               <span className="text-[15px] font-bold text-ink group-hover:text-cta">
                 {t.title}
@@ -92,11 +129,7 @@ export function CategoryTiles({
             href="/ritual-pujans"
             className="group flex flex-col overflow-hidden rounded-[15px] border border-border bg-card transition-colors hover:border-cta"
           >
-            <div className="hero-rk flex h-[84px] items-end p-4">
-              <span aria-hidden className="text-[22px]">
-                🧺
-              </span>
-            </div>
+            <TileBanner hue="hero-rk" image="/brand/ritual_pujans.png" />
             <div className="flex flex-1 flex-col p-5">
               <span className="text-[15px] font-bold text-ink group-hover:text-cta">
                 Ritual Pujans
@@ -114,11 +147,7 @@ export function CategoryTiles({
           </Link>
         ) : (
           <div className="flex flex-col overflow-hidden rounded-[15px] border border-dashed border-border bg-card/60">
-            <div className="hero-rk flex h-[84px] items-end p-4 opacity-60">
-              <span aria-hidden className="text-[22px]">
-                🧺
-              </span>
-            </div>
+            <TileBanner hue="hero-rk" image="/brand/ritual_pujans.png" dimmed />
             <div className="flex flex-1 flex-col p-5">
               <span className="text-[15px] font-bold text-ink/80">
                 Ritual Pujans

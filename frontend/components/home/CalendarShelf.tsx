@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SectionHeader } from "@/components/SectionHeader";
 import { deityHue } from "@/lib/articleExtras";
+import { mediaUrl } from "@/lib/media";
 import { fmtShort, guideHref } from "@/lib/panchangExtras";
 import type { UpcomingObservance } from "@/lib/types";
 
@@ -24,17 +26,42 @@ export function CalendarShelf({ observances }: { observances: UpcomingObservance
         viewAllLabel="Full 2026 calendar"
       />
       <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-4">
-        {cards.map(({ observance }) => {
-          const href = observance.articleSlug
-            ? guideHref(observance.articleSlug)
-            : "/panchang";
+        {cards.map(({ observance, imageId }) => {
+          // A guide, when one has been written for the occasion. Otherwise the
+          // occasion's own page — tithi, timings, what it is — rather than the
+          // generic panchang landing, which answers nothing the card asked.
+          const hasGuide = Boolean(observance.articleSlug);
+          const href = hasGuide
+            ? guideHref(observance.articleSlug as string)
+            : `/panchang/o/${observance.slug}`;
           return (
             <Link
               key={observance.slug}
               href={href}
               className="group flex flex-col overflow-hidden rounded-[15px] border border-border bg-card"
             >
-              <div className={`h-${deityHue(observance.deity)} h-[96px]`} />
+              {/* the deity gradient is the floor, not the ceiling: an image
+                  from the fallback chain sits on it when one resolves */}
+              <div
+                className={`h-${deityHue(observance.deity)} relative h-[96px] overflow-hidden`}
+              >
+                {imageId && (
+                  <>
+                    <Image
+                      src={mediaUrl(imageId)}
+                      alt=""
+                      aria-hidden
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 25vw"
+                      className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.06]"
+                    />
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
+                    />
+                  </>
+                )}
+              </div>
               <div className="flex flex-1 flex-col p-4">
                 <p className="mb-1 text-[15px] leading-[1.3] font-bold text-ink">
                   {observance.name}
@@ -52,7 +79,7 @@ export function CalendarShelf({ observances }: { observances: UpcomingObservance
                   </p>
                 )}
                 <span className="mt-[11px] text-[11.5px] font-bold text-cta group-hover:underline">
-                  Read the guide ›
+                  {hasGuide ? "Read the guide ›" : "See the timings ›"}
                 </span>
               </div>
             </Link>

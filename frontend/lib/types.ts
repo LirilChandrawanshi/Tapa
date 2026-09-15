@@ -144,6 +144,8 @@ export interface Article {
   lang: { en: ArticleContent; hi?: ArticleContent };
   dpb?: Dpb;
   heroImageId?: string;
+  /** Resolved server-side for listing cards: own image → linked date's imagery. */
+  resolvedImageId?: string | null;
   hueClass?: string;
   /** Presiding deity slug — see DEITIES in lib/articleExtras. Null = unclaimed. */
   deity?: string;
@@ -245,6 +247,8 @@ export type EclipseVisibility = "VISIBLE" | "NOT_VISIBLE" | "UNCONFIRMED";
 export interface UpcomingObservance {
   observance: Observance;
   countdownDays: number;
+  /** Resolved server-side: override → linked guide → deity set → null. */
+  imageId?: string | null;
 }
 
 export interface Paged<T> {

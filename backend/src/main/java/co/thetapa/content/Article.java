@@ -20,6 +20,15 @@ public class Article {
     @Id
     private String id;
 
+    /**
+     * Resolved at read time by DeityImageService, never stored: the picture a
+     * listing card should show when the article has no hero image of its own.
+     * Transient so it can ride the existing payload shape without every card
+     * endpoint growing a wrapper.
+     */
+    @org.springframework.data.annotation.Transient
+    private String resolvedImageId;
+
     @Indexed(unique = true)
     private String slug;
 
@@ -96,6 +105,9 @@ public class Article {
     }
 
     // getters/setters
+
+    public String getResolvedImageId() { return resolvedImageId; }
+    public void setResolvedImageId(String resolvedImageId) { this.resolvedImageId = resolvedImageId; }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

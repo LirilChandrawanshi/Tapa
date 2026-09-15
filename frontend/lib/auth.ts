@@ -118,6 +118,28 @@ export const logout = async () => {
 /** 401/403 (result.ok === false) simply means signed out — not an error state. */
 export const getMe = () => call<Me>("/me");
 
+let mePromise: Promise<AuthResult<Me>> | null = null;
+
+/**
+ * getMe() de-duplicated across components. A rail can hold several cards that
+ * each need to know "is this visitor signed in?"; they share one request.
+ * Cleared on sign-in/sign-out (AUTH_EVENT) so it never serves a stale session.
+ */
+export function getMeCached(): Promise<AuthResult<Me>> {
+  if (!mePromise) {
+    mePromise = getMe();
+  }
+  return mePromise;
+}
+
+export function clearMeCache() {
+  mePromise = null;
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener(AUTH_EVENT, clearMeCache);
+}
+
 export const updateMe = (
   patch: Partial<Pick<Me, "name" | "languagePref" | "city">>,
 ) => call<{ updated: boolean }>("/me", "PUT", patch);

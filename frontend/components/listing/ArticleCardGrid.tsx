@@ -25,6 +25,7 @@ export function ArticleCardGrid({
           <ContentCard
             key={article.slug}
             hue={hueFromClass(article.hueClass)}
+            imageId={article.resolvedImageId}
             href={articleHref(article)}
             topLeft={
               article.observanceDate ? (

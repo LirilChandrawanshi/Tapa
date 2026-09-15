@@ -101,7 +101,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Series rail: every date of the same series this year, current included. */
 async function fetchSeriesMates(series: string): Promise<UpcomingObservance[]> {
   const isEkadashi = series.toLowerCase().includes("ekadashi");
-  const list = await safeFetch(isEkadashi ? fetchEkadashi() : fetchUpcoming(60));
+  const list = await safeFetch(
+    isEkadashi ? fetchEkadashi() : fetchUpcoming(60),
+  );
   return (list ?? [])
     .filter((u) => u.observance.series === series)
     .sort((a, b) => a.observance.date.localeCompare(b.observance.date));
@@ -169,10 +171,16 @@ export default async function ObservancePage({ params }: Props) {
   const isFestivalTemplate =
     isMultiDay && (o.type === "FESTIVAL" || o.type === "SPECIAL_SEASONAL");
   const isVratTemplate =
-    !isFestivalTemplate &&
-    (o.type === "VRAT" || o.type === "PURNIMA_AMAVASYA");
+    !isFestivalTemplate && (o.type === "VRAT" || o.type === "PURNIMA_AMAVASYA");
   const isEkadashi = /ekadashi/i.test(`${o.series ?? ""} ${o.name}`);
   const isNavratri = /navratri/i.test(`${o.slug} ${o.name}`);
+
+  // Kicked off here rather than awaited after the day payloads: the series
+  // rail has no bearing on them, and running the two round trips back to back
+  // was a second network hop the reader waited out for nothing.
+  const matesPromise: Promise<UpcomingObservance[]> = o.series
+    ? fetchSeriesMates(o.series)
+    : Promise.resolve([]);
 
   // ── Vrat template data: this day + the parana day ──
   let vratDay: DayPayload | null = null;
@@ -202,7 +210,7 @@ export default async function ObservancePage({ params }: Props) {
   const anomalies = detectAnomalies(festDays);
   const merge = anomalies.find((a) => a.kind === "merge");
 
-  const mates = o.series ? await fetchSeriesMates(o.series) : [];
+  const mates = await matesPromise;
 
   // ── Fast timeline (vrat template) ──
   const paranaDate = parana?.date ?? addDays(o.date, 1);
@@ -282,7 +290,9 @@ export default async function ObservancePage({ params }: Props) {
     ...(isVratTemplate && parana
       ? [{ id: "parana", label: "◷ Parana window" }]
       : []),
-    ...(isVratTemplate ? [{ id: "timeline", label: "The fast, end to end" }] : []),
+    ...(isVratTemplate
+      ? [{ id: "timeline", label: "The fast, end to end" }]
+      : []),
     ...(isFestivalTemplate && festDays.length > 0
       ? [{ id: "days", label: "🗓 Day by day" }]
       : []),
@@ -295,7 +305,10 @@ export default async function ObservancePage({ params }: Props) {
     { id: "answers", label: "Quick answers" },
   ];
 
-  const hero = o.heroImageId ? mediaUrl(o.heroImageId) : null;
+  // The observance's own override first; otherwise whatever the imagery
+  // fallback resolved (linked guide, then the deity's set).
+  const heroId = o.heroImageId ?? data?.imageId ?? null;
+  const hero = heroId ? mediaUrl(heroId) : null;
 
   return (
     <main className="pb-16">
@@ -304,17 +317,17 @@ export default async function ObservancePage({ params }: Props) {
           { label: "Home", href: "/" },
           { label: "Panchang", href: "/panchang" },
           isFestivalTemplate
-            ? { label: "Festival Calendar", href: "/panchang/festival-calendar" }
+            ? {
+                label: "Festival Calendar",
+                href: "/panchang/festival-calendar",
+              }
             : { label: "Vrat Calendar", href: "/panchang/vrat-calendar" },
           { label: `${o.name} — ${fmtShort(o.date)}` },
         ]}
-        actions={
-          <CrumbActions title={o.name} articleSlug={o.articleSlug} />
-        }
       />
 
       {/* Hero — the observance's own image when it has one, gradient otherwise */}
-      <section className="hero-pa relative overflow-hidden py-8 md:py-11">
+      <section className="hero-pa relative overflow-hidden pt-12 pb-8 md:pt-14 md:pb-11">
         {hero && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -330,6 +343,19 @@ export default async function ObservancePage({ params }: Props) {
             />
           </>
         )}
+        {/*
+         * Save / Share ride in the hero's top-right rather than in a bar of
+         * their own above it — that bar was a full strip of chrome carrying
+         * two buttons, and its language toggle duplicated the one in the nav.
+         */}
+        <div className="absolute top-3 right-4 z-10 flex items-center gap-2 md:top-4 md:right-10">
+          <CrumbActions
+            title={o.name}
+            articleSlug={o.articleSlug}
+            tone="hero"
+          />
+        </div>
+
         <div className="relative mx-auto grid max-w-[1280px] items-center gap-6 px-4 md:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
           <div>
             <p className="mb-[10px] text-[10px] tracking-[1px] text-eyebrow-dark uppercase">
@@ -526,8 +552,8 @@ export default async function ObservancePage({ params }: Props) {
                 {!festDays[0]?.day?.muhurats?.length &&
                   !festDays[0]?.day?.abhijitMuhurat && (
                     <p className="text-[12.5px] text-sub">
-                      Day-one muhurat windows are being verified and will
-                      appear here.
+                      Day-one muhurat windows are being verified and will appear
+                      here.
                     </p>
                   )}
               </section>
@@ -589,11 +615,11 @@ export default async function ObservancePage({ params }: Props) {
                     How to observe {isEkadashi ? "an Ekadashi vrat" : o.name}
                   </p>
                   <p className="mt-1 text-[12.5px] leading-relaxed text-sub">
-                    This page answers <em>when</em>. The vidhi, the samagri,
-                    the katha and the corrections live in the guide — and they
-                    do not change from one {kindWord} to the next. Timing data
-                    carries no tag and no score; the ritual itself is
-                    classified step by step there.
+                    This page answers <em>when</em>. The vidhi, the samagri, the
+                    katha and the corrections live in the guide — and they do
+                    not change from one {kindWord} to the next. Timing data
+                    carries no tag and no score; the ritual itself is classified
+                    step by step there.
                   </p>
                 </div>
                 <Link
@@ -666,8 +692,8 @@ export default async function ObservancePage({ params }: Props) {
                   Every {o.series} in {year}
                 </h2>
                 <p className="mt-1 text-[12.5px] text-sub">
-                  {mates.length} dates this year. Each has its own name and
-                  its own timings.
+                  {mates.length} dates this year. Each has its own name and its
+                  own timings.
                 </p>
               </div>
               <OccurrenceStrip
@@ -793,7 +819,10 @@ function ObservanceSidebar({
   const glance = isVrat
     ? [
         { key: "Fast length", value: parana ? "~26 hours" : "One day" },
-        { key: "Grains", value: isEkadashi ? "Avoided" : "As your family keeps it" },
+        {
+          key: "Grains",
+          value: isEkadashi ? "Avoided" : "As your family keeps it",
+        },
         { key: "Water", value: isEkadashi ? "Permitted" : "Permitted" },
         { key: "Nirjala", value: "Optional" },
         { key: "Pandit needed", value: "No" },
@@ -844,8 +873,7 @@ function ObservanceSidebar({
       <NoTagNote>
         This is a <b>Panchang page</b>. It carries computed dates and timings,
         so it takes no Dharma/Pratha/Bhranti tag and no Confidence Score. The
-        claims about how to observe are tagged and scored — on the ritual
-        guide.
+        claims about how to observe are tagged and scored — on the ritual guide.
       </NoTagNote>
 
       <SidebarCta
@@ -911,11 +939,11 @@ function quickAnswers({
       q: `Do I fast on ${fmtShort(o.date)} or the day after?`,
       a: (
         <>
-          <b>{fmtShort(o.date)}</b>, if you follow the Smarta convention —
-          which most households without a formal sampradaya affiliation do.
-          Vaishnava observers follow a different rule for the same tithi and
-          may fast on <b>{fmtShort(addDays(o.date, 1))}</b>. Both are correct
-          within their frameworks.
+          <b>{fmtShort(o.date)}</b>, if you follow the Smarta convention — which
+          most households without a formal sampradaya affiliation do. Vaishnava
+          observers follow a different rule for the same tithi and may fast on{" "}
+          <b>{fmtShort(addDays(o.date, 1))}</b>. Both are correct within their
+          frameworks.
         </>
       ),
     });
@@ -926,10 +954,10 @@ function quickAnswers({
       q: "What if I wake up after the parana window has closed?",
       a: (
         <>
-          Break the fast anyway, as soon as you can. The tradition treats a
-          late parana as an imperfect observance, not a void one — and there
-          is no penance attached. <b>Set an alarm next time.</b> That is the
-          whole remedy.
+          Break the fast anyway, as soon as you can. The tradition treats a late
+          parana as an imperfect observance, not a void one — and there is no
+          penance attached. <b>Set an alarm next time.</b> That is the whole
+          remedy.
         </>
       ),
     });
@@ -940,8 +968,8 @@ function quickAnswers({
       q: "Can I drink water during the fast?",
       a: isEkadashi ? (
         <>
-          Yes. Nirjala — without water — is one form some observers choose,
-          but it is not what the Ekadashi vrat asks for.{" "}
+          Yes. Nirjala — without water — is one form some observers choose, but
+          it is not what the Ekadashi vrat asks for.{" "}
           <b>Fruit, milk and water are permitted</b> in the widely observed
           form. The rule that matters is the grain rule.
         </>
@@ -978,9 +1006,9 @@ function quickAnswers({
     q: "Why does the date differ between apps?",
     a: (
       <>
-        A tithi starts at a fixed moment, but the Hindu day starts at sunrise
-        — and sunrise differs by city. A tithi beginning before sunrise in
-        Delhi may begin after it in Chennai, moving the date by a day.{" "}
+        A tithi starts at a fixed moment, but the Hindu day starts at sunrise —
+        and sunrise differs by city. A tithi beginning before sunrise in Delhi
+        may begin after it in Chennai, moving the date by a day.{" "}
         <b>Set your city above</b> and the page recomputes.
       </>
     ),

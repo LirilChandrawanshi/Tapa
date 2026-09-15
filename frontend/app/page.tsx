@@ -72,12 +72,15 @@ export default async function Home() {
       {shows("launch-bar") && <LaunchBar section={sections["launch-bar"]} />}
 
       {/* 4 — HERO (+ inline panchang card) */}
-      {hero.length > 0 ? (
+      {hero.length > 0 || home?.heroOccasion ? (
         <HomeHero
           cards={hero}
           today={now}
           panchangSlot={panchangSlot}
           section={sections["hero-chrome"]}
+          occasion={home?.heroOccasion}
+          occasionSection={sections["hero-occasion"]}
+          kitSection={sections["hero-kit"]}
         />
       ) : (
         <HomeHeroFallback

@@ -24,6 +24,8 @@ export interface HomeCard {
   dpbScore?: number | null;
   /** Whether the guide actually has an audio recording to jump to. */
   hasAudio?: boolean;
+  /** Resolved server-side: own hero image → linked date's imagery → null. */
+  imageId?: string | null;
 }
 
 export interface HomeCounts {
@@ -84,12 +86,34 @@ export interface HomePromo {
 /** Live promos grouped by slot. Absent slots simply have nothing in them. */
 export type HomePromos = Partial<Record<PromoPlacement, HomePromo[]>>;
 
+/**
+ * The occasion leading the hero — today's festival, or one close enough ahead
+ * to be worth preparing for. Fully resolved server-side, including `href`,
+ * which is the guide's canonical path when one is linked and the occasion's own
+ * page when it is not.
+ */
+export interface HeroOccasion {
+  slug: string;
+  name: string;
+  nameHi?: string | null;
+  date: string;
+  tithiLabel?: string | null;
+  blurb?: string | null;
+  deity?: string | null;
+  countdownDays: number;
+  verified?: boolean;
+  articleSlug?: string | null;
+  href: string;
+}
+
 export interface HomePayload {
   hero: HomeCard[];
   panchangToday: DayPayload | null;
   nextObservances: UpcomingObservance[];
   guidesRail: HomeCard[];
   counts: HomeCounts;
+  /** Null when nothing is close enough, or the slide is switched off. */
+  heroOccasion: HeroOccasion | null;
   sections: HomeSections;
   promos: HomePromos;
   flags: HomeFlags;
@@ -183,6 +207,7 @@ export async function fetchHomeSafe(): Promise<HomePayload | null> {
             ? countsRaw.glossaryTerms
             : undefined,
       },
+      heroOccasion: asOccasion(record.heroOccasion),
       sections: asSections(record.sections),
       promos: asPromos(record.promos),
       flags: {
@@ -220,6 +245,16 @@ function asSections(raw: unknown): HomeSections {
     };
   }
   return out;
+}
+
+/** Shapes the hero occasion, or null when the payload has none. */
+function asOccasion(raw: unknown): HeroOccasion | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  if (typeof o.slug !== "string" || typeof o.name !== "string" || typeof o.href !== "string") {
+    return null;
+  }
+  return o as unknown as HeroOccasion;
 }
 
 /** Shapes the payload's `promos` map, dropping anything malformed. */

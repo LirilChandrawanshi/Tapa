@@ -8,6 +8,7 @@ import co.thetapa.panchang.PanchangDay;
 import co.thetapa.panchang.PanchangDayRepository;
 import co.thetapa.ritualcard.PanchangDayUpdatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +55,7 @@ public class AdminPanchangController {
     }
 
     /** Upsert one day (date+city is the natural key); verified flag taken as sent. */
+    @CacheEvict(value = {"home", "deity-assignments"}, allEntries = true)
     @PutMapping("/panchang/days/{date}")
     public ApiResponse<PanchangDay> upsertDay(
         @PathVariable LocalDate date,
@@ -65,6 +67,7 @@ public class AdminPanchangController {
     }
 
     /** Bulk JSON import — an array of day documents, each carrying its own date. */
+    @CacheEvict(value = {"home", "deity-assignments"}, allEntries = true)
     @PostMapping("/panchang/days/import")
     public ApiResponse<Map<String, Object>> importDays(@RequestBody List<PanchangDay> body) {
         int imported = 0;
@@ -106,6 +109,7 @@ public class AdminPanchangController {
             LocalDate.of(y, 1, 1), LocalDate.of(y, 12, 31)));
     }
 
+    @CacheEvict(value = {"home", "deity-assignments"}, allEntries = true)
     @PutMapping("/observances/{slug}")
     public ApiResponse<Observance> upsertObservance(@PathVariable String slug, @RequestBody Observance body) {
         body.setSlug(slug);
@@ -119,6 +123,7 @@ public class AdminPanchangController {
         return ApiResponse.ok(saved);
     }
 
+    @CacheEvict(value = {"home", "deity-assignments"}, allEntries = true)
     @PostMapping("/observances/{slug}/verify")
     public ApiResponse<Observance> toggleVerify(@PathVariable String slug) {
         Observance observance = observances.findBySlug(slug)

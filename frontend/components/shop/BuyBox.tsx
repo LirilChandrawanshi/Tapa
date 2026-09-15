@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { NotifyMe } from "@/components/home/NotifyMe";
 import {
   addToCart,
   formatDateLong,
@@ -12,7 +13,6 @@ import {
   prebookClosed,
   priceCtaLabel,
   shopTrack,
-  submitNotifyMe,
   termsLine,
   type Product,
 } from "@/lib/shop";
@@ -37,74 +37,6 @@ function availabilityLine(p: Product): { mark: string; text: string } {
     case "SOLD_OUT":
       return { mark: "○", text: "Sold out" };
   }
-}
-
-/** Inline phone capture shared by the notify states (opens-soon / restock / next year). */
-function NotifyInline({
-  buttonLabel,
-  doneCopy,
-  context,
-  articleSlug,
-}: {
-  buttonLabel: string;
-  doneCopy: string;
-  context: "kits" | "restock";
-  articleSlug?: string;
-}) {
-  const [phone, setPhone] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "done" | "error">(
-    "idle",
-  );
-
-  const onNotify = async () => {
-    if (!/^\d{10}$/.test(phone.trim())) {
-      setState("error");
-      return;
-    }
-    setState("sending");
-    const r = await submitNotifyMe(phone, { context, articleSlug });
-    setState(r.ok ? "done" : "error");
-  };
-
-  if (state === "done") {
-    return (
-      <p className="rounded-[10px] border border-dharma-bd bg-dharma-bg px-4 py-[11px] text-[13px] font-semibold text-dharma-fg">
-        ✓ {doneCopy}
-      </p>
-    );
-  }
-
-  return (
-    <div>
-      <div className="flex flex-wrap items-stretch gap-3">
-        <input
-          type="tel"
-          inputMode="numeric"
-          maxLength={10}
-          placeholder="10-digit mobile number"
-          value={phone}
-          onChange={(e) => {
-            setPhone(e.target.value.replace(/\D/g, ""));
-            if (state === "error") setState("idle");
-          }}
-          className="min-w-0 flex-1 rounded-[10px] border border-border bg-card px-4 py-[11px] text-[14px] text-ink outline-none focus:border-cta"
-        />
-        <button
-          type="button"
-          onClick={onNotify}
-          disabled={state === "sending"}
-          className="rounded-[10px] bg-ink px-6 py-[11px] text-[14px] font-bold whitespace-nowrap text-white disabled:opacity-60"
-        >
-          {state === "sending" ? "Saving…" : buttonLabel}
-        </button>
-      </div>
-      {state === "error" && (
-        <p className="mt-2 text-[12px] text-cta">
-          Enter the 10-digit mobile number you want the message on.
-        </p>
-      )}
-    </div>
-  );
 }
 
 /**
@@ -313,20 +245,22 @@ export function BuyBox({
           <p className="mb-2 text-[12px] font-semibold text-sub">
             Want a message when next year&apos;s kit opens?
           </p>
-          <NotifyInline
-            buttonLabel="Notify me"
-            doneCopy="Noted. We'll message you when next year's pre-booking opens."
+          <NotifyMe
+            tone="light"
             context="kits"
             articleSlug={p.slug}
+            doneCopy="Noted. We'll message you when next year's pre-booking opens."
+            note="One WhatsApp message when next year's pre-booking opens. Nothing else."
           />
         </div>
       )}
 
       {p.availability === "COMING_SOON" && (
-        <NotifyInline
-          buttonLabel="Notify me"
-          doneCopy="Noted. We'll message you the moment this opens."
+        <NotifyMe
+          tone="light"
           context="kits"
+          articleSlug={p.slug}
+          doneCopy="Noted. We'll message you the moment this opens."
         />
       )}
 
@@ -338,11 +272,12 @@ export function BuyBox({
             </strong>{" "}
             This batch is gone.
           </p>
-          <NotifyInline
-            buttonLabel="Notify me"
-            doneCopy="Noted. We'll message you the moment this is back."
+          <NotifyMe
+            tone="light"
             context="restock"
             articleSlug={p.slug}
+            doneCopy="Noted. We'll message you the moment this is back."
+            note="One WhatsApp message when it's back in stock. Nothing else."
           />
           <Link
             href={guideHref}

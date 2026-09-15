@@ -24,6 +24,10 @@ public class CacheConfig {
             .expireAfterWrite(Duration.ofHours(1)).maximumSize(5).build());
         manager.registerCustomCache("home-sections", Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(5)).maximumSize(10).build());
+        manager.registerCustomCache("deity-images", Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofMinutes(5)).maximumSize(10).build());
+        manager.registerCustomCache("deity-assignments", Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofMinutes(5)).maximumSize(10).build());
         return manager;
     }
 }

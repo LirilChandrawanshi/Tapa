@@ -47,6 +47,30 @@ final class HomeSectionSeed {
                   "audioCta", "🎧 Listen instead"),
                 List.of()),
 
+            section("hero-occasion", "Hero — the occasion slide",
+                f("enabled", "true",
+                  // How far ahead an occasion may lead the hero. 0 = the day
+                  // itself only; 1 also gives tomorrow's festival the morning
+                  // before, which is when people actually prepare.
+                  "leadDays", "1",
+                  "todayLabel", "Today",
+                  "tomorrowLabel", "Tomorrow",
+                  // {n} is replaced with the number of days
+                  "soonLabel", "In {n} days",
+                  "ctaGuide", "Read the guide ›",
+                  "ctaTimings", "See the timings ›",
+                  "secondaryCta", "☀ Today's Panchang"),
+                List.of()),
+
+            section("hero-kit", "Hero — the kit slide",
+                f("enabled", "true",
+                  "eyebrow", "Ritual Pujans · Pre-booking open",
+                  "bodyTail", "everything the vidhi calls for, sourced and sealed,"
+                      + " with the guide attached.",
+                  "primaryCta", "Pre-book the kit ›",
+                  "secondaryCta", "📖 Read the guide first"),
+                List.of()),
+
             section("category-spotlight", "Dharmic Concepts spotlight",
                 f("eyebrow", "Dharmic Concepts · Materials",
                   "title", "Why is bilva dear to Mahadev?",

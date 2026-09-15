@@ -13,12 +13,15 @@ export function OtpBottomSheet({
   open,
   context,
   heading,
+  dismissLabel,
   onSuccess,
   onClose,
 }: {
   open: boolean;
   context: OtpContext;
   heading?: string;
+  /** Overrides the context's default "Continue without…" copy. */
+  dismissLabel?: string;
   onSuccess: (user: AuthUser) => void;
   onClose: () => void;
 }) {
@@ -54,6 +57,7 @@ export function OtpBottomSheet({
         <OtpFlow
           context={context}
           heading={heading}
+          dismissLabel={dismissLabel}
           onSuccess={onSuccess}
           onDismiss={onClose}
         />

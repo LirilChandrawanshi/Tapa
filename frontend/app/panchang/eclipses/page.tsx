@@ -6,10 +6,16 @@ import {
   SourceStripBlock,
   TimingDataTag,
 } from "@/components/panchang/DataMeta";
-import { CONTROL_H,
-  ControlBar, ControlSep } from "@/components/panchang/ControlBar";
+import {
+  CONTROL_H,
+  ControlBar,
+  ControlSep,
+} from "@/components/panchang/ControlBar";
 import { CrumbActions } from "@/components/panchang/CrumbActions";
-import { EclipseCard, VisibilityBadge } from "@/components/panchang/EclipseCard";
+import {
+  EclipseCard,
+  VisibilityBadge,
+} from "@/components/panchang/EclipseCard";
 import { JumpChips } from "@/components/panchang/JumpChips";
 import { ConventionToggle } from "@/components/panchang/ConventionToggle";
 import {
@@ -20,10 +26,7 @@ import { PanchangShell } from "@/components/panchang/PanchangShell";
 import { PanchangSubnav } from "@/components/panchang/PanchangSubnav";
 import { RelatedGrid } from "@/components/panchang/RelatedGrid";
 import { RevenueBand } from "@/components/panchang/RevenueBand";
-import {
-  AtAGlance,
-  SidebarCta,
-} from "@/components/panchang/SidebarCards";
+import { AtAGlance, SidebarCta } from "@/components/panchang/SidebarCards";
 import {
   StickyActionBar,
   StickyLabel,
@@ -80,7 +83,9 @@ export default async function EclipsesPage() {
   );
 
   const solar = eclipses.filter((u) => /surya|solar/i.test(u.observance.name));
-  const lunar = eclipses.filter((u) => /chandra|lunar/i.test(u.observance.name));
+  const lunar = eclipses.filter((u) =>
+    /chandra|lunar/i.test(u.observance.name),
+  );
 
   const glance = [
     ...eclipses.map((u) => ({
@@ -98,11 +103,11 @@ export default async function EclipsesPage() {
           { label: "Panchang", href: "/panchang" },
           { label: "Eclipses" },
         ]}
-        actions={<CrumbActions title={`The ${year} eclipses`} />}
       />
 
       <CategoryHero
         variant="pa"
+        actions={<CrumbActions title={`The ${year} eclipses`} tone="hero" />}
         eyebrow="Panchang · Eclipses"
         title="Eclipses & Sutak: visibility decides everything"
         description="Grahan timings are pure astronomy — but what you observe depends entirely on whether the eclipse is visible from your city. That one rule resolves most confusion."
@@ -120,8 +125,8 @@ export default async function EclipsesPage() {
               ☾ Timing data · No tag, no score
             </p>
             <p className="text-[13px] leading-relaxed text-hero-text/80">
-              If an eclipse is not visible from your city, tradition holds
-              that no Sutak applies there — however dramatic the headlines. An
+              If an eclipse is not visible from your city, tradition holds that
+              no Sutak applies there — however dramatic the headlines. An
               eclipse over the Pacific changes nothing in {CITY_LABEL}.
             </p>
           </div>
@@ -171,13 +176,17 @@ export default async function EclipsesPage() {
                 tone="wa"
               />
               {glance.length > 1 && (
-                <AtAGlance heading={`At a glance · ${CITY_LABEL}`} rows={glance} />
+                <AtAGlance
+                  heading={`At a glance · ${CITY_LABEL}`}
+                  rows={glance}
+                />
               )}
               <NoTagNote>
-                Panchang carries <b>no Dharma or Pratha tag and no Confidence
-                Score</b> — a date is not a ritual-authority claim. The
-                corrections below are Bhranti badges: they correct a fear,
-                they do not classify the page.
+                Panchang carries{" "}
+                <b>no Dharma or Pratha tag and no Confidence Score</b> — a date
+                is not a ritual-authority claim. The corrections below are
+                Bhranti badges: they correct a fear, they do not classify the
+                page.
               </NoTagNote>
             </>
           }
@@ -234,7 +243,10 @@ export default async function EclipsesPage() {
           </article>
 
           {/* The rule, framed */}
-          <section id="rule" className="hero-pa mt-8 scroll-mt-[160px] rounded-[15px] p-6 md:p-7">
+          <section
+            id="rule"
+            className="hero-pa mt-8 scroll-mt-[160px] rounded-[15px] p-6 md:p-7"
+          >
             <p className="mb-1 text-[10px] font-bold tracking-[1px] text-eyebrow-dark uppercase">
               The rule that decides everything
             </p>
@@ -328,8 +340,8 @@ export default async function EclipsesPage() {
             <div className="space-y-4 text-[15px] leading-[1.85] text-body">
               <p>
                 If you have a ritual, a vrat or a booking around either date,
-                the only thing that changes anything for you in India is
-                whether the eclipse is actually visible from your city.
+                the only thing that changes anything for you in India is whether
+                the eclipse is actually visible from your city.
               </p>
               <p>
                 <strong>
@@ -345,9 +357,9 @@ export default async function EclipsesPage() {
           {eclipses.length === 0 && (
             <div className="mt-8 rounded-[13px] border border-data-bd bg-data-bg px-5 py-4">
               <p className="text-[12.5px] leading-relaxed text-data-fg">
-                <b>No grahan is seeded for {year} yet.</b> Each eclipse gets
-                its own card here with its visibility and Sutak window once
-                the dates are entered and checked — we do not generate them.
+                <b>No grahan is seeded for {year} yet.</b> Each eclipse gets its
+                own card here with its visibility and Sutak window once the
+                dates are entered and checked — we do not generate them.
               </p>
             </div>
           )}

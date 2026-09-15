@@ -7,6 +7,7 @@ import { HomeHeroBackdrop } from "@/components/home/HeroBackdrop";
 import { fetchArticle } from "@/lib/api";
 import {
   articleHref,
+  deityHue,
   hueFromClass,
   formatObservanceDate,
 } from "@/lib/articleExtras";
@@ -14,6 +15,7 @@ import {
   badgeTagOf,
   cardHref,
   sectionText,
+  type HeroOccasion,
   type HomeCard,
   type HomeSection,
 } from "@/lib/homeExtras";
@@ -126,6 +128,17 @@ function useSlideSwipe(total: number, setIndex: (next: (i: number) => number) =>
   };
 }
 
+/**
+ * "Today" / "Tomorrow" / "In 6 days" — the phrasing an editor set, with {n}
+ * standing in for the count. A calendar product should say how far away a date
+ * is, not make the reader work it out.
+ */
+function countdownLabel(days: number, section: HomeSection | undefined): string {
+  if (days <= 0) return sectionText(section, "todayLabel", "Today");
+  if (days === 1) return sectionText(section, "tomorrowLabel", "Tomorrow");
+  return sectionText(section, "soonLabel", "In {n} days").replace("{n}", String(days));
+}
+
 interface FeaturedKit {
   product: Product;
   guideHref: string;
@@ -147,6 +160,9 @@ export function HomeHero({
   today,
   panchangSlot,
   section,
+  occasion,
+  occasionSection,
+  kitSection,
 }: {
   cards: HomeCard[];
   today: string;
@@ -154,14 +170,25 @@ export function HomeHero({
   panchangSlot?: ReactNode;
   /** CMS copy for the hero's labels and buttons (`hero-chrome`). */
   section?: HomeSection;
+  /** The occasion leading the hero, when one is close enough. */
+  occasion?: HeroOccasion | null;
+  /** CMS copy for the occasion slide (`hero-occasion`). */
+  occasionSection?: HomeSection;
+  /** CMS copy for the kit slide (`hero-kit`). */
+  kitSection?: HomeSection;
 }) {
   const [index, setIndex] = useState(0);
   const [kit, setKit] = useState<FeaturedKit | null>(null);
+  // "false" in the CMS turns the kit slide off without a deploy
+  const kitEnabled =
+    sectionText(kitSection, "enabled", "true").toLowerCase() !== "false";
+  const lead = occasion ?? null;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        if (kitEnabled === false) return;
         const flagsRes = await fetch("/api/v1/flags");
         if (!flagsRes.ok) return;
         const flagsBody = (await flagsRes.json()) as {
@@ -195,47 +222,107 @@ export function HomeHero({
     return () => {
       cancelled = true;
     };
-  }, [today]);
+  }, [today, kitEnabled]);
 
-  const total = cards.length + (kit ? 1 : 0);
+  const leadCount = lead ? 1 : 0;
+  const total = leadCount + cards.length + (kit ? 1 : 0);
   const swipe = useSlideSwipe(total, setIndex);
-  const safeIndex = Math.min(index, total - 1);
-  const isKitSlide = kit !== null && safeIndex === cards.length;
-  const card = isKitSlide ? null : cards[Math.min(safeIndex, cards.length - 1)];
-  if (!card && !isKitSlide) return null;
+  const safeIndex = Math.min(index, Math.max(0, total - 1));
+  const isLeadSlide = lead !== null && safeIndex === 0;
+  const isKitSlide = kit !== null && safeIndex === leadCount + cards.length;
+  const card =
+    isLeadSlide || isKitSlide
+      ? null
+      : cards[Math.min(safeIndex - leadCount, cards.length - 1)];
+  if (!card && !isLeadSlide && !isKitSlide) return null;
+
+  const dot = (i: number, label: string) => (
+    <button
+      key={label}
+      type="button"
+      aria-label={`Show slide ${i + 1} of ${total}: ${label}`}
+      aria-current={i === safeIndex}
+      onClick={() => setIndex(i)}
+      className={`h-[7px] rounded-full transition-all ${
+        i === safeIndex
+          ? "w-[22px] bg-hero-text"
+          : "w-[7px] bg-hero-text/35 hover:bg-hero-text/60"
+      }`}
+    />
+  );
 
   const dots =
     total > 1 ? (
       <div className="mt-8 flex items-center gap-[7px]">
-        {cards.map((c, i) => (
-          <button
-            key={c.slug}
-            type="button"
-            aria-label={`Show featured ritual ${i + 1} of ${total}: ${c.title}`}
-            aria-current={i === safeIndex}
-            onClick={() => setIndex(i)}
-            className={`h-[7px] rounded-full transition-all ${
-              i === safeIndex
-                ? "w-[22px] bg-hero-text"
-                : "w-[7px] bg-hero-text/35 hover:bg-hero-text/60"
-            }`}
-          />
-        ))}
-        {kit && (
-          <button
-            type="button"
-            aria-label={`Show featured kit: ${kit.product.title}`}
-            aria-current={isKitSlide}
-            onClick={() => setIndex(cards.length)}
-            className={`h-[7px] rounded-full transition-all ${
-              isKitSlide
-                ? "w-[22px] bg-hero-text"
-                : "w-[7px] bg-hero-text/35 hover:bg-hero-text/60"
-            }`}
-          />
-        )}
+        {lead && dot(0, lead.name)}
+        {cards.map((c, i) => dot(leadCount + i, c.title))}
+        {kit && dot(leadCount + cards.length, kit.product.title)}
       </div>
     ) : null;
+
+  if (isLeadSlide && lead) {
+    const days = lead.countdownDays;
+    const hasGuide = Boolean(lead.articleSlug);
+    return (
+      <section
+        {...swipe}
+        className={`h-${deityHue(lead.deity ?? undefined)} hero-scene relative overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-eyebrow-dark/60`}
+      >
+        <HomeHeroBackdrop />
+        <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
+          <div>
+            <p className="anim-rise mb-3 flex flex-wrap items-center gap-x-2 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
+              <span className="rounded-[5px] bg-eyebrow-dark/15 px-[7px] py-[3px]">
+                {countdownLabel(days, occasionSection)}
+              </span>
+              <span>{formatObservanceDate(lead.date)}</span>
+            </p>
+            {lead.nameHi && (
+              <p className="anim-rise font-devanagari mb-1 text-[19px] leading-tight text-hero-text/70 md:text-[22px]">
+                {lead.nameHi}
+              </p>
+            )}
+            <h1 className="anim-rise-lcp max-w-[760px] text-[30px] leading-tight font-bold tracking-[-0.6px] text-hero-text md:text-[42px]">
+              {lead.name}
+            </h1>
+            {lead.tithiLabel && (
+              <p className="anim-rise anim-d2 mt-2 text-[12.5px] font-semibold tracking-[0.3px] text-eyebrow-dark">
+                {lead.tithiLabel}
+              </p>
+            )}
+            {lead.blurb && (
+              <p className="anim-rise anim-d2 mt-3 max-w-[620px] text-[14.5px] leading-relaxed text-hero-text/75 md:text-[15.5px]">
+                {lead.blurb}
+              </p>
+            )}
+            <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
+              {sectionText(section, "trustLine", TRUST_LINE)}
+            </p>
+
+            <div className="anim-rise anim-d4 mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                href={lead.href}
+                className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
+              >
+                {hasGuide
+                  ? sectionText(occasionSection, "ctaGuide", "Read the guide ›")
+                  : sectionText(occasionSection, "ctaTimings", "See the timings ›")}
+              </Link>
+              <Link
+                href={`/panchang/o/${lead.slug}`}
+                className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
+              >
+                {sectionText(occasionSection, "secondaryCta", "\u2600 Today\u2019s Panchang")}
+              </Link>
+            </div>
+
+            {dots}
+          </div>
+          {panchangSlot}
+        </div>
+      </section>
+    );
+  }
 
   if (isKitSlide && kit) {
     const p = kit.product;
@@ -248,7 +335,7 @@ export function HomeHero({
         <div className="relative mx-auto grid max-w-[1280px] gap-8 px-4 py-12 md:grid-cols-[1.15fr_.85fr] md:items-center md:px-10 md:py-16">
           <div>
             <p className="anim-rise mb-3 text-[10px] font-bold tracking-[1.2px] text-eyebrow-dark uppercase">
-              Ritual Pujans · Pre-booking open
+              {sectionText(kitSection, "eyebrow", "Ritual Pujans · Pre-booking open")}
             </p>
             {p.orderByDate && (
               <span className="mb-4 inline-flex items-center gap-[6px] rounded-[6px] border border-white/30 bg-white/15 px-[10px] py-[4px] text-[10.5px] font-bold tracking-[0.6px] text-hero-text">
@@ -262,8 +349,12 @@ export function HomeHero({
               {p.festivalDate
                 ? `For ${formatDateLong(p.festivalDate)} · `
                 : ""}
-              {formatPaise(p.pricePaise)} — everything the vidhi calls for,
-              sourced and sealed, with the guide attached.
+              {formatPaise(p.pricePaise)} —{" "}
+              {sectionText(
+                kitSection,
+                "bodyTail",
+                "everything the vidhi calls for, sourced and sealed, with the guide attached.",
+              )}
             </p>
             <p className="anim-rise anim-d3 mt-4 text-[11.5px] tracking-[0.3px] text-hero-text/55">
               {sectionText(section, "trustLine", TRUST_LINE)}
@@ -274,13 +365,13 @@ export function HomeHero({
                 href={`/ritual-pujans/p/${p.slug}`}
                 className="rounded-[10px] bg-cta px-5 py-[11px] text-[13px] font-bold text-white hover:opacity-90"
               >
-                Pre-book the kit ›
+                {sectionText(kitSection, "primaryCta", "Pre-book the kit ›")}
               </Link>
               <Link
                 href={kit.guideHref}
                 className="rounded-[10px] border border-white/30 bg-white/10 px-5 py-[11px] text-[13px] font-bold text-hero-text hover:bg-white/20"
               >
-                📖 Read the guide first
+                {sectionText(kitSection, "secondaryCta", "\u{1F4D6} Read the guide first")}
               </Link>
             </div>
 

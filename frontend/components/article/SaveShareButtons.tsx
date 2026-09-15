@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  ACTION_BTN,
+  type ActionTone,
+  actionSkin,
+} from "@/components/article/actionTone";
 import { OtpBottomSheet } from "@/components/auth/OtpBottomSheet";
 import { track } from "@/lib/analytics";
-import {
-  getMe,
-  getSavedRituals,
-  saveRitual,
-  unsaveRitual,
-} from "@/lib/auth";
+import { getMe, getSavedRituals, saveRitual, unsaveRitual } from "@/lib/auth";
 
 /**
  * Save + Share behavior shared by the breadcrumb buttons and the utility
@@ -136,27 +136,29 @@ export function useSaveShare(slug: string, title: string) {
   return { saved, copied, onSave, onShare, flash, extras };
 }
 
-/** Save + Share controls in the breadcrumb row (all breakpoints). */
+/** Save + Share controls, either in a light bar or over a dark hero. */
 export function SaveShareButtons({
   slug,
   title,
+  tone = "bar",
 }: {
   slug: string;
   title: string;
+  tone?: ActionTone;
 }) {
   const { saved, copied, onSave, onShare, extras } = useSaveShare(slug, title);
-
-  const btn =
-    "flex h-[35px] items-center gap-[6px] rounded-lg border-[1.5px] px-[14px] text-[13px] hover:border-cta";
+  const skin = actionSkin(tone);
 
   return (
     <>
       <button
         type="button"
-        className={`${btn} ${
+        className={`${ACTION_BTN} ${
           saved
-            ? "border-cta bg-bhranti-bg font-bold text-cta"
-            : "border-border bg-card text-body"
+            ? tone === "hero"
+              ? "border-white/60 bg-white/20 font-bold text-hero-text backdrop-blur"
+              : "border-cta bg-bhranti-bg font-bold text-cta"
+            : skin
         }`}
         aria-pressed={saved}
         onClick={() => void onSave()}
@@ -166,7 +168,11 @@ export function SaveShareButtons({
         </span>{" "}
         {saved ? "Saved" : "Save"}
       </button>
-      <button type="button" className={`${btn} border-border bg-card text-body`} onClick={() => void onShare()}>
+      <button
+        type="button"
+        className={`${ACTION_BTN} ${skin}`}
+        onClick={() => void onShare()}
+      >
         <span aria-hidden>↗</span> {copied ? "Copied" : "Share"}
       </button>
       {extras}

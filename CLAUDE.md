@@ -28,8 +28,18 @@ dharmic concepts, glossary, search, accounts, ritual-card PDFs, custom admin).
 - Schema must survive Phase 2+ (commerce, Circle) without destructive migrations.
 
 ## Dev
-- No Docker on this machine: `make db` (local mongod on .data/mongo), `make backend`,
-  `make frontend`. Compose files exist for portable/prod use.
+- Whole stack, one handle: `make up` / `make down` / `make restart` / `make status` /
+  `make logs` (or `make logs-frontend`). Detached; logs in `.data/dev/logs`.
+- mongod here is a **root LaunchDaemon** (homebrew.mxcl.mongodb-community) on
+  `/opt/homebrew/var/mongodb` — that is where the dev data lives. `make down`
+  leaves it running on purpose; `scripts/dev.sh down --with-db` cycles it (sudo).
+  Note `make db` starts a *different*, empty DB on `.data/mongo` — only useful on
+  a machine with no homebrew mongod.
+- Foreground, one service per terminal: `make backend`, `make frontend`.
+  Compose files exist for portable/prod use.
+- `make build` / `make test` build the frontend into `.next-build` (via
+  `NEXT_DIST_DIR`), so a verification build cannot clobber a running dev server's
+  `.next` — that clobber shows up as `Cannot find module './NNNN.js'`.
 - Dev login: any 10-digit number + OTP `000000` (works only while ConsoleSmsProvider
   is active — dead the moment a real SMS provider bean exists). `9876543210` = admin.
 - Tests: `cd backend && mvn test` (55 unit tests, no Docker needed);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { MythStrip } from "@/components/MythStrip";
+import { mediaUrl } from "@/lib/media";
 
 export type DeityHue =
   | "teej"
@@ -17,6 +18,7 @@ export type DeityHue =
 
 export function ContentCard({
   hue,
+  imageId,
   href = "#",
   topLeft,
   topRight,
@@ -28,6 +30,8 @@ export function ContentCard({
   myth,
 }: {
   hue: DeityHue;
+  /** Media id for the header band. The hue shows through when absent. */
+  imageId?: string | null;
   href?: string;
   /** Slot at the top-left of the hue header — usually a CountdownPill. */
   topLeft?: ReactNode;
@@ -50,11 +54,28 @@ export function ContentCard({
       className="group hover-lift reveal flex flex-col overflow-hidden rounded-[15px] border border-border bg-card hover:border-cta"
     >
       <div
-        className={`h-${hue} flex h-[100px] items-start justify-between p-[13px]`}
+        className={`h-${hue} relative flex h-[100px] items-start justify-between overflow-hidden p-[13px]`}
       >
-        <span>{topLeft}</span>
+        {imageId && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={mediaUrl(imageId)}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.06]"
+            />
+            {/* the pills sit on this band, so it needs a floor of contrast */}
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/10 to-black/25"
+            />
+          </>
+        )}
+        <span className="relative">{topLeft}</span>
         {topRight && (
-          <span className="rounded-[5px] border border-white/30 bg-white/20 px-[9px] py-[3px] text-[9.5px] font-bold tracking-[0.4px] text-white">
+          <span className="relative rounded-[5px] border border-white/30 bg-white/20 px-[9px] py-[3px] text-[9.5px] font-bold tracking-[0.4px] text-white">
             {topRight}
           </span>
         )}

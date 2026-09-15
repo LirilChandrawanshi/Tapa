@@ -19,12 +19,15 @@ public class PanchangService {
     private final PanchangProvider provider;
     private final PanchangDayRepository days;
     private final ObservanceRepository observances;
+    private final co.thetapa.imagery.DeityImageService imagery;
 
     public PanchangService(PanchangProvider provider, PanchangDayRepository days,
-                           ObservanceRepository observances) {
+                           ObservanceRepository observances,
+                           co.thetapa.imagery.DeityImageService imagery) {
         this.provider = provider;
         this.days = days;
         this.observances = observances;
+        this.imagery = imagery;
     }
 
     /**
@@ -57,48 +60,55 @@ public class PanchangService {
         LocalDate today = LocalDate.now(IST);
         return observances.findByDateGreaterThanEqualOrderByDateAsc(today).stream()
             .limit(Math.min(limit, 30))
-            .map(o -> UpcomingObservance.of(o, today))
+            .map(o -> UpcomingObservance.of(o, today, imagery.imageFor(o)))
             .toList();
     }
 
     public List<UpcomingObservance> calendar(YearMonth month) {
         LocalDate today = LocalDate.now(IST);
         return provider.observances(month).stream()
-            .map(o -> UpcomingObservance.of(o, today))
+            .map(o -> UpcomingObservance.of(o, today, imagery.imageFor(o)))
             .toList();
     }
 
     public List<UpcomingObservance> byType(Observance.Type type) {
         LocalDate today = LocalDate.now(IST);
         return observances.findByTypeAndDateGreaterThanEqualOrderByDateAsc(type, today).stream()
-            .map(o -> UpcomingObservance.of(o, today))
+            .map(o -> UpcomingObservance.of(o, today, imagery.imageFor(o)))
             .toList();
     }
 
     public List<UpcomingObservance> ekadashi() {
         LocalDate today = LocalDate.now(IST);
         return observances.findBySeriesOrderByDateAsc("ekadashi").stream()
-            .map(o -> UpcomingObservance.of(o, today))
+            .map(o -> UpcomingObservance.of(o, today, imagery.imageFor(o)))
             .toList();
     }
 
     public Map<String, Object> festival(String slug) {
         Observance o = observances.findBySlug(slug)
             .orElseThrow(() -> new co.thetapa.common.NotFoundException("observance", slug));
-        return Map.of(
-            "observance", o,
-            "countdownDays", ChronoUnit.DAYS.between(LocalDate.now(IST), o.getDate())
-        );
+        java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
+        out.put("observance", o);
+        out.put("countdownDays", ChronoUnit.DAYS.between(LocalDate.now(IST), o.getDate()));
+        // null when nothing resolves; the page keeps its deity gradient
+        out.put("imageId", imagery.imageFor(o));
+        return out;
     }
 
     public record DayPayload(PanchangDay day, boolean stale, boolean verified) {
     }
 
-    /** Countdown is computed server-side against IST — the pill colour rule lives in the client. */
-    public record UpcomingObservance(Observance observance, long countdownDays) {
+    /**
+     * Countdown is computed server-side against IST — the pill colour rule
+     * lives in the client. {@code imageId} is resolved here too, so every
+     * surface that lists observances shows the same picture for a date without
+     * each one re-deriving the fallback chain.
+     */
+    public record UpcomingObservance(Observance observance, long countdownDays, String imageId) {
 
-        static UpcomingObservance of(Observance o, LocalDate today) {
-            return new UpcomingObservance(o, ChronoUnit.DAYS.between(today, o.getDate()));
+        static UpcomingObservance of(Observance o, LocalDate today, String imageId) {
+            return new UpcomingObservance(o, ChronoUnit.DAYS.between(today, o.getDate()), imageId);
         }
     }
 }
