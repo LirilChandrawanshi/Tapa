@@ -207,11 +207,23 @@ public class BookingService {
     }
 
     private String cityOf(Booking.Address address) {
-        return address == null || address.city() == null ? "delhi-ncr"
-            : address.city().toLowerCase().contains("delhi") || address.city().toLowerCase().contains("noida")
-              || address.city().toLowerCase().contains("gurugram") || address.city().toLowerCase().contains("gurgaon")
-              || address.city().toLowerCase().contains("faridabad") || address.city().toLowerCase().contains("ghaziabad")
-            ? "delhi-ncr" : address.city().toLowerCase();
+        if (address == null || address.city() == null) {
+            return "delhi-ncr";
+        }
+        String city = address.city().toLowerCase();
+        // Map common NCR city/locality names to "delhi-ncr". If the city doesn't match
+        // any known NCR locality, default to "delhi-ncr" rather than passing an unmapped
+        // city that will fail purohit filtering — users booking pujas are almost always
+        // in NCR (the service area), and fuzzy-matching on free-text user input (Rohini,
+        // Dwarka, etc.) is error-prone.
+        if (city.contains("delhi") || city.contains("noida") || city.contains("gurugram")
+            || city.contains("gurgaon") || city.contains("faridabad") || city.contains("ghaziabad")
+            || city.contains("rohini") || city.contains("dwarka") || city.contains("vasant")
+            || city.contains("indirapuram") || city.contains("gurgaon") || city.contains("sector")) {
+            return "delhi-ncr";
+        }
+        // Fallback to delhi-ncr for any unrecognized city; don't pass raw user input.
+        return "delhi-ncr";
     }
 
     String nextBookingNumber() {

@@ -82,6 +82,7 @@ public class RazorpayPaymentProvider implements PaymentProvider {
         clientPayload.put("provider", "razorpay");
         clientPayload.put("keyId", props.keyId());
         clientPayload.put("razorpayOrderId", razorpayOrderId);
+        clientPayload.put("providerRef", razorpayOrderId); // needed for retry payment flow
         clientPayload.put("amountPaise", amountPaise);
         clientPayload.put("currency", "INR");
         clientPayload.put("orderNumber", orderNumber);

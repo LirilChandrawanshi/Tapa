@@ -10,6 +10,22 @@ export function productHref(p: Product): string {
   return `/ritual-pujans/p/${p.slug}`;
 }
 
+const KNOWN_HUE_CLASSES = new Set([
+  "h-shiva",
+  "h-ganesh",
+  "h-devi",
+  "h-vishnu",
+  "h-earth",
+  "h-thread",
+  "h-sanskar",
+  "h-gold",
+]);
+
+/** Falls back to a default gradient so an unrecognized/mistyped hueClass never renders as blank white. */
+function resolveHueClass(hueClass: string): string {
+  return KNOWN_HUE_CLASSES.has(hueClass) ? hueClass : "h-default";
+}
+
 /** Per-card CTA text — the card links to the PDP, where the action happens. */
 function cardCta(p: Product): string {
   switch (p.availability) {
@@ -36,7 +52,7 @@ export function ProductCard({ product: p }: { product: Product }) {
       className="group flex flex-col overflow-hidden rounded-[15px] border border-border bg-card transition-colors hover:border-cta"
     >
       <div
-        className={`${p.hueClass} flex h-[132px] items-start justify-between p-[13px]`}
+        className={`${resolveHueClass(p.hueClass)} flex h-[132px] items-start justify-between p-[13px]`}
       >
         <span className="font-devanagari text-[34px] leading-none text-white/90">
           {p.titleDevanagari}

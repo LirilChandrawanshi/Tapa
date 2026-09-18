@@ -20,4 +20,6 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
     List<Booking> findByStatusOrderByDateAsc(Booking.Status status);
 
     List<Booking> findAllByOrderByCreatedAtDesc(org.springframework.data.domain.Pageable pageable);
+
+    List<Booking> findByPurohitSlugOrderByDateDesc(String purohitSlug);
 }

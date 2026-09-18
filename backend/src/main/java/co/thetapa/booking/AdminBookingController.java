@@ -81,6 +81,11 @@ public class AdminBookingController {
             : bookings.findByStatusOrderByDateAsc(status));
     }
 
+    @GetMapping("/purohits/{slug}/bookings")
+    public ApiResponse<List<Booking>> bookingsForPurohit(@PathVariable String slug) {
+        return ApiResponse.ok(bookings.findByPurohitSlugOrderByDateDesc(slug));
+    }
+
     public record StatusChange(Booking.Status status, String note) {
     }
 

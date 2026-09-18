@@ -68,6 +68,7 @@
 .h-data { background: linear-gradient(150deg, #1b3a52, #0c1a26); }
 .h-sanskar { background: linear-gradient(150deg, #4a2a5c, #241432); }
 .h-gold { background: linear-gradient(150deg, #7a4a12, #2a1408); }
+.h-default { background: linear-gradient(150deg, #2c1c10, #6b4a28); }
 
 /*
  * Category hero gradients — one per parent category (PLP prototype).

@@ -24,13 +24,16 @@ public class BookingController {
     private final BookingService service;
     private final BookingRepository bookings;
     private final co.thetapa.identity.UserRepository users;
+    private final org.springframework.data.mongodb.core.MongoTemplate mongo;
 
     public BookingController(PujaTypeRepository pujaTypes, BookingService service,
-                             BookingRepository bookings, co.thetapa.identity.UserRepository users) {
+                             BookingRepository bookings, co.thetapa.identity.UserRepository users,
+                             org.springframework.data.mongodb.core.MongoTemplate mongo) {
         this.pujaTypes = pujaTypes;
         this.service = service;
         this.bookings = bookings;
         this.users = users;
+        this.mongo = mongo;
     }
 
     @GetMapping("/pujas")
@@ -70,8 +73,21 @@ public class BookingController {
     /** Dev/mock capture; the production gateway webhook replaces this. */
     @PostMapping("/bookings/payments/mock/confirm")
     public ApiResponse<BookingView> mockConfirm(@RequestBody Map<String, Object> payload) {
-        return ApiResponse.ok(BookingView.of(
-            service.confirmPayment((String) payload.get("providerRef"), payload)));
+        String providerRef = (String) payload.get("providerRef");
+        Booking booking = mongo.findOne(
+            org.springframework.data.mongodb.core.query.Query.query(
+                org.springframework.data.mongodb.core.query.Criteria.where("paymentRef").is(providerRef)), Booking.class);
+        if (booking == null) {
+            throw new co.thetapa.common.NotFoundException("booking for payment", providerRef);
+        }
+        // In dev/mock mode, skip actual payment verification and just confirm the booking.
+        // Production uses webhooks (e.g., /api/v1/payments/razorpay/webhook) with real signatures.
+        if (booking.getStatus() != Booking.Status.PENDING_PAYMENT) {
+            return ApiResponse.ok(BookingView.of(booking));
+        }
+        booking.setStatus(Booking.Status.CONFIRMED);
+        booking.setStatusNote("Confirmed · " + booking.getPurohitName() + " will call a day before.");
+        return ApiResponse.ok(BookingView.of(bookings.save(booking)));
     }
 
     @GetMapping("/bookings/{bookingNumber}")
